@@ -42,7 +42,7 @@ Ext.define('Shopware.apps.ByjunoLog.view.detail.Detail', {
    * of the view through Ext.widget('moptPayoneApilogMainDetail')
    * @string
    */
-  alias: 'widget.moptPayoneApilogMainDetail',
+  alias: 'widget.ByjunoApilogMainDetail',
   /**
    * The window uses a border layout, so we need to set
    * a region for the grid panel
@@ -72,8 +72,13 @@ Ext.define('Shopware.apps.ByjunoLog.view.detail.Detail', {
             listeners: {
                 boxready:function (e) {
                     url = 'ByjunoLog/getGridData?id='+me.itemSelected+'&type=request';
-                    ExternalInfoWindow.request({
-                        url:url,
+                    Ext.Ajax.request({
+                        url:'{url controller="ByjunoLog" action="getGridData"}',
+                        method: 'GET',
+                        params: {
+                            id: me.itemSelected,
+                            type: 'request'
+                        },
                         success:function (r) {
                             e.update(r.responseText);
                         }
@@ -91,8 +96,13 @@ Ext.define('Shopware.apps.ByjunoLog.view.detail.Detail', {
             listeners: {
                 boxready:function (e) {
                     url = 'ByjunoLog/getGridData?id='+me.itemSelected+'&type=response';
-                    ExternalInfoWindow.request({
-                        url:url,
+                    Ext.Ajax.request({
+                        url:'{url controller="ByjunoLog" action="getGridData"}',
+                        method: 'GET',
+                        params: {
+                            id: me.itemSelected,
+                            type: 'response'
+                        },
                         success:function (r) {
                             e.update(r.responseText);
                         }
