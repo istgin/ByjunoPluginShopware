@@ -13,14 +13,6 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
     const ORDERSTATUSCANCEL = 4;
     const ORDERSTATUSINPROGRESS = 1;
 
-    public function preDispatch()
-    {
-        /** @var \Shopware\Components\Plugin $plugin */
-        $plugin = $this->get('kernel')->getPlugins()['ByjunoPayments'];
-
-        $this->get('template')->addTemplateDir($plugin->getPath() . '/Resources/views/');
-    }
-
     /**
      * Index action method.
      *

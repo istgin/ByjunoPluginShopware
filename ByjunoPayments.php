@@ -7,10 +7,61 @@ use Shopware\Components\Plugin\Context\ActivateContext;
 use Shopware\Components\Plugin\Context\DeactivateContext;
 use Shopware\Components\Plugin\Context\InstallContext;
 use Shopware\Components\Plugin\Context\UninstallContext;
+use ByjunoPayments\Models\ByjunoTransactions;
 use Shopware\Models\Payment\Payment;
+use Doctrine\ORM\Tools\SchemaTool;
 
 class ByjunoPayments extends Plugin
 {
+
+    /**
+     * @inheritdoc
+     */
+    public static function getSubscribedEvents()
+    {
+        return [
+            'Enlight_Controller_Dispatcher_ControllerPath_Frontend_PaymentInvoice' => 'registerControllerInvoice',
+            'Enlight_Controller_Dispatcher_ControllerPath_Frontend_PaymentInstallment' => 'registerControllerInstallment',
+            'Enlight_Controller_Dispatcher_ControllerPath_Backend_ByjunoTransactions' => 'registerControllerTransactions',
+        ];
+    }
+
+    public function registerControllerTransactions(\Enlight_Event_EventArgs $args)
+    {
+        $this->container->get('Template')->addTemplateDir(
+            $this->getPath() . '/Resources/views/'
+        );
+
+        return $this->getPath() . '/Controllers/Backend/ByjunoTransactions.php';
+    }
+
+    public function registerControllerInstallment(\Enlight_Event_EventArgs $args)
+    {
+        $this->container->get('Template')->addTemplateDir(
+            $this->getPath() . '/Resources/views/'
+        );
+
+        return $this->getPath() . '/Controllers/Frontend/PaymentInstallment.php';
+    }
+
+    public function registerControllerInvoice(\Enlight_Event_EventArgs $args)
+    {
+        $this->container->get('Template')->addTemplateDir(
+            $this->getPath() . '/Resources/views/'
+        );
+
+        return $this->getPath() . '/Controllers/Frontend/PaymentInvoice.php';
+    }
+
+    private function removeSchema()
+    {
+        $tool = new SchemaTool($this->container->get('models'));
+        $classes = [
+            $this->container->get('models')->getClassMetadata(ByjunoTransactions::class)
+        ];
+        $tool->dropSchema($classes);
+    }
+
     /**
      * @param InstallContext $context
      */
@@ -18,6 +69,42 @@ class ByjunoPayments extends Plugin
     {
         /** @var \Shopware\Components\Plugin\PaymentInstaller $installer */
         $installer = $this->container->get('shopware.plugin_payment_installer');
+
+        $tool = new SchemaTool($this->container->get('models'));
+        $classes = [
+            $this->container->get('models')->getClassMetadata(ByjunoTransactions::class)
+        ];
+
+        try {
+            $tool->createSchema($classes);
+        } catch (\Exception $e) {
+
+        }
+
+/*
+
+        $parent = $this->Menu()->findOneBy(array('id' => 65));
+        $item   = $this->createMenuItem(array(
+            'label'  => 'Byjuno',
+            'class'  => 'byjunoicon',
+            'active' => 1,
+            'parent' => $parent,
+        ));
+        $parent = $item;
+        $this->createMenuItem(array(
+            'label'      => 'Byjuno Log',
+            'controller' => 'ByjunoTransactions',
+            'action'     => 'Index',
+            'class'      => 'sprite-cards-stack',
+            'active'     => 1,
+            'parent'     => $parent,
+        ));
+*/
+        $sql = "ALTER TABLE `s_plugin_byjuno_transactions`
+CHANGE COLUMN `xml_request` `xml_request` TEXT CHARACTER SET 'utf8' COLLATE 'utf8_unicode_ci' NOT NULL ,
+CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'utf8_unicode_ci' NOT NULL";
+        Shopware()->Db()->exec($sql);
+
 
         $options = [
             'name' => 'byjuno_payment_invoice',
@@ -47,6 +134,7 @@ class ByjunoPayments extends Plugin
         ];
 
         $installer->createOrUpdate($context->getPlugin(), $options);
+        parent::install($context);
     }
 
     /**
@@ -55,6 +143,11 @@ class ByjunoPayments extends Plugin
     public function uninstall(UninstallContext $context)
     {
         $this->setActiveFlag($context->getPlugin()->getPayments(), false);
+        try {
+            $this->removeSchema();
+        } catch(\Exception $e) {
+
+        }
     }
 
     /**

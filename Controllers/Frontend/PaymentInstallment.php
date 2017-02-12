@@ -7,13 +7,6 @@ class Shopware_Controllers_Frontend_PaymentInstallment extends Shopware_Controll
 {
     const PAYMENTSTATUSPAID = 12;
 
-    public function preDispatch()
-    {
-        /** @var \Shopware\Components\Plugin $plugin */
-        $plugin = $this->get('kernel')->getPlugins()['ByjunoPayments'];
-
-        $this->get('template')->addTemplateDir($plugin->getPath() . '/Resources/views/');
-    }
 
     /**
      * Index action method.
