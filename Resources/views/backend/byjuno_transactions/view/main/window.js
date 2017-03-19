@@ -10,7 +10,7 @@
 //{block name="backend/byjuno_transactions/view/main/window"}
 Ext.define('Shopware.apps.ByjunoTransactions.view.main.Window', {
   extend: 'Enlight.app.Window',
-  title: '{s name=window_title}API-Log{/s}',
+  title: '{s name=window_title}Byjuno transactions log{/s}',
   cls: Ext.baseCSSPrefix + 'log-window',
   alias: 'widget.log-main-window-api',
   border: false,

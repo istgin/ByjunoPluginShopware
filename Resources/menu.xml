@@ -3,12 +3,12 @@
     <entries>
         <entry>
             <name>SloganOfTheDay</name>
-            <label lang="en">Byjuno Log</label>
-            <label lang="de">Byjuno Log</label>
+            <label lang="en">Byjuno Transaction log</label>
+            <label lang="de">Byjuno Transaction log</label>
             <controller>ByjunoTransactions</controller>
             <action>index</action>
             <class>sprite-cards-stack</class>
-            <parent identifiedBy="controller">Marketing</parent>
+            <parent identifiedBy="controller">Payments</parent>
         </entry>
     </entries>
 </menu>
