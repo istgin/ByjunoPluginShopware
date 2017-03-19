@@ -28,6 +28,7 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                 $this->gatewayAction();
                 return $this->redirect(['controller' => 'checkout', 'action' => 'finish']);
             default:
+                exit('bbb');
                 return $this->redirect(['controller' => 'checkout']);
         }
     }
@@ -49,7 +50,7 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
         $orderModule->setOrderStatus($order->getId(), self::ORDERSTATUSCANCEL, false);
         $mail = $orderModule->createStatusMail($order->getId(), self::ORDERSTATUSCANCEL);
         $mail->clearRecipients();
-        $mail->addTo("jimsw@inbox.lv");
+        $mail->addTo("igor.sutugin@gmail.com");
         $orderModule->sendStatusMail($mail);
     }
 

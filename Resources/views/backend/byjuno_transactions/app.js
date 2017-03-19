@@ -1,7 +1,6 @@
 /**
  * $Id: $
  */
-console.log('aaa');
 //{block name="backend/byjuno_transactions/application"}
 Ext.define('Shopware.apps.ByjunoTransactions', {
   /**

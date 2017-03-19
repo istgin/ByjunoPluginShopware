@@ -15,7 +15,7 @@ class Shopware_Controllers_Frontend_PaymentInstallment extends Shopware_Controll
      */
     public function indexAction()
     {
-        exit('aaa');
+        exit('Shopware_Controllers_Frontend_PaymentInstallment');
         /**
          * Check if one of the payment methods is selected. Else return to default controller.
          */
