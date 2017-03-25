@@ -25,11 +25,16 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
          */
         switch ($this->getPaymentShortName()) {
             case 'byjuno_payment_invoice':
-                $this->gatewayAction();
-                return $this->redirect(['controller' => 'checkout', 'action' => 'finish']);
+                if ($this->gatewayAction()) {
+                    $this->redirect(['controller' => 'checkout', 'action' => 'finish']);
+                    break;
+                } else {
+                    $this->forward('cancel');
+                    break;
+                }
             default:
-                exit('bbb');
-                return $this->redirect(['controller' => 'checkout']);
+                $this->redirect(['controller' => 'checkout']);
+                break;
         }
     }
 
@@ -59,13 +64,12 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
     private function gatewayAction()
     {
         $mode = Shopware()->Config()->get("ByjunoPayments", "plugin_mode");
-        $this->saveOrder(1, uniqid("byjuno_"), self::PAYMENTSTATUSOPEN);
-        /* @var $order \Shopware\Models\Order\Order */
-        $order = Shopware()->Models()->getRepository('Shopware\Models\Order\Order')
-            ->findOneBy(array('number' =>  $this->getOrderNumber()));
 
+        $user = $this->getUser();
+        $billing = $user['billingaddress'];
+        $shipping = $user['shippingaddress'];
         $status = 0;
-        $request = CreateShopWareShopRequest($order);
+        $request = CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $this);
         $xml = $request->createRequest();
         $byjunoCommunicator = new \ByjunoCommunicator();
         if (isset($mode) && $mode == 'live') {
@@ -85,62 +89,21 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                 $status = 0;
             }
         }
-        var_dump($status);
-        exit($status);
-
-        $orderModule = Shopware()->Modules()->Order();
-        $orderModule->setPaymentStatus($order->getId(), self::PAYMENTSTATUSVOID, false);
-        $orderModule->setOrderStatus($order->getId(), self::ORDERSTATUSCANCEL, false);
-        $mail = $orderModule->createStatusMail($order->getId(), self::ORDERSTATUSCANCEL);
-        $mail->clearRecipients();
-        $mail->addTo("igor.sutugin@gmail.com");
-        $orderModule->sendStatusMail($mail);
-    }
-
-    /**
-     * Direct action method.
-     *
-     * Collects the payment information and transmits it to the payment provider.
-     */
-    public function directAction()
-    {
-        $providerUrl = $this->getProviderUrl();
-        $this->redirect($providerUrl . $this->getUrlParameters());
-    }
-
-    /**
-     * Return action method
-     *
-     * Reads the transactionResult and represents it for the customer.
-     */
-    public function returnAction()
-    {
-        /** @var InvoicePaymentService $service */
-        $service = $this->container->get('byjuno_payment.byjuno_payment_service');
-        $user = $this->getUser();
-        $billing = $user['billingaddress'];
-        /** @var PaymentResponse $response */
-        $response = $service->createPaymentResponse($this->Request());
-        $token = $service->createPaymentToken($this->getAmount(), $billing['customernumber']);
-
-        if (!$service->isValidToken($response, $token)) {
-            $this->forward('cancel');
-
-            return;
-        }
-
-        switch ($response->status) {
-            case 'accepted':
-                $this->saveOrder(
-                    $response->transactionId,
-                    $response->token,
-                    self::PAYMENTSTATUSPAID
-                );
-                $this->redirect(['controller' => 'checkout', 'action' => 'finish']);
-                break;
-            default:
-                $this->forward('cancel');
-                break;
+        if ($status == 2) {
+            $this->saveOrder(1, uniqid("byjuno_"), self::PAYMENTSTATUSOPEN);
+            /* @var $order \Shopware\Models\Order\Order */
+            $order = Shopware()->Models()->getRepository('Shopware\Models\Order\Order')
+                ->findOneBy(array('number' => $this->getOrderNumber()));
+            $orderModule = Shopware()->Modules()->Order();
+            $orderModule->setPaymentStatus($order->getId(), self::PAYMENTSTATUSPAID, false);
+            $orderModule->setOrderStatus($order->getId(), self::ORDERSTATUSCANCEL, false);
+            $mail = $orderModule->createStatusMail($order->getId(), self::PAYMENTSTATUSPAID);
+            $mail->clearRecipients();
+            $mail->addTo("igor.sutugin@gmail.com");
+            $orderModule->sendStatusMail($mail);
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -149,39 +112,11 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
      */
     public function cancelAction()
     {
+        $_SESSION["byjuno"]["paymentMessage"] = "Payment canceled";
+        $this->redirect(array(
+            'controller' => 'checkout',
+            'action' => 'payment'
+        ));
     }
 
-    /**
-     * Creates the url parameters
-     */
-    private function getUrlParameters()
-    {
-        /** @var InvoicePaymentService $service */
-        $service = $this->container->get('byjuno_payment.byjuno_payment_service');
-        $router = $this->Front()->Router();
-        $user = $this->getUser();
-        $billing = $user['billingaddress'];
-
-        $parameter = [
-            'amount' => $this->getAmount(),
-            'currency' => $this->getCurrencyShortName(),
-            'firstName' => $billing['firstname'],
-            'lastName' => $billing['lastname'],
-            'returnUrl' => $router->assemble(['action' => 'return', 'forceSecure' => true]),
-            'cancelUrl' => $router->assemble(['action' => 'cancel', 'forceSecure' => true]),
-            'token' => $service->createPaymentToken($this->getAmount(), $billing['customernumber'])
-        ];
-
-        return '?' . http_build_query($parameter);
-    }
-
-    /**
-     * Returns the URL of the payment provider. This has to be replaced with the real payment provider URL
-     *
-     * @return string
-     */
-    protected function getProviderUrl()
-    {
-        return $this->Front()->Router()->assemble(['controller' => 'DemoPaymentProvider', 'action' => 'pay']);
-    }
 }

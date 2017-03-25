@@ -35,9 +35,66 @@ class ByjunoPayments extends Plugin
             'Enlight_Controller_Dispatcher_ControllerPath_Frontend_PaymentInvoice' => 'registerControllerInvoice',
             'Enlight_Controller_Dispatcher_ControllerPath_Frontend_PaymentInstallment' => 'registerControllerInstallment',
             'Enlight_Controller_Dispatcher_ControllerPath_Backend_ByjunoTransactions' => 'registerControllerTransactions',
-            'Shopware_Modules_Order_SendMail_Send' => 'sendOrderConfirmationEmail'
+            'Shopware_Modules_Order_SendMail_Send' => 'sendOrderConfirmationEmail',
+            'Enlight_Controller_Action_PostDispatch' => 'onPostDispatchByjunoMessage'
         ];
     }
+    function onPostDispatchByjunoMessage(\Enlight_Event_EventArgs $args) {
+        if (!empty($_SESSION["byjuno"]["message"])) {
+            if ($args->getSubject()->View()->hasTemplate()){
+                $args->getSubject()->View()->assign("sBasketInfo", $_SESSION["byjuno"]["message"]);
+            }
+            $_SESSION["byjuno"]["message"] = null;
+        }
+
+        /* @var $request \Enlight_Controller_Request_RequestHttp */
+        $request = $args->getSubject()->Request();
+        $response = $args->getSubject()->Response();
+        /* @var $view \Enlight_View_Default */
+        $view = $args->getSubject()->View();
+
+
+        if (!$request->isDispatched()
+            || $response->isException()
+            || $request->getModuleName() != 'frontend'
+            || $request->isXmlHttpRequest()
+            || !$view->hasTemplate()
+        ) {
+            return;
+        }
+
+        if (!strstr($args->getRequest()->getActionName(), "ajax")
+            && !strstr($args->getRequest()->getControllerName(), "PaymentInvoice")
+            && !strstr($args->getRequest()->getControllerName(), "PaymentInstallment")) {
+            $view->messageByjuno = "";
+            if (!empty($_SESSION["byjuno"]["paymentMessage"])) {
+                $view->messageByjuno = $_SESSION["byjuno"]["paymentMessage"];
+                unset($_SESSION["byjuno"]["paymentMessage"]);
+            }
+            $this->container->get('Template')->addTemplateDir(
+                $this->getPath() . '/Views/'
+            );
+            $view->extendsTemplate('frontend/byjuno_message.tpl');
+        }
+
+/*
+        $config = $this->Config();
+        $tmx_enable = $config->get("tmx_enable");
+        $tmxorgid = $config->get("tmxorgid");
+        if (isset($tmx_enable) && $tmx_enable == 'enable' && isset($tmxorgid) && $tmxorgid != '' && !isset($_SESSION["intrum_tmx"])) {
+            $_SESSION["intrum_tmx"] = session_id();
+            $view->tmx_enable = $tmx_enable;
+            $view->tmx_orgid = $tmxorgid;
+            $view->tmx_session = $_SESSION["intrum_tmx"];
+            $this->Application()->Template()->addTemplateDir(
+                $this->Path() . 'Views/'
+            );
+            $view->extendsTemplate('frontend/intrum_tmx.tpl');
+        }
+*/
+
+    }
+
 
     public function sendOrderConfirmationEmail(\Enlight_Event_EventArgs $args)
     {
