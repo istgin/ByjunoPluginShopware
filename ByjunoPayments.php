@@ -1,5 +1,6 @@
 <?php
 
+
 namespace ByjunoPayments;
 
 use Shopware\Components\Plugin;
@@ -10,6 +11,9 @@ use Shopware\Components\Plugin\Context\UninstallContext;
 use ByjunoPayments\Models\ByjunoTransactions;
 use Shopware\Models\Payment\Payment;
 use Doctrine\ORM\Tools\SchemaTool;
+
+require (__DIR__) . '/api/byjuno.php';
+require (__DIR__) . '/api/helper.php';
 
 class ByjunoPayments extends Plugin
 {
@@ -114,25 +118,25 @@ class ByjunoPayments extends Plugin
 
         }
 
-/*
+        /*
 
-        $parent = $this->Menu()->findOneBy(array('id' => 65));
-        $item   = $this->createMenuItem(array(
-            'label'  => 'Byjuno',
-            'class'  => 'byjunoicon',
-            'active' => 1,
-            'parent' => $parent,
-        ));
-        $parent = $item;
-        $this->createMenuItem(array(
-            'label'      => 'Byjuno Log',
-            'controller' => 'ByjunoTransactions',
-            'action'     => 'Index',
-            'class'      => 'sprite-cards-stack',
-            'active'     => 1,
-            'parent'     => $parent,
-        ));
-*/
+                $parent = $this->Menu()->findOneBy(array('id' => 65));
+                $item   = $this->createMenuItem(array(
+                    'label'  => 'Byjuno',
+                    'class'  => 'byjunoicon',
+                    'active' => 1,
+                    'parent' => $parent,
+                ));
+                $parent = $item;
+                $this->createMenuItem(array(
+                    'label'      => 'Byjuno Log',
+                    'controller' => 'ByjunoTransactions',
+                    'action'     => 'Index',
+                    'class'      => 'sprite-cards-stack',
+                    'active'     => 1,
+                    'parent'     => $parent,
+                ));
+        */
         $sql = "ALTER TABLE `s_plugin_byjuno_transactions`
 CHANGE COLUMN `xml_request` `xml_request` TEXT CHARACTER SET 'utf8' COLLATE 'utf8_unicode_ci' NOT NULL ,
 CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'utf8_unicode_ci' NOT NULL";
@@ -178,7 +182,7 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
         $this->setActiveFlag($context->getPlugin()->getPayments(), false);
         try {
             $this->removeSchema();
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
 
         }
     }

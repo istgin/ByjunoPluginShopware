@@ -33,6 +33,24 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
         }
     }
 
+    public function SaveLog(ByjunoRequest $request, $xml_request, $xml_response, $status, $type) {
+        $sql     = '
+            INSERT INTO s_plugin_byjuno_transactions (requestid, requesttype, firstname, lastname, ip, status, datecolumn, xml_request, xml_responce)
+                    VALUES (?,?,?,?,?,?,?,?,?)
+        ';
+        Shopware()->Db()->query($sql, Array(
+            $request->getRequestId(),
+            $type,
+            $request->getFirstName(),
+            $request->getLastName(),
+            $_SERVER['REMOTE_ADDR'],
+            (($status != 0) ? $status : 'Error'),
+            date('Y-m-d\TH:i:sP'),
+            $xml_request,
+            $xml_response
+        ));
+    }
+
     /**
      * Gateway action method.
      *
@@ -40,10 +58,35 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
      */
     private function gatewayAction()
     {
+        $mode = Shopware()->Config()->get("ByjunoPayments", "plugin_mode");
         $this->saveOrder(1, uniqid("byjuno_"), self::PAYMENTSTATUSOPEN);
         /* @var $order \Shopware\Models\Order\Order */
         $order = Shopware()->Models()->getRepository('Shopware\Models\Order\Order')
             ->findOneBy(array('number' =>  $this->getOrderNumber()));
+
+        $status = 0;
+        $request = CreateShopWareShopRequest($order);
+        $xml = $request->createRequest();
+        $byjunoCommunicator = new \ByjunoCommunicator();
+        if (isset($mode) && $mode == 'live') {
+            $byjunoCommunicator->setServer('live');
+        } else {
+            $byjunoCommunicator->setServer('test');
+        }
+        $response = $byjunoCommunicator->sendRequest($xml);
+        if ($response) {
+            $byjunoResponse = new ByjunoResponse();
+            $byjunoResponse->setRawResponse($response);
+            $byjunoResponse->processResponse();
+            $status = (int)$byjunoResponse->getCustomerRequestStatus();
+            $statusLog = "Order request (S1)";
+            $this->saveLog($request, $xml, $response, $status, $statusLog);
+            if (intval($status) > 15) {
+                $status = 0;
+            }
+        }
+        var_dump($status);
+        exit($status);
 
         $orderModule = Shopware()->Modules()->Order();
         $orderModule->setPaymentStatus($order->getId(), self::PAYMENTSTATUSVOID, false);
