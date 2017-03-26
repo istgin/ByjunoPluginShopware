@@ -26,6 +26,58 @@ class ByjunoPayments extends Plugin
         return $sOrder->sUserData['additional']['user']['paymentID'];
     }
 
+    private function getShopLocaleMapping()
+    {
+        $connection = Shopware()->Container()->get('dbal_connection');
+        $query = $connection->createQueryBuilder();
+        $query->select(['locale_id, IFNULL(main_id, id)']);
+        $query->from('s_core_shops');
+        $query->where('s_core_shops.default = 1');
+        $query->setMaxResults(1);
+        return $query->execute()->fetchAll(\PDO::FETCH_KEY_PAIR);
+    }
+
+    private function snippetInstalationToDB()
+    {
+
+        $shops = $this->getShopLocaleMapping();
+        $sql = '
+            INSERT IGNORE INTO s_core_snippets (namespace, shopID, localeID, name, created, `value`) VALUES (?, ?, ?, ?, ?, ?)
+        ';
+
+        $repository = Shopware()->Models()->getRepository('Shopware\Models\Shop\Locale');
+
+        $file = $this->getPath() . '/Snippets/frontend/byjuno/index.ini';
+        $parsed = parse_ini_file($file, true);
+        $date = new \DateTime();
+
+        foreach ($shops as $localeId => $shopId)
+        {
+            foreach ($parsed as $sectionKey => $sectionValue) {
+                foreach ($sectionValue as $key => $val) {
+
+                    $locale = array_shift($repository->findBy(array('locale' => $sectionKey)));
+                    $arr = Array(
+                        'frontend/byjuno/index',
+                        $shopId,
+                        $locale->getId(),
+                        trim($key),
+                        $date->format('Y-m-d H:i:s'),
+                        trim($val)
+                    );
+                    Shopware()->Db()->query($sql, $arr);
+                }
+            }
+        }
+    }
+
+    public function registerMySnippets()
+    {
+        $this->container->get('Snippets')->addConfigDir(
+            $this->getPath() . '/Snippets/'
+        );
+    }
+
     /**
      * @inheritdoc
      */
@@ -109,8 +161,7 @@ class ByjunoPayments extends Plugin
                 $mail = $args->get("mail");
                 $mail->send();
                 $mail->clearRecipients();
-                //TODO: Email from config
-                $mail->addTo("igor.sutugin@gmail.com");
+                $mail->addTo(Shopware()->Config()->get("ByjunoPayments", "byjuno_email"));
                 $mail->send();
                 return false;
             }
@@ -132,7 +183,7 @@ class ByjunoPayments extends Plugin
     public function registerControllerInstallment(\Enlight_Event_EventArgs $args)
     {
         $this->container->get('Template')->addTemplateDir(
-            $this->getPath() . '/Resources/views/'
+            $this->getPath() . '/Views/'
         );
 
         return $this->getPath() . '/Controllers/Frontend/PaymentInstallment.php';
@@ -140,8 +191,9 @@ class ByjunoPayments extends Plugin
 
     public function registerControllerInvoice(\Enlight_Event_EventArgs $args)
     {
+        $this->registerMySnippets();
         $this->container->get('Template')->addTemplateDir(
-            $this->getPath() . '/Resources/views/'
+            $this->getPath() . '/Views/'
         );
 
         return $this->getPath() . '/Controllers/Frontend/PaymentInvoice.php';
@@ -228,6 +280,7 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
         ];
 
         $installer->createOrUpdate($context->getPlugin(), $options);
+        $this->snippetInstalationToDB();
         parent::install($context);
     }
 

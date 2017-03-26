@@ -1,11 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/5.2/engine/Shopware/Components/Plugin/schema/config.xsd">
     <elements>
-        <element required="true" type="text">
-            <name>slogan</name>
-            <label lang="de">Dein Slogan</label>
-            <label lang="en">Your slogan</label>
-            <value>XML is fun!</value>
+        <element type="select">
+            <name>byjuno_invoice</name>
+            <label>Byjuno Invoice (with partial payment option)</label>
+            <value>Disabled</value>
+            <store>
+                <option>
+                    <value>0</value>
+                    <label lang="de">Disabled</label>
+                    <label lang="en">Disabled</label>
+                </option>
+                <option>
+                    <value>1</value>
+                    <label lang="de">Enabled</label>
+                    <label lang="en">Enabled</label>
+                </option>
+            </store>
+        </element>
+        <element type="select">
+            <name>single_invoice</name>
+            <label>Byjuno Single Invoice</label>
+            <value>Disabled</value>
+            <store>
+                <option>
+                    <value>0</value>
+                    <label lang="de">Disabled</label>
+                    <label lang="en">Disabled</label>
+                </option>
+                <option>
+                    <value>1</value>
+                    <label lang="de">Enabled</label>
+                    <label lang="en">Enabled</label>
+                </option>
+            </store>
         </element>
     </elements>
 </config>
