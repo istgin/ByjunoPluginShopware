@@ -3,7 +3,8 @@
 use ByjunoPayments\Components\ByjunoPayment\PaymentResponse;
 use ByjunoPayments\Components\ByjunoPayment\InvoicePaymentService;
 
-class Shopware_Controllers_Frontend_PaymentInstallment extends Shopware_Controllers_Frontend_Payment
+include(__DIR__."/BaseController.php");
+class Shopware_Controllers_Frontend_PaymentInstallment extends Shopware_Controllers_Frontend_BasebyjunoController
 {
     const PAYMENTSTATUSPAID = 12;
 

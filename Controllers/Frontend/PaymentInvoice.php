@@ -2,8 +2,8 @@
 
 use ByjunoPayments\Components\ByjunoPayment\PaymentResponse;
 use ByjunoPayments\Components\ByjunoPayment\InvoicePaymentService;
-
-class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_Frontend_Payment
+include(__DIR__."/BaseController.php");
+class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_Frontend_BasebyjunoController
 {
     const PAYMENTSTATUSPAID = 12;
     const PAYMENTSTATUSOPEN = 17;
@@ -26,6 +26,9 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
          */
         switch ($this->getPaymentShortName()) {
             case 'byjuno_payment_invoice':
+                $user = $this->getUser();
+                $billing = $user['billingaddress'];
+                $address = trim(trim((String)$billing['street'].' '.$billing['streetnumber']).', '.(String)$billing['city'].', '.(String)$billing['zipcode']);
                 $viewAssignments = array(
                     'paymentplans' => Array(
                         Array("key" => "byjuno_invoice",
@@ -33,6 +36,14 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                         ),
                         Array("key" => "sinlge_invoice",
                             "val" => "Single invoice"
+                        )
+                    ),
+                    'paymentdelivery' => Array(
+                        Array("key" => "email",
+                            "val" => (String)$user["additional"]["user"]["email"]
+                        ),
+                        Array("key" => "postal",
+                            "val" => $address
                         )
                     )
                 );
@@ -43,7 +54,6 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                 break;
         }
     }
-    private $payment_plan;
     public function confirmAction()
     {
         /**
@@ -51,7 +61,18 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
          */
         if ($this->Request()->isPost()) {
             $this->payment_plan = $this->Request()->getParam('payment_plan');
+            $this->payment_send = $this->Request()->getParam('invoice_send');
+            $user = $this->getUser();
+            if ($this->payment_send == "email") {
+                $this->payment_send_to = (String)$user["additional"]["user"]["email"];
+            } else {
+                $billing = $user['billingaddress'];
+                $address = trim(trim((String)$billing['street'].' '.$billing['streetnumber']).', '.(String)$billing['city'].', '.(String)$billing['zipcode']);
+                $this->payment_send_to = $address;
+            }
         }
+        var_dump($this->payment_send_to);
+        exit();
         switch ($this->getPaymentShortName()) {
             case 'byjuno_payment_invoice':
                 if ($this->gatewayAction()) {
@@ -83,20 +104,6 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
             $xml_request,
             $xml_response
         ));
-    }
-
-    protected function saveTransactionPaymentData($orderId, $paymentData)
-    {
-        $sql = 'UPDATE `s_order_attributes` SET byjuno_payment_plan=? WHERE orderID = ?';
-        Shopware()->Db()->query($sql, array(serialize($paymentData), $orderId));
-    }
-
-    protected function getPaymentDataFromOrder($orderId)
-    {
-        $sql = 'SELECT `byjuno_payment_plan` FROM `s_order_attributes` WHERE orderID = ?';
-        $paymentData = Shopware()->Db()->fetchOne($sql, $orderId);
-
-        return unserialize($paymentData);
     }
 
     /**
@@ -169,8 +176,8 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
             $mail->clearRecipients();
             $mail->addTo(Shopware()->Config()->get("ByjunoPayments", "byjuno_email"));
             $orderModule->sendStatusMail($mail);
-            $this->saveTransactionPaymentData($order->getId(), $this->payment_plan);
-            //var_dump($this->getPaymentDataFromOrder($order->getId()));
+            $this->saveTransactionPaymentData($order->getId(), 'payment_plan', $this->payment_plan);
+            //var_dump($this->getPaymentDataFromOrder($order->getId(), 'payment_plan'));
             return true;
         }
         return false;

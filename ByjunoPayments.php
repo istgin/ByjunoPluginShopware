@@ -283,7 +283,9 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
         $this->snippetInstalationToDB();
 
         $attributeService = Shopware()->Container()->get('shopware_attribute.crud_service');
-        $attributeService->update('s_order_attributes', "byjuno_payment_plan", "string", []);
+        $attributeService->update('s_order_attributes', "payment_plan", "string", []);
+        $attributeService->update('s_order_attributes', "payment_send", "string", []);
+        $attributeService->update('s_order_attributes', "payment_send_to", "string", []);
 
 
         parent::install($context);
@@ -298,7 +300,9 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
         $attributeService = Shopware()->Container()->get('shopware_attribute.crud_service');
         try {
             $this->removeSchema();
-            $attributeService->delete('s_order_attributes', "byjuno_payment_plan");
+            $attributeService->delete('s_order_attributes', "payment_plan");
+            $attributeService->delete('s_order_attributes', "payment_send");
+            $attributeService->delete('s_order_attributes', "payment_send_to");
         } catch (\Exception $e) {
 
         }
