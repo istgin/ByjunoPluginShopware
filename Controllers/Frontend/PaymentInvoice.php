@@ -30,12 +30,26 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                 $billing = $user['billingaddress'];
                 $address = trim(trim((String)$billing['street'].' '.$billing['streetnumber']).', '.(String)$billing['city'].', '.(String)$billing['zipcode']);
                 $viewAssignments = array(
-                    'paymentplans' => Array(
-                        Array("key" => "byjuno_invoice",
-                                    "val" => "Byjuno invoice"
+                    'genders' => Array(
+                        Array("key" => "2",
+                            "val" => "Mr"
                         ),
-                        Array("key" => "sinlge_invoice",
-                            "val" => "Single invoice"
+                        Array("key" => "2",
+                            "val" => "Mrs"
+                        )
+                    ),
+                    'paymentplans' => Array(
+                        Array(
+                            "checked" => "checked=\"\"",
+                            "key" => "byjuno_invoice",
+                            "val" => "Byjuno invoice",
+                            "url" => "http://www.csv.lv"
+                        ),
+                        Array(
+                            "checked" => "",
+                            "key" => "sinlge_invoice",
+                            "val" => "Single invoice",
+                            "url" => "http://www.csv.lv"
                         )
                     ),
                     'paymentdelivery' => Array(
