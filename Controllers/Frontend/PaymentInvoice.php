@@ -27,7 +27,14 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
         switch ($this->getPaymentShortName()) {
             case 'byjuno_payment_invoice':
                 $viewAssignments = array(
-                    'sBreadcrumb' => 'xXXX'
+                    'paymentplans' => Array(
+                        Array("key" => "byjuno_invoice",
+                                    "val" => "Byjuno invoice"
+                        ),
+                        Array("key" => "sinlge_invoice",
+                            "val" => "Single invoice"
+                        )
+                    )
                 );
                 $this->View()->assign($viewAssignments);
                 break;
@@ -36,12 +43,15 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                 break;
         }
     }
-
+    private $payment_plan;
     public function confirmAction()
     {
         /**
          * Check if one of the payment methods is selected. Else return to default controller.
          */
+        if ($this->Request()->isPost()) {
+            $this->payment_plan = $this->Request()->getParam('payment_plan');
+        }
         switch ($this->getPaymentShortName()) {
             case 'byjuno_payment_invoice':
                 if ($this->gatewayAction()) {
@@ -73,6 +83,20 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
             $xml_request,
             $xml_response
         ));
+    }
+
+    protected function saveTransactionPaymentData($orderId, $paymentData)
+    {
+        $sql = 'UPDATE `s_order_attributes` SET byjuno_payment_plan=? WHERE orderID = ?';
+        Shopware()->Db()->query($sql, array(serialize($paymentData), $orderId));
+    }
+
+    protected function getPaymentDataFromOrder($orderId)
+    {
+        $sql = 'SELECT `byjuno_payment_plan` FROM `s_order_attributes` WHERE orderID = ?';
+        $paymentData = Shopware()->Db()->fetchOne($sql, $orderId);
+
+        return unserialize($paymentData);
     }
 
     /**
@@ -145,6 +169,8 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
             $mail->clearRecipients();
             $mail->addTo(Shopware()->Config()->get("ByjunoPayments", "byjuno_email"));
             $orderModule->sendStatusMail($mail);
+            $this->saveTransactionPaymentData($order->getId(), $this->payment_plan);
+            //var_dump($this->getPaymentDataFromOrder($order->getId()));
             return true;
         }
         return false;

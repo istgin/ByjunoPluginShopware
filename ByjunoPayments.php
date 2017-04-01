@@ -281,6 +281,11 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
 
         $installer->createOrUpdate($context->getPlugin(), $options);
         $this->snippetInstalationToDB();
+
+        $attributeService = Shopware()->Container()->get('shopware_attribute.crud_service');
+        $attributeService->update('s_order_attributes', "byjuno_payment_plan", "string", []);
+
+
         parent::install($context);
     }
 
@@ -290,11 +295,14 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
     public function uninstall(UninstallContext $context)
     {
         $this->setActiveFlag($context->getPlugin()->getPayments(), false);
+        $attributeService = Shopware()->Container()->get('shopware_attribute.crud_service');
         try {
             $this->removeSchema();
+            $attributeService->delete('s_order_attributes', "byjuno_payment_plan");
         } catch (\Exception $e) {
 
         }
+
     }
 
     /**
