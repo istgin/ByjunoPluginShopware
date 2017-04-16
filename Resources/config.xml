@@ -7,12 +7,12 @@
             <value>Disabled</value>
             <store>
                 <option>
-                    <value>0</value>
+                    <value>Disabled</value>
                     <label lang="de">Disabled</label>
                     <label lang="en">Disabled</label>
                 </option>
                 <option>
-                    <value>1</value>
+                    <value>Enabled</value>
                     <label lang="de">Enabled</label>
                     <label lang="en">Enabled</label>
                 </option>
@@ -24,12 +24,12 @@
             <value>Disabled</value>
             <store>
                 <option>
-                    <value>0</value>
+                    <value>Disabled</value>
                     <label lang="de">Disabled</label>
                     <label lang="en">Disabled</label>
                 </option>
                 <option>
-                    <value>1</value>
+                    <value>Enabled</value>
                     <label lang="de">Enabled</label>
                     <label lang="en">Enabled</label>
                 </option>

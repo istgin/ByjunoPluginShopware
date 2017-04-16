@@ -26,6 +26,28 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
          */
         switch ($this->getPaymentShortName()) {
             case 'byjuno_payment_invoice':
+
+                $config = Shopware()->Config();
+                $checked = 'checked=\"\"';
+                $paymentplans = Array();
+                if ($config->getByNamespace("ByjunoPayments", "byjuno_invoice") == "Enabled") {
+                    $paymentplans[] = Array(
+                        "checked" => $checked,
+                        "key" => "byjuno_invoice",
+                        "val" => "Byjuno invoice",
+                        "url" => "http://www.csv.lv"
+                    );
+                    $checked = '';
+                }
+                if ($config->getByNamespace("ByjunoPayments", "single_invoice") == "Enabled") {
+                    $paymentplans[] =
+                        Array(
+                            "checked" => $checked,
+                            "key" => "sinlge_invoice",
+                            "val" => "Single invoice",
+                            "url" => "http://www.csv.lv"
+                        );
+                }
                 $user = $this->getUser();
                 $addInfo = $user["additional"]["user"];
                 $customer_gender = 1;
@@ -58,24 +80,13 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                             "val" => "Mrs"
                         )
                     ),
+                    'custom_bd_enable' => 1,
+                    'custom_gender_enable' => 1,
                     'customer_day' => $customer_day,
                     'customer_month' => $customer_month,
                     'customer_year' => $customer_year,
                     'customer_gender' => $customer_gender,
-                    'paymentplans' => Array(
-                        Array(
-                            "checked" => "checked=\"\"",
-                            "key" => "byjuno_invoice",
-                            "val" => "Byjuno invoice",
-                            "url" => "http://www.csv.lv"
-                        ),
-                        Array(
-                            "checked" => "",
-                            "key" => "sinlge_invoice",
-                            "val" => "Single invoice",
-                            "url" => "http://www.csv.lv"
-                        )
-                    ),
+                    'paymentplans' => $paymentplans,
                     'paymentdelivery' => Array(
                         Array("key" => "email",
                             "val" => (String)$user["additional"]["user"]["email"]
