@@ -5,6 +5,8 @@ use ByjunoPayments\Components\ByjunoPayment\InvoicePaymentService;
 
 class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Controllers_Frontend_Payment
 {
+    public $custom_birthday;
+    public $custom_gender;
     protected $payment_plan;
     protected $payment_send;
     protected $payment_send_to;

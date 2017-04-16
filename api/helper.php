@@ -59,8 +59,24 @@ function CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $contr
     $request->setTown((String)$billing['city']);
     $request->setFax((String)$billing['fax']);
 
-    if (!empty($billing['birthday']) && substr($billing['birthday'], 0, 4) != '0000') {
-        $request->setDateOfBirth((String)$billing['birthday']);
+    $request->setGender(0);
+    $additionalInfo = $user["additional"]["user"];
+    if (!empty($additionalInfo['salutation'])) {
+        if (strtolower($additionalInfo['salutation']) == 'ms') {
+            $request->setGender(2);
+        } else if (strtolower($additionalInfo['salutation']) == 'mr') {
+            $request->setGender(1);
+        }
+    }
+    if ($controller->custom_gender != null) {
+        $request->setGender($controller->custom_gender);
+    }
+
+    if (!empty($additionalInfo['birthday']) && substr($additionalInfo['birthday'], 0, 4) != '0000') {
+        $request->setDateOfBirth((String)$additionalInfo['birthday']);
+    }
+    if ($controller->custom_birthday != null) {
+        $request->setDateOfBirth($controller->custom_birthday);
     }
 
     $request->setTelephonePrivate((String)$billing['phone']);

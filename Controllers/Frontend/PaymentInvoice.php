@@ -27,17 +27,41 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
         switch ($this->getPaymentShortName()) {
             case 'byjuno_payment_invoice':
                 $user = $this->getUser();
+                $addInfo = $user["additional"]["user"];
+                $customer_gender = 1;
+                if (!empty($addInfo['salutation'])) {
+                    if (strtolower($addInfo['salutation']) == 'ms') {
+                        $customer_gender = 2;
+                    } else if (strtolower($addInfo['salutation']) == 'mr') {
+                        $customer_gender = 1;
+                    }
+                }
+                $customer_day = '';
+                $customer_month = '';
+                $customer_year = '';
+                if (!empty($addInfo['birthday']) && substr($addInfo['birthday'], 0, 4) != '0000') {
+                    $bd = explode("-", $addInfo['birthday']);
+                    if (count($bd) == 3) {
+                        $customer_day = $bd[2];
+                        $customer_month = $bd[1];
+                        $customer_year = $bd[0];
+                    }
+                }
                 $billing = $user['billingaddress'];
                 $address = trim(trim((String)$billing['street'].' '.$billing['streetnumber']).', '.(String)$billing['city'].', '.(String)$billing['zipcode']);
                 $viewAssignments = array(
                     'genders' => Array(
-                        Array("key" => "2",
+                        Array("key" => "1",
                             "val" => "Mr"
                         ),
                         Array("key" => "2",
                             "val" => "Mrs"
                         )
                     ),
+                    'customer_day' => $customer_day,
+                    'customer_month' => $customer_month,
+                    'customer_year' => $customer_year,
+                    'customer_gender' => $customer_gender,
                     'paymentplans' => Array(
                         Array(
                             "checked" => "checked=\"\"",
@@ -84,9 +108,16 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                 $address = trim(trim((String)$billing['street'].' '.$billing['streetnumber']).', '.(String)$billing['city'].', '.(String)$billing['zipcode']);
                 $this->payment_send_to = $address;
             }
+            $custom_gender = $this->Request()->getParam('custom_gender');
+            if ($custom_gender != null) {
+                $this->custom_gender = $custom_gender;
+            }
+            $custom_birthday = $this->Request()->getParam('custom_birthday');
+
+            if ($custom_birthday != null && isset($custom_birthday["day"]) && isset($custom_birthday["month"]) && isset($custom_birthday["year"])) {
+                $this->custom_birthday = $custom_birthday["year"]."-".$custom_birthday["month"]."-".$custom_birthday["day"];
+            }
         }
-        var_dump($this->payment_send_to);
-        exit();
         switch ($this->getPaymentShortName()) {
             case 'byjuno_payment_invoice':
                 if ($this->gatewayAction()) {
