@@ -74,10 +74,10 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                 $viewAssignments = array(
                     'genders' => Array(
                         Array("key" => "1",
-                            "val" => "Mr"
+                            "val" => $snippets->get('mr', "Mr")
                         ),
                         Array("key" => "2",
-                            "val" => "Mrs"
+                            "val" => $snippets->get('ms', "Ms")
                         )
                     ),
                     'custom_bd_enable' => 1,

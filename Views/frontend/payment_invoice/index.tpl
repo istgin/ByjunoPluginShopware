@@ -4,7 +4,7 @@
 
 {* Breadcrumb *}
 {block name='frontend_index_start' append}
-    {$sBreadcrumb = [['name'=>"{s name=PayByjunoInvoice namespace=frontend/byjuno/index}Pay with byjuno invoice{/s}"]]}
+    {$sBreadcrumb = [['name'=>"{s name=pay_byjuno_invoice namespace=frontend/byjuno/index}Pay with byjuno invoice{/s}"]]}
 {/block}
 
 {* Main content *}
@@ -13,7 +13,7 @@
 
         <form action="{url action='confirm'}" method="post" id="proceed_byjuno_invoice" name="proceed_byjuno_invoice">
             {if $custom_gender_enable == 1}
-                <div style="padding: 0 0 5px 0"><label for="custom_gender" style="font-size: 18px"><b>Gender</b></label></div>
+                <div style="padding: 0 0 5px 0"><label for="custom_gender" style="font-size: 18px"><b>{s name=gender namespace=frontend/byjuno/index}Gender{/s}</b></label></div>
                 <div style="padding: 0 0 15px 0">
                     <select id="custom_gender" name="custom_gender" required>
                         {foreach from=$genders item=gender}
@@ -23,7 +23,7 @@
                 </div>
             {/if}
             {if $custom_bd_enable == 1}
-                <div style="padding: 0 0 5px 0"><label for="custom_birthday" style="font-size: 18px"><b>Date of birth</b></label></div>
+                <div style="padding: 0 0 5px 0"><label for="custom_birthday" style="font-size: 18px"><b>{s name=dob namespace=frontend/byjuno/index}Date of birth{/s}</b></label></div>
                 <div style="padding: 0 0 15px 0">
                     {block name="frontend_account_profile_profile_input_birthday_day"}
                         <div class="profile--birthday field--select" style="display: inline-block">
@@ -70,27 +70,27 @@
                 </div>
             {/if}
 
-            <div style="padding: 0 0 5px 0"><label for="payment_plan" style="font-size: 18px"><b>Select payment plan</b></label></div>
+            <div style="padding: 0 0 5px 0"><label for="payment_plan" style="font-size: 18px"><b>{s name=select_payment_plan namespace=frontend/byjuno/index}Select payment plan{/s}</b></label></div>
             <div style="padding: 0 0 15px 0">
                 {foreach from=$paymentplans item=paymentplan}
                     <input type="radio" name="payment_plan" {$paymentplan.checked} value="{$paymentplan.key}"> &nbsp;{$paymentplan.val} <a href="{$paymentplan.url}" target="_blank">(T&C)</a><br>
                 {/foreach}
                 {if count($paymentplans) == 0}
-                    {s name=PaymentPlansNotAvailable namespace=frontend/byjuno/index}No any payment plans are available{/s}
+                    {s name=payment_plans_not_available namespace=frontend/byjuno/index}No any payment plans are available{/s}
                 {/if}
             </div>
-            <div style="padding: 0 0 5px 0"><label for="invoice_send" style="font-size: 18px"><b>Select invoice delivery method</b></label></div>
+            <div style="padding: 0 0 5px 0"><label for="invoice_send" style="font-size: 18px"><b>{s name=select_invoice_delivery_method namespace=frontend/byjuno/index}Select invoice delivery method{/s}</b></label></div>
             <div style="padding: 0 0 15px 0">
                 {foreach from=$paymentdelivery item=paymentdeliver}
                     {if $paymentdeliver.key == "email"}
-                        <input type="radio" name="invoice_send" checked="checked" value="{$paymentdeliver.key}"> &nbsp;Rechnungsversand via E-Mail (ohne Gebühr) an: {$paymentdeliver.val}<br>
+                        <input type="radio" name="invoice_send" checked="checked" value="{$paymentdeliver.key}"> &nbsp;{s name=invoice_email namespace=frontend/byjuno/index}Rechnungsversand via E-Mail (ohne Gebühr) an:{/s} {$paymentdeliver.val}<br>
                     {/if}
                     {if $paymentdeliver.key == "postal"}
-                        <input type="radio" name="invoice_send" value="{$paymentdeliver.key}"> &nbsp;Rechnungsversand in Papierform via Post (gegen Gebühr von CHF 3.50) an: {$paymentdeliver.val}<br>
+                        <input type="radio" name="invoice_send" value="{$paymentdeliver.key}"> &nbsp;{s name=invoice_postal namespace=frontend/byjuno/index}Rechnungsversand in Papierform via Post (gegen Gebühr von CHF 3.50) an:{/s} {$paymentdeliver.val}<br>
                     {/if}
                 {/foreach}
             </div>
-            <button type="submit" class="btn is--primary is--large left is--icon-right"{if count($paymentplans) == 0} disabled="disabled"{/if} form="proceed_byjuno_invoice" data-preloader-button="true">Proceed payment<i class="icon--arrow-right"></i>
+            <button type="submit" class="btn is--primary is--large left is--icon-right"{if count($paymentplans) == 0} disabled="disabled"{/if} form="proceed_byjuno_invoice" data-preloader-button="true">{s name=proceed_payment namespace=frontend/byjuno/index}Proceed payment{/s}<i class="icon--arrow-right"></i>
             </button>
         </form>
     </div>
