@@ -26,7 +26,7 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
          */
         switch ($this->getPaymentShortName()) {
             case 'byjuno_payment_invoice':
-
+                $snippets = Shopware()->Snippets()->getNamespace('frontend/byjuno/index');
                 $config = Shopware()->Config();
                 $checked = 'checked=\"\"';
                 $paymentplans = Array();
@@ -34,8 +34,8 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                     $paymentplans[] = Array(
                         "checked" => $checked,
                         "key" => "byjuno_invoice",
-                        "val" => "Byjuno invoice",
-                        "url" => "http://www.csv.lv"
+                        "val" => $snippets->get('byjuno_invoice', "Byjuno invoice"),
+                        "url" => $snippets->get('byjuno_invoice_toc_url', "http://byjuno.ch/de/terms")
                     );
                     $checked = '';
                 }
@@ -44,8 +44,8 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                         Array(
                             "checked" => $checked,
                             "key" => "sinlge_invoice",
-                            "val" => "Single invoice",
-                            "url" => "http://www.csv.lv"
+                            "val" => $snippets->get('single_invoice', "Single invoice"),
+                            "url" => $snippets->get('single_invoice_toc_url', "http://byjuno.ch/de/terms")
                         );
                 }
                 $user = $this->getUser();

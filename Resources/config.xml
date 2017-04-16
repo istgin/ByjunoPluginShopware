@@ -35,5 +35,90 @@
                 </option>
             </store>
         </element>
+        <element type="select">
+            <name>installment_3</name>
+            <label>3 installments</label>
+            <value>Disabled</value>
+            <store>
+                <option>
+                    <value>Disabled</value>
+                    <label lang="de">Disabled</label>
+                    <label lang="en">Disabled</label>
+                </option>
+                <option>
+                    <value>Enabled</value>
+                    <label lang="de">Enabled</label>
+                    <label lang="en">Enabled</label>
+                </option>
+            </store>
+        </element>
+        <element type="select">
+            <name>installment_10</name>
+            <label>10 installments</label>
+            <value>Disabled</value>
+            <store>
+                <option>
+                    <value>Disabled</value>
+                    <label lang="de">Disabled</label>
+                    <label lang="en">Disabled</label>
+                </option>
+                <option>
+                    <value>Enabled</value>
+                    <label lang="de">Enabled</label>
+                    <label lang="en">Enabled</label>
+                </option>
+            </store>
+        </element>
+        <element type="select">
+            <name>installment_12</name>
+            <label>12 installments</label>
+            <value>Disabled</value>
+            <store>
+                <option>
+                    <value>Disabled</value>
+                    <label lang="de">Disabled</label>
+                    <label lang="en">Disabled</label>
+                </option>
+                <option>
+                    <value>Enabled</value>
+                    <label lang="de">Enabled</label>
+                    <label lang="en">Enabled</label>
+                </option>
+            </store>
+        </element>
+        <element type="select">
+            <name>installment_24</name>
+            <label>24 installments</label>
+            <value>Disabled</value>
+            <store>
+                <option>
+                    <value>Disabled</value>
+                    <label lang="de">Disabled</label>
+                    <label lang="en">Disabled</label>
+                </option>
+                <option>
+                    <value>Enabled</value>
+                    <label lang="de">Enabled</label>
+                    <label lang="en">Enabled</label>
+                </option>
+            </store>
+        </element>
+        <element type="select">
+            <name>installment_4x12</name>
+            <label>4 installments in 12 months</label>
+            <value>Disabled</value>
+            <store>
+                <option>
+                    <value>Disabled</value>
+                    <label lang="de">Disabled</label>
+                    <label lang="en">Disabled</label>
+                </option>
+                <option>
+                    <value>Enabled</value>
+                    <label lang="de">Enabled</label>
+                    <label lang="en">Enabled</label>
+                </option>
+            </store>
+        </element>
     </elements>
 </config>
