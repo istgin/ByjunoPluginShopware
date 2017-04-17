@@ -2,6 +2,127 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/5.2/engine/Shopware/Components/Plugin/schema/config.xsd">
     <elements>
         <element type="select">
+            <name>byjuno_mode</name>
+            <label>Enable B2B check</label>
+            <value>Test</value>
+            <store>
+                <option>
+                    <value>Test</value>
+                    <label lang="de">Disabled</label>
+                    <label lang="en">Test</label>
+                </option>
+                <option>
+                    <value>Live</value>
+                    <label lang="de">Live</label>
+                    <label lang="en">Live</label>
+                </option>
+            </store>
+        </element>
+        <element type="text">
+            <name>byjuno_userid</name>
+            <label>User ID</label>
+        </element>
+        <element type="text">
+            <name>byjuno_clientid</name>
+            <label>Client ID</label>
+        </element>
+        <element type="password">
+            <name>byjuno_password</name>
+            <label>Password</label>
+        </element>
+        <element type="text">
+            <name>byjuno_techemail</name>
+            <label>Technical Contact (E-mail)</label>
+        </element>
+        <element type="text">
+            <name>byjuno_minimum</name>
+            <label>Mininmal amount for checkout)</label>
+            <value>10</value>
+        </element>
+        <element type="text">
+            <name>byjuno_maximum</name>
+            <label>Maximal amount for checkout)</label>
+            <value>1000</value>
+        </element>
+        <element type="text">
+            <name>byjuno_timeout</name>
+            <label>Connection timeout to Byjuno CDP server in seconds</label>
+            <value>30</value>
+        </element>
+        <element type="select">
+            <name>byjuno_threatmetrixenable</name>
+            <label>Enable ThreatMetrix security check</label>
+            <value>Disabled</value>
+            <store>
+                <option>
+                    <value>Disabled</value>
+                    <label lang="de">Disabled</label>
+                    <label lang="en">Disabled</label>
+                </option>
+                <option>
+                    <value>Enabled</value>
+                    <label lang="de">Enabled</label>
+                    <label lang="en">Enabled</label>
+                </option>
+            </store>
+        </element>
+        <element type="text">
+            <name>byjuno_threatmetrix</name>
+            <label>ThreatMetrix Org Id</label>
+            <value>lq866c5i</value>
+        </element>
+        <element type="select">
+            <name>byjuno_cdpenable</name>
+            <label>Credit check before submit</label>
+            <value>Enabled</value>
+            <store>
+                <option>
+                    <value>Disabled</value>
+                    <label lang="de">Disabled</label>
+                    <label lang="en">Disabled</label>
+                </option>
+                <option>
+                    <value>Enabled</value>
+                    <label lang="de">Enabled</label>
+                    <label lang="en">Enabled</label>
+                </option>
+            </store>
+        </element>
+        <element type="select">
+            <name>byjuno_genderbirthday</name>
+            <label>Enable gender &amp; birthday selection</label>
+            <value>Enabled</value>
+            <store>
+                <option>
+                    <value>Disabled</value>
+                    <label lang="de">Disabled</label>
+                    <label lang="en">Disabled</label>
+                </option>
+                <option>
+                    <value>Enabled</value>
+                    <label lang="de">Enabled</label>
+                    <label lang="en">Enabled</label>
+                </option>
+            </store>
+        </element>
+        <element type="text">
+            <name>byjuno_prodemail</name>
+            <label>Production email of Byjuno</label>
+            <value>invoices@byjuno.ch</value>
+        </element>
+        <element type="text">
+            <name>byjuno_testemail</name>
+            <label>Production email of Byjuno</label>
+            <value>igor.sutugin@gmail.com</value>
+        </element>
+
+        <element type="textarea">
+            <name>elementTextarea</name>
+            <label>Information</label>
+            <value>Below fields are using to define active plans for Byjuno payment methods</value>
+        </element>
+
+        <element type="select">
             <name>byjuno_invoice</name>
             <label>Byjuno Invoice (with partial payment option)</label>
             <value>Disabled</value>
