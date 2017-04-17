@@ -1,5 +1,13 @@
 <?php
 
+function mapMethod($method) {
+    if ($method == 'byjuno_payment_installment') {
+        return "INSTALLMENT";
+    } else {
+        return "INVOICE";
+    }
+}
+
 function getClientIp() {
     $ipaddress = '';
     if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
@@ -21,19 +29,39 @@ function getClientIp() {
     return trim(end($ipd));
 }
 
+function mapRepayment($type) {
+    if ($type == 'installment_3_enable') {
+        return "10";
+    } else if ($type == 'installment_10_enable') {
+        return "5";
+    } else if ($type == 'installment_12_enable') {
+        return "8";
+    } else if ($type == 'installment_24_enable') {
+        return "9";
+    } else if ($type == 'installment_4x12_enable') {
+        return "1";
+    } else if ($type == 'installment_4x10_enable') {
+        return "2";
+    } else if ($type == 'sinlge_invoice') {
+        return "3";
+    } else {
+        return "4";
+    }
+}
+
 /* @var $controller \Shopware_Controllers_Frontend_PaymentInvoice  */
-function CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $controller, $orderClosed = "NO") {
+function CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $controller, $paymentmethod, $repayment, $invoiceDelivery, $riskOwner, $orderId = "", $orderClosed = "NO") {
 
     $sql     = 'SELECT `countryiso` FROM s_core_countries WHERE id = ' . intval($billing["countryID"]);
     $countryBilling = Shopware()->Db()->fetchOne($sql);
     $sql     = 'SELECT `countryiso` FROM s_core_countries WHERE id = ' . intval($shipping["countryID"]);
     $countryShipping = Shopware()->Db()->fetchOne($sql);
     $request = new \ByjunoRequest();
-    $request->setClientId(Shopware()->Config()->get("ByjunoPayments", "client_id"));
-    $request->setUserID(Shopware()->Config()->get("ByjunoPayments", "user_id"));
-    $request->setPassword(Shopware()->Config()->get("ByjunoPayments", "password"));
+    $request->setClientId(Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_clientid"));
+    $request->setUserID(Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_userid"));
+    $request->setPassword(Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_password"));
     $request->setVersion("1.00");
-    $request->setRequestEmail(Shopware()->Config()->get("ByjunoPayments", "technical_contact"));
+    $request->setRequestEmail(Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_techemail"));
 
 
     $sql     = 'SELECT `language` FROM s_core_locales WHERE id = ' . intval($user["additional"]["user"]["language"]);
@@ -43,20 +71,19 @@ function CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $contr
         $lang = substr($langName, 0, 2);
     }
     $request->setLanguage($lang);
-
-    $request->setRequestId(uniqid((String)$user['billingaddress']['customerBillingId']."_"));
-    $reference = $user['billingaddress']['customerBillingId'];
+    $request->setRequestId(uniqid((String)$billing["id"]."_"));
+    $reference = $billing["id"];
     if (empty($reference)) {
-        $request->setCustomerReference("guest_".$user['billingaddress']['customerBillingId']);
+        $request->setCustomerReference(uniqid("guest_"));
     } else {
-        $request->setCustomerReference($user['billingaddress']['customerBillingId']);
+        $request->setCustomerReference($billing["id"]);
     }
     $request->setFirstName((String)$billing['firstname']);
     $request->setLastName((String)$billing['lastname']);
     $request->setFirstLine(trim((String)$billing['street'].' '.$billing['streetnumber']));
     $request->setCountryCode(strtoupper((String)$countryBilling));
-    $request->setPostCode((String)$billing['zipcode']);
-    $request->setTown((String)$billing['city']);
+    $request->setPostCode((String)$billing['city']);
+    $request->setTown((String)$billing['zipcode']);
     $request->setFax((String)$billing['fax']);
 
     $request->setGender(0);
@@ -98,11 +125,17 @@ function CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $contr
     $extraInfo["Value"] = getClientIp();
     $request->setExtraInfo($extraInfo);
 
-    $tmx_enable = Shopware()->Config()->get("ByjunoPayments", "tmx_enable");
-    $tmxorgid = Shopware()->Config()->get("ByjunoPayments", "tmxorgid");
+    $tmx_enable = Shopware()->Config()->getByNamespace("ByjunoPayments", "tmx_enable");
+    $tmxorgid = Shopware()->Config()->getByNamespace("ByjunoPayments", "tmxorgid");
     if (isset($tmx_enable) && $tmx_enable == 'enable' && isset($tmxorgid) && $tmxorgid != '' && !empty($_SESSION["intrum_tmx"])) {
         $extraInfo["Name"] = 'DEVICE_FINGERPRINT_ID';
         $extraInfo["Value"] = $_SESSION["intrum_tmx"];
+        $request->setExtraInfo($extraInfo);
+    }
+
+    if ($invoiceDelivery == 'postal') {
+        $extraInfo["Name"] = 'PAPER_INVOICE';
+        $extraInfo["Value"] = 'YES';
         $request->setExtraInfo($extraInfo);
     }
 
@@ -135,10 +168,27 @@ function CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $contr
     $extraInfo["Value"] = $shipping['city'];
     $request->setExtraInfo($extraInfo);
 
+    if ($orderId != "") {
+        $extraInfo["Name"] = 'ORDERID';
+        $extraInfo["Value"] = $orderId;
+        $request->setExtraInfo($extraInfo);
+    }
+    var_dump($repayment);
+    $extraInfo["Name"] = 'PAYMENTMETHOD';
+    $extraInfo["Value"] = mapMethod($paymentmethod);
+    $request->setExtraInfo($extraInfo);
+
+    $extraInfo["Name"] = 'REPAYMENTTYPE';
+    $extraInfo["Value"] = mapRepayment($repayment);
+    $request->setExtraInfo($extraInfo);
+
+    $extraInfo["Name"] = 'RISKOWNER';
+    $extraInfo["Value"] = $riskOwner;
+    $request->setExtraInfo($extraInfo);
+
     $extraInfo["Name"] = 'CONNECTIVTY_MODULE';
     $extraInfo["Value"] = 'Byjuno ShopWare module 1.0.0';
     $request->setExtraInfo($extraInfo);
-
     return $request;
 
 }
@@ -150,11 +200,11 @@ function CreateShopWareShopRequest(\Shopware_Controllers_Frontend_PaymentInvoice
     /* @var \Shopware\Models\Order\Shipping $shipping */
     $shipping = $order->getShipping();
     $request = new \ByjunoRequest();
-    $request->setClientId(Shopware()->Config()->get("ByjunoPayments", "client_id"));
-    $request->setUserID(Shopware()->Config()->get("ByjunoPayments", "user_id"));
-    $request->setPassword(Shopware()->Config()->get("ByjunoPayments", "password"));
+    $request->setClientId(Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_clientid"));
+    $request->setUserID(Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_userid"));
+    $request->setPassword(Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_password"));
     $request->setVersion("1.00");
-    $request->setRequestEmail(Shopware()->Config()->get("ByjunoPayments", "technical_contact"));
+    $request->setRequestEmail(Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_techemail"));
 	
 	
     $sql     = 'SELECT `locale` FROM s_core_locales WHERE id = ' . intval($order->getLanguageIso());
@@ -204,8 +254,8 @@ function CreateShopWareShopRequest(\Shopware_Controllers_Frontend_PaymentInvoice
     $extraInfo["Value"] = getClientIp();
     $request->setExtraInfo($extraInfo);
 
-    $tmx_enable = Shopware()->Config()->get("ByjunoPayments", "tmx_enable");
-    $tmxorgid = Shopware()->Config()->get("ByjunoPayments", "tmxorgid");
+    $tmx_enable = Shopware()->Config()->getByNamespace("ByjunoPayments", "tmx_enable");
+    $tmxorgid = Shopware()->Config()->getByNamespace("ByjunoPayments", "tmxorgid");
     if (isset($tmx_enable) && $tmx_enable == 'enable' && isset($tmxorgid) && $tmxorgid != '' && !empty($_SESSION["intrum_tmx"])) {
         $extraInfo["Name"] = 'DEVICE_FINGERPRINT_ID';
         $extraInfo["Value"] = $_SESSION["intrum_tmx"];

@@ -131,7 +131,7 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
         }
         switch ($this->getPaymentShortName()) {
             case 'byjuno_payment_invoice':
-                if ($this->gatewayAction()) {
+                if ($this->gatewayAction('byjuno_payment_invoice')) {
                     $this->redirect(['controller' => 'checkout', 'action' => 'finish']);
                     break;
                 } else {
@@ -167,19 +167,19 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
      *
      * Collects the payment information and transmit it to the payment provider.
      */
-    private function gatewayAction()
+    private function gatewayAction($paymentMethod)
     {
-        $mode = Shopware()->Config()->get("ByjunoPayments", "plugin_mode");
-
+        $mode = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_mode");
         $user = $this->getUser();
         $billing = $user['billingaddress'];
         $shipping = $user['shippingaddress'];
         $statusS1 = 0;
         $statusS2 = 0;
-        $request = CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $this, "NO");
+        //function CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $controller, $paymentmethod, $repayment, $invoiceDelivery, $riskOwner, $orderId = "", $orderClosed = "NO") {
+        $request = CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $this, $paymentMethod, $this->payment_plan, $this->payment_send, "IJ", "",  "NO");
         $xml = $request->createRequest();
         $byjunoCommunicator = new \ByjunoCommunicator();
-        if (isset($mode) && $mode == 'live') {
+        if (isset($mode) && $mode == 'Live') {
             $byjunoCommunicator->setServer('live');
         } else {
             $byjunoCommunicator->setServer('test');
@@ -196,11 +196,17 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                 $statusS1 = 0;
             }
         }
-        if ($statusS1 == 2) {
-            $request = CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $this, "YES");
+        $order = null;
+        if ($statusS1 == 9) {
+            $this->saveOrder(1, uniqid("byjuno_"), self::PAYMENTSTATUSOPEN);
+            /* @var $order \Shopware\Models\Order\Order */
+            $order = Shopware()->Models()->getRepository('Shopware\Models\Order\Order')
+                ->findOneBy(array('number' => $this->getOrderNumber()));
+
+            $request = CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $this, $paymentMethod, $this->payment_plan, $this->payment_send, "IJ", $order->getNumber(),  "YES");
             $xml = $request->createRequest();
             $byjunoCommunicator = new \ByjunoCommunicator();
-            if (isset($mode) && $mode == 'live') {
+            if (isset($mode) && $mode == 'Live') {
                 $byjunoCommunicator->setServer('live');
             } else {
                 $byjunoCommunicator->setServer('test');
@@ -220,21 +226,22 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
         } else {
             return false;
         }
-        if ($statusS1 == 2 && $statusS2 == 2) {
-            $this->saveOrder(1, uniqid("byjuno_"), self::PAYMENTSTATUSOPEN);
-            /* @var $order \Shopware\Models\Order\Order */
-            $order = Shopware()->Models()->getRepository('Shopware\Models\Order\Order')
-                ->findOneBy(array('number' => $this->getOrderNumber()));
-            $orderModule = Shopware()->Modules()->Order();
+        if ($order == null) {
+            return false;
+        }
+        $orderModule = Shopware()->Modules()->Order();
+        if ($statusS1 == 9 && $statusS2 == 9) {
             $orderModule->setPaymentStatus($order->getId(), self::PAYMENTSTATUSPAID, false);
-            $orderModule->setOrderStatus($order->getId(), self::ORDERSTATUSCANCEL, false);
+            $orderModule->setOrderStatus($order->getId(), self::ORDERSTATUSINPROGRESS, false);
             $mail = $orderModule->createStatusMail($order->getId(), self::PAYMENTSTATUSPAID);
             $mail->clearRecipients();
             $mail->addTo(Shopware()->Config()->get("ByjunoPayments", "byjuno_email"));
             $orderModule->sendStatusMail($mail);
             $this->saveTransactionPaymentData($order->getId(), 'payment_plan', $this->payment_plan);
-            //var_dump($this->getPaymentDataFromOrder($order->getId(), 'payment_plan'));
             return true;
+        } else {
+            $orderModule->setPaymentStatus($order->getId(), self::PAYMENTSTATUSVOID, false);
+            $orderModule->setOrderStatus($order->getId(), self::ORDERSTATUSCANCEL, false);
         }
         return false;
     }
