@@ -182,9 +182,11 @@ function CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $contr
     $extraInfo["Value"] = mapRepayment($repayment);
     $request->setExtraInfo($extraInfo);
 
-    $extraInfo["Name"] = 'RISKOWNER';
-    $extraInfo["Value"] = $riskOwner;
-    $request->setExtraInfo($extraInfo);
+    if ($riskOwner != "") {
+        $extraInfo["Name"] = 'RISKOWNER';
+        $extraInfo["Value"] = $riskOwner;
+        $request->setExtraInfo($extraInfo);
+    }
 
     $extraInfo["Name"] = 'CONNECTIVTY_MODULE';
     $extraInfo["Value"] = 'Byjuno ShopWare module 1.0.0';

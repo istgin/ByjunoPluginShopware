@@ -3,18 +3,35 @@
     <elements>
         <element type="select">
             <name>byjuno_mode</name>
-            <label>Enable B2B check</label>
+            <label>Plugin mode</label>
             <value>Test</value>
             <store>
                 <option>
                     <value>Test</value>
-                    <label lang="de">Disabled</label>
+                    <label lang="de">Test</label>
                     <label lang="en">Test</label>
                 </option>
                 <option>
                     <value>Live</value>
                     <label lang="de">Live</label>
                     <label lang="en">Live</label>
+                </option>
+            </store>
+        </element>
+        <element type="select">
+            <name>byjuno_b2b</name>
+            <label>Enable B2B check</label>
+            <value>Disabled</value>
+            <store>
+                <option>
+                    <value>Disabled</value>
+                    <label lang="de">Disabled</label>
+                    <label lang="en">Disabled</label>
+                </option>
+                <option>
+                    <value>Enabled</value>
+                    <label lang="de">Enabled</label>
+                    <label lang="en">Enabled</label>
                 </option>
             </store>
         </element>
@@ -113,13 +130,23 @@
         <element type="text">
             <name>byjuno_testemail</name>
             <label>Production email of Byjuno</label>
-            <value>igor.sutugin@gmail.com</value>
+            <value>invoices-test@byjuno.ch</value>
         </element>
 
-        <element type="textarea">
-            <name>elementTextarea</name>
-            <label>Information</label>
-            <value>Below fields are using to define active plans for Byjuno payment methods</value>
+
+        <element type="text">
+            <name>allowed_s2</name>
+            <label>Accepted Byjuno Risk for S2</label>
+            <value>2</value>
+        </element>
+        <element type="text">
+            <name>allowed_s2_merchant</name>
+            <label>Accepted Merchant Risk for S2</label>
+        </element>
+        <element type="text">
+            <name>allowed_s3</name>
+            <label>Accepted statuses for S3 response</label>
+            <value>2</value>
         </element>
 
         <element type="select">

@@ -162,6 +162,57 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
         ));
     }
 
+    private function isStatusOkS2($status) {
+        try {
+            $accepted_S2_ij = Shopware()->Config()->getByNamespace("ByjunoPayments", "allowed_s2");
+            $accepted_S2_merhcant = Shopware()->Config()->getByNamespace("ByjunoPayments", "allowed_s2_merchant");
+            $ijStatus = explode(",", $accepted_S2_ij);
+            $merchantStatus = explode(",", $accepted_S2_merhcant);
+            if (in_array($status, $ijStatus)) {
+                return true;
+            } else if (in_array($status, $merchantStatus)) {
+                return true;
+            }
+            return false;
+
+        } catch (Exception $e) {
+            return "INTERNAL ERROR";
+        }
+    }
+
+
+    private function isStatusOkS3($status) {
+        try {
+            $accepted_S3 = Shopware()->Config()->getByNamespace("ByjunoPayments", "allowed_s3");
+            $ijStatus = explode(",", $accepted_S3);
+            if (in_array($status, $ijStatus)) {
+                return true;
+            }
+            return false;
+
+        } catch (Exception $e) {
+            return "INTERNAL ERROR";
+        }
+    }
+
+    private function getStatusRisk($status) {
+        try {
+            $accepted_S2_ij = Shopware()->Config()->getByNamespace("ByjunoPayments", "allowed_s2");
+            $accepted_S2_merhcant = Shopware()->Config()->getByNamespace("ByjunoPayments", "allowed_s2_merchant");
+            $ijStatus = explode(",", $accepted_S2_ij);
+            $merchantStatus = explode(",", $accepted_S2_merhcant);
+            if (in_array($status, $ijStatus)) {
+                return "IJ";
+            } else if (in_array($status, $merchantStatus)) {
+                return "CLIENT";
+            }
+            return "No owner";
+
+        } catch (Exception $e) {
+            return "INTERNAL ERROR";
+        }
+    }
+
     /**
      * Gateway action method.
      *
@@ -174,9 +225,9 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
         $billing = $user['billingaddress'];
         $shipping = $user['shippingaddress'];
         $statusS1 = 0;
-        $statusS2 = 0;
+        $statusS3 = 0;
         //function CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $controller, $paymentmethod, $repayment, $invoiceDelivery, $riskOwner, $orderId = "", $orderClosed = "NO") {
-        $request = CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $this, $paymentMethod, $this->payment_plan, $this->payment_send, "IJ", "",  "NO");
+        $request = CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $this, $paymentMethod, $this->payment_plan, $this->payment_send, "", "",  "NO");
         $xml = $request->createRequest();
         $byjunoCommunicator = new \ByjunoCommunicator();
         if (isset($mode) && $mode == 'Live') {
@@ -197,13 +248,14 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
             }
         }
         $order = null;
-        if ($statusS1 == 9) {
+        if ($this->isStatusOkS2($statusS1)) {
             $this->saveOrder(1, uniqid("byjuno_"), self::PAYMENTSTATUSOPEN);
             /* @var $order \Shopware\Models\Order\Order */
             $order = Shopware()->Models()->getRepository('Shopware\Models\Order\Order')
                 ->findOneBy(array('number' => $this->getOrderNumber()));
 
-            $request = CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $this, $paymentMethod, $this->payment_plan, $this->payment_send, "IJ", $order->getNumber(),  "YES");
+            $risk = $this->getStatusRisk($statusS1);
+            $request = CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $this, $paymentMethod, $this->payment_plan, $this->payment_send, $risk, $order->getNumber(), "YES");
             $xml = $request->createRequest();
             $byjunoCommunicator = new \ByjunoCommunicator();
             if (isset($mode) && $mode == 'Live') {
@@ -216,11 +268,11 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                 $byjunoResponse = new ByjunoResponse();
                 $byjunoResponse->setRawResponse($response);
                 $byjunoResponse->processResponse();
-                $statusS2 = (int)$byjunoResponse->getCustomerRequestStatus();
+                $statusS3 = (int)$byjunoResponse->getCustomerRequestStatus();
                 $statusLog = "Order complete (S3)";
-                $this->saveLog($request, $xml, $response, $statusS2, $statusLog);
-                if (intval($statusS2) > 15) {
-                    $statusS2 = 0;
+                $this->saveLog($request, $xml, $response, $statusS3, $statusLog);
+                if (intval($statusS3) > 15) {
+                    $statusS3 = 0;
                 }
             }
         } else {
@@ -230,7 +282,7 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
             return false;
         }
         $orderModule = Shopware()->Modules()->Order();
-        if ($statusS1 == 9 && $statusS2 == 9) {
+        if ($this->isStatusOkS2($statusS1) && $this->isStatusOkS3($statusS3)) {
             $orderModule->setPaymentStatus($order->getId(), self::PAYMENTSTATUSPAID, false);
             $orderModule->setOrderStatus($order->getId(), self::ORDERSTATUSINPROGRESS, false);
             $mail = $orderModule->createStatusMail($order->getId(), self::PAYMENTSTATUSPAID);
