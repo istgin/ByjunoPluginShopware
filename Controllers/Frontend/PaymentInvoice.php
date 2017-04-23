@@ -221,6 +221,7 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
     private function gatewayAction($paymentMethod)
     {
         $mode = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_mode");
+        $b2b = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_b2b");
         $user = $this->getUser();
         $billing = $user['billingaddress'];
         $shipping = $user['shippingaddress'];
@@ -228,7 +229,13 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
         $statusS3 = 0;
         //function CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $controller, $paymentmethod, $repayment, $invoiceDelivery, $riskOwner, $orderId = "", $orderClosed = "NO") {
         $request = CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $this, $paymentMethod, $this->payment_plan, $this->payment_send, "", "",  "NO");
-        $xml = $request->createRequest();
+         $statusLog = "Order request (S1)";
+        if ($request->getCompanyName1() != '' && $b2b == 'Enabled') {
+            $statusLog = "Order request for Company (S1)";
+            $xml = $request->createRequestCompany();
+        } else {
+            $xml = $request->createRequest();
+        }
         $byjunoCommunicator = new \ByjunoCommunicator();
         if (isset($mode) && $mode == 'Live') {
             $byjunoCommunicator->setServer('live');
@@ -241,7 +248,6 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
             $byjunoResponse->setRawResponse($response);
             $byjunoResponse->processResponse();
             $statusS1 = (int)$byjunoResponse->getCustomerRequestStatus();
-            $statusLog = "Order request (S1)";
             $this->saveLog($request, $xml, $response, $statusS1, $statusLog);
             if (intval($statusS1) > 15) {
                 $statusS1 = 0;
@@ -256,7 +262,13 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
 
             $risk = $this->getStatusRisk($statusS1);
             $request = CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $this, $paymentMethod, $this->payment_plan, $this->payment_send, $risk, $order->getNumber(), "YES");
-            $xml = $request->createRequest();
+            $statusLog = "Order complete (S3)";
+            if ($request->getCompanyName1() != '' && $b2b == 'Enabled') {
+                $statusLog = "Order complete for Company (S3)";
+                $xml = $request->createRequestCompany();
+            } else {
+                $xml = $request->createRequest();
+            }
             $byjunoCommunicator = new \ByjunoCommunicator();
             if (isset($mode) && $mode == 'Live') {
                 $byjunoCommunicator->setServer('live');
@@ -269,7 +281,6 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                 $byjunoResponse->setRawResponse($response);
                 $byjunoResponse->processResponse();
                 $statusS3 = (int)$byjunoResponse->getCustomerRequestStatus();
-                $statusLog = "Order complete (S3)";
                 $this->saveLog($request, $xml, $response, $statusS3, $statusLog);
                 if (intval($statusS3) > 15) {
                     $statusS3 = 0;

@@ -86,6 +86,10 @@ function CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $contr
     $request->setTown((String)$billing['zipcode']);
     $request->setFax((String)$billing['fax']);
 
+    if (!empty($billing["company"])) {
+        $request->setCompanyName1($billing["company"]);
+    }
+
     $request->setGender(0);
     $additionalInfo = $user["additional"]["user"];
     if (!empty($additionalInfo['salutation'])) {
@@ -173,7 +177,6 @@ function CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $contr
         $extraInfo["Value"] = $orderId;
         $request->setExtraInfo($extraInfo);
     }
-    var_dump($repayment);
     $extraInfo["Name"] = 'PAYMENTMETHOD';
     $extraInfo["Value"] = mapMethod($paymentmethod);
     $request->setExtraInfo($extraInfo);

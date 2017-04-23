@@ -1,6 +1,6 @@
 <?php
 /**
- * Created by PhpStorm.
+ * Created by Byjuno.
  * User: i.sutugins
  * Date: 14.2.9
  * Time: 10:28
@@ -35,6 +35,24 @@ class ByjunoRequest
     private $Fax;
     private $Mobile;
     private $Email;
+
+    private $CompanyName1;
+
+    /**
+     * @param mixed $CompanyName1
+     */
+    public function setCompanyName1($CompanyName1)
+    {
+        $this->CompanyName1 = $CompanyName1;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCompanyName1()
+    {
+        return $this->CompanyName1;
+    }
 
 
 
@@ -110,6 +128,9 @@ class ByjunoRequest
      */
     public function setExtraInfo($ExtraInfo)
     {
+        if (empty($ExtraInfo["Name"]) || !isset($ExtraInfo["Value"])) {
+            throw new Exception("ExtraInfo requires 'Name' and 'Value' keys");
+        }
         $this->ExtraInfo[] = $ExtraInfo;
     }
 
@@ -119,6 +140,23 @@ class ByjunoRequest
     public function getExtraInfo()
     {
         return $this->ExtraInfo;
+    }
+
+
+    /**
+     * @return String
+     */
+    public function getExtraInfoByKey($searchKey)
+    {
+        if ($this->ExtraInfo == null) {
+            return "";
+        }
+        foreach($this->ExtraInfo as $key => $val) {
+            if ($val["Name"] == $searchKey) {
+                return $val["Value"];
+            }
+        }
+        return "";
     }
 
     /**
@@ -286,6 +324,9 @@ class ByjunoRequest
      */
     public function setRequestEmail($RequestEmail)
     {
+        if (!preg_match('/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$/', $RequestEmail)) {
+            throw new Exception("Request Email is invalid");
+        }
         $this->RequestEmail = $RequestEmail;
     }
 
@@ -413,7 +454,7 @@ class ByjunoRequest
     {
         $xml = new SimpleXMLElement("<Request></Request>");
         $xml->addAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
-        $xml->addAttribute("xsi:noNamespaceSchemaLocation", "http://site.intrum.ch/schema/CreditDecisionRequest140.xsd");
+        $xml->addAttribute("xsi:noNamespaceSchemaLocation", "http://site.byjuno.ch/schema/CreditDecisionRequest140.xsd");
         $xml->addAttribute("ClientId", $this->ClientId);
         $xml->addAttribute("Version", $this->Version);
         $xml->addAttribute("RequestId", $this->RequestId);
@@ -447,6 +488,55 @@ class ByjunoRequest
 
         foreach($this->ExtraInfo as $ei) {
             $ExtraInfo = $Person->addChild("ExtraInfo");
+            $ExtraInfo->Name = $ei["Name"];
+            $ExtraInfo->Value = $ei["Value"];
+        }
+
+        return $xml->asXML();
+    }
+
+    public function createRequestCompany()
+    {
+        $xml = new SimpleXMLElement("<Request></Request>");
+        $xml->addAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+        $xml->addAttribute("xsi:noNamespaceSchemaLocation", "http://site.byjuno.ch/schema/CreditDecisionRequest140.xsd");
+        $xml->addAttribute("ClientId", $this->ClientId);
+        $xml->addAttribute("Version", $this->Version);
+        $xml->addAttribute("RequestId", $this->RequestId);
+        $xml->addAttribute("Email", $this->RequestEmail);
+        $xml->addAttribute("UserID", $this->UserID);
+        $xml->addAttribute("Password", $this->Password);
+
+        $Customer = $xml->addChild('Customer');
+        $Customer->addAttribute("Reference", $this->CustomerReference);
+        $Company = $Customer->addChild("Company");
+        $Company->CompanyName1 = $this->CompanyName1;
+
+        $OrderingPerson = $Company->addChild('OrderingPerson');
+        $Person = $OrderingPerson->addChild("Person");
+        $Person->LastName = $this->LastName;
+        $Person->FirstName = $this->FirstName;
+        $Person->Gender = $this->Gender;
+        $Person->DateOfBirth = $this->DateOfBirth;
+        $Person->Language = $this->Language;
+
+        $CurrentAddress = $Company->addChild("CurrentAddress");
+        $CurrentAddress->FirstLine = $this->FirstLine;
+        $CurrentAddress->HouseNumber = $this->HouseNumber;
+        $CurrentAddress->FirstLine = $this->FirstLine;
+        $CurrentAddress->CountryCode = $this->CountryCode;
+        $CurrentAddress->PostCode = $this->PostCode;
+        $CurrentAddress->Town = $this->Town;
+
+        $CommunicationNumbers = $Company->addChild("CommunicationNumbers");
+        $CommunicationNumbers->TelephonePrivate = $this->TelephonePrivate;
+        $CommunicationNumbers->TelephoneOffice = $this->TelephoneOffice;
+        $CommunicationNumbers->Fax = $this->Fax;
+        $CommunicationNumbers->Mobile = $this->Mobile;
+        $CommunicationNumbers->Email = $this->Email;
+
+        foreach($this->ExtraInfo as $ei) {
+            $ExtraInfo = $Company->addChild("ExtraInfo");
             $ExtraInfo->Name = $ei["Name"];
             $ExtraInfo->Value = $ei["Value"];
         }
