@@ -49,7 +49,7 @@ function mapRepayment($type) {
     }
 }
 
-/* @var $controller \Shopware_Controllers_Frontend_PaymentInvoice  */
+/* @var $controller \Shopware_Controllers_Frontend_BasebyjunoController  */
 function CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $controller, $paymentmethod, $repayment, $invoiceDelivery, $riskOwner, $orderId = "", $orderClosed = "NO") {
 
     $sql     = 'SELECT `countryiso` FROM s_core_countries WHERE id = ' . intval($billing["countryID"]);
@@ -62,7 +62,6 @@ function CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $contr
     $request->setPassword(Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_password"));
     $request->setVersion("1.00");
     $request->setRequestEmail(Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_techemail"));
-
 
     $sql     = 'SELECT `language` FROM s_core_locales WHERE id = ' . intval($user["additional"]["user"]["language"]);
     $langName = Shopware()->Db()->fetchRow($sql);
@@ -181,9 +180,11 @@ function CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $contr
     $extraInfo["Value"] = mapMethod($paymentmethod);
     $request->setExtraInfo($extraInfo);
 
-    $extraInfo["Name"] = 'REPAYMENTTYPE';
-    $extraInfo["Value"] = mapRepayment($repayment);
-    $request->setExtraInfo($extraInfo);
+    if ($repayment != "") {
+        $extraInfo["Name"] = 'REPAYMENTTYPE';
+        $extraInfo["Value"] = mapRepayment($repayment);
+        $request->setExtraInfo($extraInfo);
+    }
 
     if ($riskOwner != "") {
         $extraInfo["Name"] = 'RISKOWNER';

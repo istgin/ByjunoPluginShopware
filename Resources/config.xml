@@ -105,6 +105,11 @@
                 </option>
             </store>
         </element>
+        <element type="text">
+            <name>allowed_cdp</name>
+            <label>Accepted CDP risks if credit check enabled</label>
+            <value>2</value>
+        </element>
         <element type="select">
             <name>byjuno_genderbirthday</name>
             <label>Enable gender &amp; birthday selection</label>
@@ -132,8 +137,6 @@
             <label>Production email of Byjuno</label>
             <value>invoices-test@byjuno.ch</value>
         </element>
-
-
         <element type="text">
             <name>allowed_s2</name>
             <label>Accepted Byjuno Risk for S2</label>

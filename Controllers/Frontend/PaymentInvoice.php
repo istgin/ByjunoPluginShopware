@@ -26,6 +26,16 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
          */
         switch ($this->getPaymentShortName()) {
             case 'byjuno_payment_invoice':
+
+                $cdp_enabled = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_cdpenable");
+                if ($cdp_enabled == 'Enabled') {
+                    $allowed = $this->CDPRequest("byjuno_payment_invoice");
+                    if (!$allowed) {
+                        $this->forward('cancel');
+                        break;
+                    }
+                }
+
                 $snippets = Shopware()->Snippets()->getNamespace('frontend/byjuno/index');
                 $config = Shopware()->Config();
                 $checked = 'checked=\"\"';
@@ -144,75 +154,6 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
         }
     }
 
-    public function SaveLog(ByjunoRequest $request, $xml_request, $xml_response, $status, $type) {
-        $sql     = '
-            INSERT INTO s_plugin_byjuno_transactions (requestid, requesttype, firstname, lastname, ip, status, datecolumn, xml_request, xml_responce)
-                    VALUES (?,?,?,?,?,?,?,?,?)
-        ';
-        Shopware()->Db()->query($sql, Array(
-            $request->getRequestId(),
-            $type,
-            $request->getFirstName(),
-            $request->getLastName(),
-            $_SERVER['REMOTE_ADDR'],
-            (($status != 0) ? $status : 'Error'),
-            date('Y-m-d\TH:i:sP'),
-            $xml_request,
-            $xml_response
-        ));
-    }
-
-    private function isStatusOkS2($status) {
-        try {
-            $accepted_S2_ij = Shopware()->Config()->getByNamespace("ByjunoPayments", "allowed_s2");
-            $accepted_S2_merhcant = Shopware()->Config()->getByNamespace("ByjunoPayments", "allowed_s2_merchant");
-            $ijStatus = explode(",", $accepted_S2_ij);
-            $merchantStatus = explode(",", $accepted_S2_merhcant);
-            if (in_array($status, $ijStatus)) {
-                return true;
-            } else if (in_array($status, $merchantStatus)) {
-                return true;
-            }
-            return false;
-
-        } catch (Exception $e) {
-            return "INTERNAL ERROR";
-        }
-    }
-
-
-    private function isStatusOkS3($status) {
-        try {
-            $accepted_S3 = Shopware()->Config()->getByNamespace("ByjunoPayments", "allowed_s3");
-            $ijStatus = explode(",", $accepted_S3);
-            if (in_array($status, $ijStatus)) {
-                return true;
-            }
-            return false;
-
-        } catch (Exception $e) {
-            return "INTERNAL ERROR";
-        }
-    }
-
-    private function getStatusRisk($status) {
-        try {
-            $accepted_S2_ij = Shopware()->Config()->getByNamespace("ByjunoPayments", "allowed_s2");
-            $accepted_S2_merhcant = Shopware()->Config()->getByNamespace("ByjunoPayments", "allowed_s2_merchant");
-            $ijStatus = explode(",", $accepted_S2_ij);
-            $merchantStatus = explode(",", $accepted_S2_merhcant);
-            if (in_array($status, $ijStatus)) {
-                return "IJ";
-            } else if (in_array($status, $merchantStatus)) {
-                return "CLIENT";
-            }
-            return "No owner";
-
-        } catch (Exception $e) {
-            return "INTERNAL ERROR";
-        }
-    }
-
     /**
      * Gateway action method.
      *
@@ -227,11 +168,10 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
         $shipping = $user['shippingaddress'];
         $statusS1 = 0;
         $statusS3 = 0;
-        //function CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $controller, $paymentmethod, $repayment, $invoiceDelivery, $riskOwner, $orderId = "", $orderClosed = "NO") {
         $request = CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $this, $paymentMethod, $this->payment_plan, $this->payment_send, "", "",  "NO");
          $statusLog = "Order request (S1)";
         if ($request->getCompanyName1() != '' && $b2b == 'Enabled') {
-            $statusLog = "Order request for Company (S1)";
+            $statusLog = "Order request for company (S1)";
             $xml = $request->createRequestCompany();
         } else {
             $xml = $request->createRequest();
@@ -264,7 +204,7 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
             $request = CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $this, $paymentMethod, $this->payment_plan, $this->payment_send, $risk, $order->getNumber(), "YES");
             $statusLog = "Order complete (S3)";
             if ($request->getCompanyName1() != '' && $b2b == 'Enabled') {
-                $statusLog = "Order complete for Company (S3)";
+                $statusLog = "Order complete for company (S3)";
                 $xml = $request->createRequestCompany();
             } else {
                 $xml = $request->createRequest();
