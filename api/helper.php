@@ -129,11 +129,11 @@ function CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $contr
     $extraInfo["Value"] = getClientIp();
     $request->setExtraInfo($extraInfo);
 
-    $tmx_enable = Shopware()->Config()->getByNamespace("ByjunoPayments", "tmx_enable");
-    $tmxorgid = Shopware()->Config()->getByNamespace("ByjunoPayments", "tmxorgid");
-    if (isset($tmx_enable) && $tmx_enable == 'enable' && isset($tmxorgid) && $tmxorgid != '' && !empty($_SESSION["intrum_tmx"])) {
+    $tmx_enable = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_threatmetrixenable");
+    $tmxorgid = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_threatmetrix");
+    if (isset($tmx_enable) && $tmx_enable == 'Enabled' && isset($tmxorgid) && $tmxorgid != '' && !empty($_SESSION["byjuno_tmx"])) {
         $extraInfo["Name"] = 'DEVICE_FINGERPRINT_ID';
-        $extraInfo["Value"] = $_SESSION["intrum_tmx"];
+        $extraInfo["Value"] = $_SESSION["byjuno_tmx"];
         $request->setExtraInfo($extraInfo);
     }
 
@@ -259,11 +259,11 @@ function CreateShopWareShopRequest(\Shopware_Controllers_Frontend_PaymentInvoice
     $extraInfo["Value"] = getClientIp();
     $request->setExtraInfo($extraInfo);
 
-    $tmx_enable = Shopware()->Config()->getByNamespace("ByjunoPayments", "tmx_enable");
-    $tmxorgid = Shopware()->Config()->getByNamespace("ByjunoPayments", "tmxorgid");
-    if (isset($tmx_enable) && $tmx_enable == 'enable' && isset($tmxorgid) && $tmxorgid != '' && !empty($_SESSION["intrum_tmx"])) {
+    $tmx_enable = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_threatmetrixenable");
+    $tmxorgid = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_threatmetrix");
+    if (isset($tmx_enable) && $tmx_enable == 'Enabled' && isset($tmxorgid) && $tmxorgid != '' && !empty($_SESSION["byjuno_tmx"])) {
         $extraInfo["Name"] = 'DEVICE_FINGERPRINT_ID';
-        $extraInfo["Value"] = $_SESSION["intrum_tmx"];
+        $extraInfo["Value"] = $_SESSION["byjuno_tmx"];
         $request->setExtraInfo($extraInfo);
     }
 

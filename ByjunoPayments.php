@@ -129,22 +129,19 @@ class ByjunoPayments extends Plugin
             $view->extendsTemplate('frontend/byjuno_message.tpl');
         }
 
-/*
-        $config = $this->Config();
-        $tmx_enable = $config->get("tmx_enable");
-        $tmxorgid = $config->get("tmxorgid");
-        if (isset($tmx_enable) && $tmx_enable == 'enable' && isset($tmxorgid) && $tmxorgid != '' && !isset($_SESSION["intrum_tmx"])) {
-            $_SESSION["intrum_tmx"] = session_id();
+        $tmx_enable = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_threatmetrixenable");
+        $tmxorgid = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_threatmetrix");
+
+        if (isset($tmx_enable) && $tmx_enable == 'Enabled' && isset($tmxorgid) && $tmxorgid != '' && !isset($_SESSION["byjuno_tmx"])) {
+            $_SESSION["byjuno_tmx"] = session_id();
             $view->tmx_enable = $tmx_enable;
             $view->tmx_orgid = $tmxorgid;
-            $view->tmx_session = $_SESSION["intrum_tmx"];
-            $this->Application()->Template()->addTemplateDir(
-                $this->Path() . 'Views/'
+            $view->tmx_session = $_SESSION["byjuno_tmx"];
+            $this->container->get('Template')->addTemplateDir(
+                $this->getPath() . '/Views/'
             );
-            $view->extendsTemplate('frontend/intrum_tmx.tpl');
+            $view->extendsTemplate('frontend/byjuno_tmx.tpl');
         }
-*/
-
     }
 
 
@@ -239,10 +236,7 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
             'active' => 0,
             'position' => 0,
             'additionalDescription' =>
-                '<img src="http://your-image-url"/>'
-                . '<div id="payment_desc">'
-                . '  Pay with byjuno invoice.'
-                . '</div>'
+                '<img src="https://byjuno.ch/Content/logo/de/6639/BJ_Rechnung_BLK.gif" />'
         ];
         $installer->createOrUpdate($context->getPlugin(), $options);
 
@@ -253,10 +247,7 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
             'active' => 0,
             'position' => 0,
             'additionalDescription' =>
-                '<img src="http://your-image-url"/>'
-                . '<div id="payment_desc">'
-                . '  Pay with byjuno installment.'
-                . '</div>'
+                '<img src="https://byjuno.ch/Content/logo/de/6639/BJ_Ratenzahlung_BLK.gif "/>'
         ];
 
         $installer->createOrUpdate($context->getPlugin(), $options);
