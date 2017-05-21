@@ -67,7 +67,7 @@ class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Contro
         }
         $response = $byjunoCommunicator->sendRequest($xml);
         if (isset($response)) {
-            $byjunoResponse = new ByjunoResponse();
+            $byjunoResponse = new \ByjunoResponse();
             $byjunoResponse->setRawResponse($response);
             $byjunoResponse->processResponse();
             $statusCDP = (int)$byjunoResponse->getCustomerRequestStatus();
@@ -230,7 +230,7 @@ class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Contro
         }
         $response = $byjunoCommunicator->sendRequest($xml);
         if (isset($response)) {
-            $byjunoResponse = new ByjunoResponse();
+            $byjunoResponse = new \ByjunoResponse();
             $byjunoResponse->setRawResponse($response);
             $byjunoResponse->processResponse();
             $statusS1 = (int)$byjunoResponse->getCustomerRequestStatus();
@@ -263,7 +263,7 @@ class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Contro
             }
             $response = $byjunoCommunicator->sendRequest($xml);
             if (isset($response)) {
-                $byjunoResponse = new ByjunoResponse();
+                $byjunoResponse = new \ByjunoResponse();
                 $byjunoResponse->setRawResponse($response);
                 $byjunoResponse->processResponse();
                 $statusS3 = (int)$byjunoResponse->getCustomerRequestStatus();
