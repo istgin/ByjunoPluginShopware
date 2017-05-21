@@ -24,6 +24,18 @@ class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Contro
         return unserialize($paymentData);
     }
 
+    protected function minMaxCheck()
+    {
+        $min = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_minimum");
+        $max = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_maximum");
+        $amount = $this->getAmount();
+        if ($amount < $min || $amount > $max)
+        {
+            return false;
+        }
+        return true;
+    }
+
     protected function CDPRequest($paymentMethod)
     {
         $statusCDP = 0;
@@ -168,4 +180,18 @@ class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Contro
             'action' => 'payment'
         ));
     }
+    /**
+     * Cancel action method
+     */
+    public function cancelminmaxAction()
+    {
+        $snippets = Shopware()->Snippets()->getNamespace('frontend/byjuno/index');
+        $_SESSION["byjuno"]["paymentMessage"] = $snippets->get('paymentminmax_canceled', "Byjuno invoice");
+        $this->redirect(array(
+            'controller' => 'checkout',
+            'action' => 'payment'
+        ));
+    }
+
+
 }

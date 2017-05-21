@@ -27,6 +27,12 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
         switch ($this->getPaymentShortName()) {
             case 'byjuno_payment_invoice':
 
+                $minMaxCheck = $this->minMaxCheck();
+                if (!$minMaxCheck) {
+                    $this->forward('cancelminmax');
+                    break;
+                }
+
                 $cdp_enabled = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_cdpenable");
                 if ($cdp_enabled == 'Enabled') {
                     $allowed = $this->CDPRequest("byjuno_payment_invoice");
