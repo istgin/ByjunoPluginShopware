@@ -30,17 +30,17 @@ function getClientIp() {
 }
 
 function mapRepayment($type) {
-    if ($type == 'installment_3_enable') {
+    if ($type == 'installment_3') {
         return "10";
-    } else if ($type == 'installment_10_enable') {
+    } else if ($type == 'installment_10') {
         return "5";
-    } else if ($type == 'installment_12_enable') {
+    } else if ($type == 'installment_12') {
         return "8";
-    } else if ($type == 'installment_24_enable') {
+    } else if ($type == 'installment_24') {
         return "9";
-    } else if ($type == 'installment_4x12_enable') {
+    } else if ($type == 'installment_4x12') {
         return "1";
-    } else if ($type == 'installment_4x10_enable') {
+    } else if ($type == 'installment_4x10') {
         return "2";
     } else if ($type == 'sinlge_invoice') {
         return "3";

@@ -8,7 +8,7 @@ class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Contro
     const PAYMENTSTATUSPAID = 12;
     const PAYMENTSTATUSOPEN = 17;
     const PAYMENTSTATUSVOID = 30;
-    
+
     const ORDERSTATUSCANCEL = 4;
     const ORDERSTATUSINPROGRESS = 1;
 

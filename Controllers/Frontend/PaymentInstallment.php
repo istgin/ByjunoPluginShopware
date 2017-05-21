@@ -6,124 +6,154 @@ use ByjunoPayments\Components\ByjunoPayment\InvoicePaymentService;
 include(__DIR__."/BaseController.php");
 class Shopware_Controllers_Frontend_PaymentInstallment extends Shopware_Controllers_Frontend_BasebyjunoController
 {
-    const PAYMENTSTATUSPAID = 12;
-
-
     /**
      * Index action method.
      *
      * Forwards to the correct action.
      */
+
     public function indexAction()
     {
-        exit('Shopware_Controllers_Frontend_PaymentInstallment');
         /**
          * Check if one of the payment methods is selected. Else return to default controller.
          */
         switch ($this->getPaymentShortName()) {
             case 'byjuno_payment_installment':
-                return $this->redirect(['action' => 'gateway', 'forceSecure' => true]);
-            default:
-                return $this->redirect(['controller' => 'checkout']);
-        }
-    }
 
-    /**
-     * Gateway action method.
-     *
-     * Collects the payment information and transmit it to the payment provider.
-     */
-    public function gatewayAction()
-    {
-        $providerUrl = $this->getProviderUrl();
-        $this->View()->assign('gatewayUrl', $providerUrl . $this->getUrlParameters());
-    }
+                $minMaxCheck = $this->minMaxCheck();
+                if (!$minMaxCheck) {
+                    $this->forward('cancelminmax');
+                    break;
+                }
 
-    /**
-     * Direct action method.
-     *
-     * Collects the payment information and transmits it to the payment provider.
-     */
-    public function directAction()
-    {
-        $providerUrl = $this->getProviderUrl();
-        $this->redirect($providerUrl . $this->getUrlParameters());
-    }
+                $cdp_enabled = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_cdpenable");
+                if ($cdp_enabled == 'Enabled') {
+                    $allowed = $this->CDPRequest("byjuno_payment_installment");
+                    if (!$allowed) {
+                        $this->forward('cancelcdp');
+                        break;
+                    }
+                }
 
-    /**
-     * Return action method
-     *
-     * Reads the transactionResult and represents it for the customer.
-     */
-    public function returnAction()
-    {
-        /** @var InvoicePaymentService $service */
-        $service = $this->container->get('byjuno_payment.byjuno_payment_service');
-        $user = $this->getUser();
-        $billing = $user['billingaddress'];
-        /** @var PaymentResponse $response */
-        $response = $service->createPaymentResponse($this->Request());
-        $token = $service->createPaymentToken($this->getAmount(), $billing['customernumber']);
-
-        if (!$service->isValidToken($response, $token)) {
-            $this->forward('cancel');
-
-            return;
-        }
-
-        switch ($response->status) {
-            case 'accepted':
-                $this->saveOrder(
-                    $response->transactionId,
-                    $response->token,
-                    self::PAYMENTSTATUSPAID
+                $snippets = Shopware()->Snippets()->getNamespace('frontend/byjuno/index');
+                $config = Shopware()->Config();
+                $checked = 'checked=\"\"';
+                $paymentplans = Array();
+                if ($config->getByNamespace("ByjunoPayments", "installment_3") == "Enabled") {
+                    $paymentplans[] = Array(
+                        "checked" => $checked,
+                        "key" => "installment_3",
+                        "val" => $snippets->get('installment_3', "3 Raten"),
+                        "url" => $snippets->get('installment_3_toc_url', "http://byjuno.ch/de/terms")
+                    );
+                    $checked = '';
+                }
+                if ($config->getByNamespace("ByjunoPayments", "installment_10") == "Enabled") {
+                    $paymentplans[] =
+                        Array(
+                            "checked" => $checked,
+                            "key" => "installment_10",
+                            "val" => $snippets->get('installment_10', "10 Raten"),
+                            "url" => $snippets->get('installment_10_toc_url', "http://byjuno.ch/de/terms")
+                        );
+                }
+                if ($config->getByNamespace("ByjunoPayments", "installment_12") == "Enabled") {
+                    $paymentplans[] =
+                        Array(
+                            "checked" => $checked,
+                            "key" => "installment_12",
+                            "val" => $snippets->get('installment_12', "12 Raten"),
+                            "url" => $snippets->get('installment_12_toc_url', "http://byjuno.ch/de/terms")
+                        );
+                }
+                if ($config->getByNamespace("ByjunoPayments", "installment_24") == "Enabled") {
+                    $paymentplans[] =
+                        Array(
+                            "checked" => $checked,
+                            "key" => "installment_24",
+                            "val" => $snippets->get('installment_24', "24 Raten"),
+                            "url" => $snippets->get('installment_24_toc_url', "http://byjuno.ch/de/terms")
+                        );
+                }
+                if ($config->getByNamespace("ByjunoPayments", "installment_4x12") == "Enabled") {
+                    $paymentplans[] =
+                        Array(
+                            "checked" => $checked,
+                            "key" => "installment_4x12",
+                            "val" => $snippets->get('installment_4x12', "4 Raten innerhalb von 12 Monaten"),
+                            "url" => $snippets->get('installment_4x12_toc_url', "http://byjuno.ch/de/terms")
+                        );
+                }
+                $user = $this->getUser();
+                $addInfo = $user["additional"]["user"];
+                $customer_gender = 1;
+                if (!empty($addInfo['salutation'])) {
+                    if (strtolower($addInfo['salutation']) == 'ms') {
+                        $customer_gender = 2;
+                    } else if (strtolower($addInfo['salutation']) == 'mr') {
+                        $customer_gender = 1;
+                    }
+                }
+                $customer_day = '';
+                $customer_month = '';
+                $customer_year = '';
+                if (!empty($addInfo['birthday']) && substr($addInfo['birthday'], 0, 4) != '0000') {
+                    $bd = explode("-", $addInfo['birthday']);
+                    if (count($bd) == 3) {
+                        $customer_day = $bd[2];
+                        $customer_month = $bd[1];
+                        $customer_year = $bd[0];
+                    }
+                }
+                $billing = $user['billingaddress'];
+                $address = trim(trim((String)$billing['street'].' '.$billing['streetnumber']).', '.(String)$billing['city'].', '.(String)$billing['zipcode']);
+                $viewAssignments = array(
+                    'genders' => Array(
+                        Array("key" => "1",
+                            "val" => $snippets->get('mr', "Mr")
+                        ),
+                        Array("key" => "2",
+                            "val" => $snippets->get('ms', "Ms")
+                        )
+                    ),
+                    'custom_bd_enable' => 1,
+                    'custom_gender_enable' => 1,
+                    'customer_day' => $customer_day,
+                    'customer_month' => $customer_month,
+                    'customer_year' => $customer_year,
+                    'customer_gender' => $customer_gender,
+                    'paymentplans' => $paymentplans,
+                    'paymentdelivery' => Array(
+                        Array("key" => "email",
+                            "val" => (String)$user["additional"]["user"]["email"]
+                        ),
+                        Array("key" => "postal",
+                            "val" => $address
+                        )
+                    )
                 );
-                $this->redirect(['controller' => 'checkout', 'action' => 'finish']);
+                $this->View()->assign($viewAssignments);
                 break;
             default:
-                $this->forward('cancel');
+                $this->redirect(['controller' => 'checkout']);
                 break;
         }
     }
-
-    /**
-     * Cancel action method
-     */
-    public function cancelAction()
+    public function confirmAction()
     {
-    }
-
-    /**
-     * Creates the url parameters
-     */
-    private function getUrlParameters()
-    {
-        /** @var InvoicePaymentService $service */
-        $service = $this->container->get('byjuno_payment.byjuno_payment_service');
-        $router = $this->Front()->Router();
-        $user = $this->getUser();
-        $billing = $user['billingaddress'];
-
-        $parameter = [
-            'amount' => $this->getAmount(),
-            'currency' => $this->getCurrencyShortName(),
-            'firstName' => $billing['firstname'],
-            'lastName' => $billing['lastname'],
-            'returnUrl' => $router->assemble(['action' => 'return', 'forceSecure' => true]),
-            'cancelUrl' => $router->assemble(['action' => 'cancel', 'forceSecure' => true]),
-            'token' => $service->createPaymentToken($this->getAmount(), $billing['customernumber'])
-        ];
-
-        return '?' . http_build_query($parameter);
-    }
-
-    /**
-     * Returns the URL of the payment provider. This has to be replaced with the real payment provider URL
-     *
-     * @return string
-     */
-    protected function getProviderUrl()
-    {
-        return $this->Front()->Router()->assemble(['controller' => 'DemoPaymentProvider', 'action' => 'pay']);
+        $this->baseConfirmActions();
+        switch ($this->getPaymentShortName()) {
+            case 'byjuno_payment_installment':
+                if ($this->gatewayAction('byjuno_payment_installment')) {
+                    $this->redirect(['controller' => 'checkout', 'action' => 'finish']);
+                    break;
+                } else {
+                    $this->forward('cancel');
+                    break;
+                }
+            default:
+                $this->redirect(['controller' => 'checkout']);
+                break;
+        }
     }
 }
