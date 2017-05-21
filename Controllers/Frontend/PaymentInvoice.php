@@ -31,7 +31,7 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                 if ($cdp_enabled == 'Enabled') {
                     $allowed = $this->CDPRequest("byjuno_payment_invoice");
                     if (!$allowed) {
-                        $this->forward('cancel');
+                        $this->forward('cancelcdp');
                         break;
                     }
                 }
@@ -247,18 +247,6 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
             $orderModule->setOrderStatus($order->getId(), self::ORDERSTATUSCANCEL, false);
         }
         return false;
-    }
-
-    /**
-     * Cancel action method
-     */
-    public function cancelAction()
-    {
-        $_SESSION["byjuno"]["paymentMessage"] = "Payment canceled";
-        $this->redirect(array(
-            'controller' => 'checkout',
-            'action' => 'payment'
-        ));
     }
 
 }

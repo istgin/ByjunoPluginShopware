@@ -142,4 +142,30 @@ class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Contro
             $xml_response
         ));
     }
+
+    /**
+     * Cancel action method
+     */
+    public function cancelcdpAction()
+    {
+        $snippets = Shopware()->Snippets()->getNamespace('frontend/byjuno/index');
+        $_SESSION["byjuno"]["paymentMessage"] = $snippets->get('paymentcdp_canceled', "Byjuno invoice");
+        $this->redirect(array(
+            'controller' => 'checkout',
+            'action' => 'payment'
+        ));
+    }
+
+    /**
+     * Cancel action method
+     */
+    public function cancelAction()
+    {
+        $snippets = Shopware()->Snippets()->getNamespace('frontend/byjuno/index');
+        $_SESSION["byjuno"]["paymentMessage"] = $snippets->get('payment_canceled', "Byjuno invoice");
+        $this->redirect(array(
+            'controller' => 'checkout',
+            'action' => 'payment'
+        ));
+    }
 }
