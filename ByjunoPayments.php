@@ -188,7 +188,6 @@ class ByjunoPayments extends Plugin
 
     public function registerControllerInvoice(\Enlight_Event_EventArgs $args)
     {
-        $this->registerMySnippets();
         $this->container->get('Template')->addTemplateDir(
             $this->getPath() . '/Views/'
         );

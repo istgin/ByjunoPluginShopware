@@ -66,7 +66,7 @@ class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Contro
             $byjunoCommunicator->setServer('test');
         }
         $response = $byjunoCommunicator->sendRequest($xml);
-        if ($response) {
+        if (isset($response)) {
             $byjunoResponse = new ByjunoResponse();
             $byjunoResponse->setRawResponse($response);
             $byjunoResponse->processResponse();
@@ -229,7 +229,7 @@ class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Contro
             $byjunoCommunicator->setServer('test');
         }
         $response = $byjunoCommunicator->sendRequest($xml);
-        if ($response) {
+        if (isset($response)) {
             $byjunoResponse = new ByjunoResponse();
             $byjunoResponse->setRawResponse($response);
             $byjunoResponse->processResponse();
@@ -262,7 +262,7 @@ class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Contro
                 $byjunoCommunicator->setServer('test');
             }
             $response = $byjunoCommunicator->sendRequest($xml);
-            if ($response) {
+            if (isset($response)) {
                 $byjunoResponse = new ByjunoResponse();
                 $byjunoResponse->setRawResponse($response);
                 $byjunoResponse->processResponse();

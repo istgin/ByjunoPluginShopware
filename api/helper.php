@@ -81,8 +81,8 @@ function CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $contr
     $request->setLastName((String)$billing['lastname']);
     $request->setFirstLine(trim((String)$billing['street'].' '.$billing['streetnumber']));
     $request->setCountryCode(strtoupper((String)$countryBilling));
-    $request->setPostCode((String)$billing['city']);
-    $request->setTown((String)$billing['zipcode']);
+    $request->setPostCode((String)$billing['zipcode']);
+    $request->setTown((String)$billing['city']);
     $request->setFax((String)$billing['fax']);
 
     if (!empty($billing["company"])) {
