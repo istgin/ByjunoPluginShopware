@@ -36,6 +36,10 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
 
                 $snippets = Shopware()->Snippets()->getNamespace('frontend/byjuno/index');
                 $config = Shopware()->Config();
+				$custom_fields = 1;
+				if ($config->getByNamespace("ByjunoPayments", "byjuno_genderbirthday") == "Disabled") {
+					$custom_fields = 0;
+				}
                 $checked = 'checked=\"\"';
                 $paymentplans = Array();
                 if ($config->getByNamespace("ByjunoPayments", "byjuno_invoice") == "Enabled") {
@@ -88,8 +92,8 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                             "val" => $snippets->get('ms', "Ms")
                         )
                     ),
-                    'custom_bd_enable' => 1,
-                    'custom_gender_enable' => 1,
+                    'custom_bd_enable' => $custom_fields,
+                    'custom_gender_enable' => $custom_fields,
                     'customer_day' => $customer_day,
                     'customer_month' => $customer_month,
                     'customer_year' => $customer_year,
