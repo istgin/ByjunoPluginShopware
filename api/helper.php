@@ -63,11 +63,11 @@ function CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $contr
     $request->setVersion("1.00");
     $request->setRequestEmail(Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_techemail"));
 
-    $sql     = 'SELECT `language` FROM s_core_locales WHERE id = ' . intval($user["additional"]["user"]["language"]);
+    $sql     = 'SELECT `locale` FROM s_core_locales WHERE id = ' . intval(Shopware()->Shop()->getLocale()->getId());
     $langName = Shopware()->Db()->fetchRow($sql);
     $lang = 'de';
-    if (!empty($langName) &&  strlen($langName) > 4) {
-        $lang = substr($langName, 0, 2);
+    if (!empty($langName["locale"]) && strlen($langName["locale"]) > 4) {
+        $lang = substr($langName["locale"], 0, 2);
     }
     $request->setLanguage($lang);
     $request->setRequestId(uniqid((String)$billing["id"]."_"));
@@ -211,13 +211,13 @@ function CreateShopWareShopRequest(\Shopware_Controllers_Frontend_PaymentInvoice
     $request->setPassword(Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_password"));
     $request->setVersion("1.00");
     $request->setRequestEmail(Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_techemail"));
-	
-	
-    $sql     = 'SELECT `locale` FROM s_core_locales WHERE id = ' . intval($order->getLanguageIso());
+
+
+    $sql     = 'SELECT `locale` FROM s_core_locales WHERE id = ' . intval(Shopware()->Shop()->getLocale()->getId());
     $langName = Shopware()->Db()->fetchRow($sql);
     $lang = 'de';
-    if (!empty($langName) &&  strlen($langName) > 4) {
-        $lang = substr($langName, 0, 2);
+    if (!empty($langName["locale"]) && strlen($langName["locale"]) > 4) {
+        $lang = substr($langName["locale"], 0, 2);
     }
     $request->setLanguage($lang);
 
