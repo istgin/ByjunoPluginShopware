@@ -368,7 +368,7 @@ function SaveS4Log(ByjunoS4Request $request, $xml_request, $xml_response, $statu
     ));
 }
 
-function SaveS5Log(ByjunoS4Request $request, $xml_request, $xml_response, $status, $type, $firstName, $lastName)
+function SaveS5Log(ByjunoS5Request $request, $xml_request, $xml_response, $status, $type, $firstName, $lastName)
 {
     $sql     = '
             INSERT INTO s_plugin_byjuno_transactions (requestid, requesttype, firstname, lastname, ip, status, datecolumn, xml_request, xml_responce)
