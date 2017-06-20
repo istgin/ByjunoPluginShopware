@@ -58,7 +58,6 @@ class ByjunoCommunicator
             }
 
             fclose($sslsock);
-
             $response = substr($response, strpos($response,'<?xml')-1);
             $response = substr($response, 1,strpos($response,'Response>')+8);
         }

@@ -97,6 +97,10 @@ class ByjunoPayments extends Plugin
         if ($args->getRequest()->getActionName() == "createDocument"
             && $args->getRequest()->getControllerName() == "Order") {
 
+            $s4s5 = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_S4_S5");
+            if (!isset($s4s5) || $s4s5 != 'Enabled') {
+                return;
+            }
             $orderId = $args->getSubject()->Request()->getParam('orderId', null);
             $documentType = $args->getSubject()->Request()->getParam('documentType', null);
             $preview = $args->getSubject()->Request()->getParam('preview', null);
@@ -118,12 +122,35 @@ class ByjunoPayments extends Plugin
                 ",
                     array($orderId)
                 );
+                $statusLog = "";
                 if (!empty($row) && !empty($rowOrder) && $documentType == 1) {
-                    $request = CreateShopRequestS4($row["docID"], $row["amount"], $rowOrder["invoice_amount"], $rowOrder["currency"], $rowOrder["id"], $rowOrder["userID"], $row["date"]);
+                    $request = CreateShopRequestS4($row["docID"], $row["amount"], $rowOrder["invoice_amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], $row["date"]);
+                    $statusLog = "S4 Request";
                 } else if (!empty($row) && !empty($rowOrder) && $documentType == 3) {
-                    $request = CreateShopRequestS5($row["docID"], $row["amount"], $rowOrder["currency"], $rowOrder["id"], $rowOrder["userID"], $row["date"]);
+                    $request = CreateShopRequestS5($row["docID"], $row["amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], $row["date"]);
+                    $statusLog = "S5 Request";
                 } else {
                     return;
+                }
+                $xml = $request->createRequest();
+                $byjunoCommunicator = new \ByjunoCommunicator();
+                $mode = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_mode");
+                if (isset($mode) && $mode == 'Live') {
+                    $byjunoCommunicator->setServer('live');
+                } else {
+                    $byjunoCommunicator->setServer('test');
+                }
+                $response = $byjunoCommunicator->sendRequest($xml);
+                if (isset($response)) {
+                    $byjunoResponse = new \ByjunoResponse();
+                    $byjunoResponse->setRawResponse($response);
+                    $byjunoResponse->processResponse();
+                    $statusCDP = (int)$byjunoResponse->getProcessingInfoClassification();
+                    if ($statusLog == "S4 Request") {
+                        saveS4Log($request, $xml, $response, $statusCDP, $statusLog, "-", "-");
+                    } else if ($statusLog == "S5 Request") {
+                        saveS5Log($request, $xml, $response, $statusCDP, $statusLog, "-", "-");
+                    }
                 }
             }
 

@@ -216,7 +216,7 @@ function CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $contr
     $extraInfo["Value"] = $shipping['city'];
     $request->setExtraInfo($extraInfo);
 
-    if ($orderId != "") {
+    if (!empty($orderId)) {
         $extraInfo["Name"] = 'ORDERID';
         $extraInfo["Value"] = $orderId;
         $request->setExtraInfo($extraInfo);
@@ -347,4 +347,42 @@ function CreateShopWareShopRequest(\Shopware_Controllers_Frontend_PaymentInvoice
     $request->setExtraInfo($extraInfo);
     return $request;
 
+}
+
+function SaveS4Log(ByjunoS4Request $request, $xml_request, $xml_response, $status, $type, $firstName, $lastName)
+{
+    $sql     = '
+            INSERT INTO s_plugin_byjuno_transactions (requestid, requesttype, firstname, lastname, ip, status, datecolumn, xml_request, xml_responce)
+                    VALUES (?,?,?,?,?,?,?,?,?)
+        ';
+    Shopware()->Db()->query($sql, Array(
+        $request->getRequestId(),
+        $type,
+        $firstName,
+        $lastName,
+        $_SERVER['REMOTE_ADDR'],
+        (($status != 0) ? $status : 'Error'),
+        date('Y-m-d\TH:i:sP'),
+        $xml_request,
+        $xml_response
+    ));
+}
+
+function SaveS5Log(ByjunoS4Request $request, $xml_request, $xml_response, $status, $type, $firstName, $lastName)
+{
+    $sql     = '
+            INSERT INTO s_plugin_byjuno_transactions (requestid, requesttype, firstname, lastname, ip, status, datecolumn, xml_request, xml_responce)
+                    VALUES (?,?,?,?,?,?,?,?,?)
+        ';
+    Shopware()->Db()->query($sql, Array(
+        $request->getRequestId(),
+        $type,
+        $firstName,
+        $lastName,
+        $_SERVER['REMOTE_ADDR'],
+        (($status != 0) ? $status : 'Error'),
+        date('Y-m-d\TH:i:sP'),
+        $xml_request,
+        $xml_response
+    ));
 }

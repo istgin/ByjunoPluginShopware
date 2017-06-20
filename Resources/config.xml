@@ -127,6 +127,23 @@
                 </option>
             </store>
         </element>
+        <element type="select">
+            <name>byjuno_S4_S5</name>
+            <label>S4 &amp; S5 transactions</label>
+            <value>Disabled</value>
+            <store>
+                <option>
+                    <value>Disabled</value>
+                    <label lang="de">Disabled</label>
+                    <label lang="en">Disabled</label>
+                </option>
+                <option>
+                    <value>Enabled</value>
+                    <label lang="de">Enabled</label>
+                    <label lang="en">Enabled</label>
+                </option>
+            </store>
+        </element>
         <element type="text">
             <name>byjuno_prodemail</name>
             <label>Production email of Byjuno</label>
