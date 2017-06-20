@@ -87,9 +87,47 @@ class ByjunoPayments extends Plugin
             'Enlight_Controller_Dispatcher_ControllerPath_Frontend_PaymentInvoice' => 'registerControllerInvoice',
             'Enlight_Controller_Dispatcher_ControllerPath_Frontend_PaymentInstallment' => 'registerControllerInstallment',
             'Enlight_Controller_Dispatcher_ControllerPath_Backend_ByjunoTransactions' => 'registerControllerTransactions',
+            'Enlight_Controller_Action_PostDispatch_Backend' => 'documentGenerated',
             'Shopware_Modules_Order_SendMail_Send' => 'sendOrderConfirmationEmail',
             'Enlight_Controller_Action_PostDispatch' => 'onPostDispatchByjunoMessage'
         ];
+    }
+    function documentGenerated(\Enlight_Event_EventArgs $args) {
+
+        if ($args->getRequest()->getActionName() == "createDocument"
+            && $args->getRequest()->getControllerName() == "Order") {
+
+            $orderId = $args->getSubject()->Request()->getParam('orderId', null);
+            $documentType = $args->getSubject()->Request()->getParam('documentType', null);
+            $preview = $args->getSubject()->Request()->getParam('preview', null);
+            if (!empty($orderId) && !empty($documentType) && !isset($preview))
+            {
+                $row = Shopware()->Db()->fetchRow("
+                SELECT *
+                FROM s_order_documents
+                WHERE orderID = ? AND type = ?
+                ORDER BY ID DESC
+                ",
+                    array($orderId, $documentType)
+                );
+
+                $rowOrder = Shopware()->Db()->fetchRow("
+                SELECT *
+                FROM s_order
+                WHERE ID = ?
+                ",
+                    array($orderId)
+                );
+                if (!empty($row) && !empty($rowOrder) && $documentType == 1) {
+                    $request = CreateShopRequestS4($row["docID"], $row["amount"], $rowOrder["invoice_amount"], $rowOrder["currency"], $rowOrder["id"], $rowOrder["userID"], $row["date"]);
+                } else if (!empty($row) && !empty($rowOrder) && $documentType == 3) {
+                    $request = CreateShopRequestS5($row["docID"], $row["amount"], $rowOrder["currency"], $rowOrder["id"], $rowOrder["userID"], $row["date"]);
+                } else {
+                    return;
+                }
+            }
+
+        }
     }
     function onPostDispatchByjunoMessage(\Enlight_Event_EventArgs $args) {
         if (!empty($_SESSION["byjuno"]["message"])) {
