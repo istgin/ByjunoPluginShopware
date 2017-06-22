@@ -140,12 +140,12 @@ class ByjunoPayments extends Plugin
                 } else {
                     $byjunoCommunicator->setServer('test');
                 }
-                $response = $byjunoCommunicator->sendRequest($xml);
+                $response = $byjunoCommunicator->sendS4Request($xml);
                 if (isset($response)) {
-                    $byjunoResponse = new \ByjunoResponse();
+                    $byjunoResponse = new \ByjunoS4Response(); 
                     $byjunoResponse->setRawResponse($response);
                     $byjunoResponse->processResponse();
-                    $statusCDP = (int)$byjunoResponse->getProcessingInfoClassification();
+                    $statusCDP = $byjunoResponse->getProcessingInfoClassification();
                     if ($statusLog == "S4 Request") {
                         saveS4Log($request, $xml, $response, $statusCDP, $statusLog, "-", "-");
                     } else if ($statusLog == "S5 Request") {

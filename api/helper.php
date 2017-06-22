@@ -361,7 +361,7 @@ function SaveS4Log(ByjunoS4Request $request, $xml_request, $xml_response, $statu
         $firstName,
         $lastName,
         $_SERVER['REMOTE_ADDR'],
-        (($status != 0) ? $status : 'Error'),
+        (($status != "") ? $status : 'Error'),
         date('Y-m-d\TH:i:sP'),
         $xml_request,
         $xml_response
@@ -380,7 +380,7 @@ function SaveS5Log(ByjunoS5Request $request, $xml_request, $xml_response, $statu
         $firstName,
         $lastName,
         $_SERVER['REMOTE_ADDR'],
-        (($status != 0) ? $status : 'Error'),
+        (($status != "") ? $status : 'Error'),
         date('Y-m-d\TH:i:sP'),
         $xml_request,
         $xml_response
