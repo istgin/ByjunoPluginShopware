@@ -36,7 +36,7 @@ class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Contro
         $min = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_minimum");
         $max = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_maximum");
         $amount = $this->getAmount();
-        if ($amount < $min || $amount > $max)
+        if ((isset($min) && $min != "" && $amount < $min) || (isset($max) && $max != "" && $amount > $max))
         {
             return false;
         }
