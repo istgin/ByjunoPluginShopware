@@ -53,12 +53,12 @@
         </element>
         <element type="text">
             <name>byjuno_minimum</name>
-            <label>Mininmal amount for checkout)</label>
+            <label>Mininmal amount for checkout (empty, default 10)</label>
             <value>10</value>
         </element>
         <element type="text">
             <name>byjuno_maximum</name>
-            <label>Maximal amount for checkout)</label>
+            <label>Maximal amount for checkout  (empty, default 1000)</label>
             <value>1000</value>
         </element>
         <element type="text">
