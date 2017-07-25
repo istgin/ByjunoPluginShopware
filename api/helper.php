@@ -72,7 +72,7 @@ function CreateShopRequestS4($doucmentId, $amount, $orderAmount, $orderCurrency,
 
 }
 
-function CreateShopRequestS5($doucmentId, $amount, $orderCurrency, $orderId, $customerId, $date)
+function CreateShopRequestS5Refund($doucmentId, $amount, $orderCurrency, $orderId, $customerId, $date)
 {
 
     $request = new \ByjunoS5Request();
@@ -90,6 +90,29 @@ function CreateShopRequestS5($doucmentId, $amount, $orderCurrency, $orderId, $cu
     $request->setTransactionCurrency($orderCurrency);
     $request->setTransactionType("REFUND");
     $request->setAdditional2($doucmentId);
+
+    return $request;
+}
+
+function CreateShopRequestS5Cancel($amount, $orderCurrency, $orderId, $customerId, $date)
+{
+
+    $request = new \ByjunoS5Request();
+    $request->setClientId(Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_clientid"));
+    $request->setUserID(Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_userid"));
+    $request->setPassword(Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_password"));
+    $request->setVersion("1.00");
+    $request->setRequestEmail(Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_techemail"));
+
+    $request->setRequestId(uniqid((String)$orderId . "_"));
+    $request->setOrderId($orderId);
+    $request->setClientRef($customerId);
+    $request->setTransactionDate($date);
+    $request->setTransactionAmount(number_format($amount, 2, '.', ''));
+    $request->setTransactionCurrency($orderCurrency);
+    $request->setAdditional2('');
+    $request->setTransactionType("EXPIRED");
+    $request->setOpenBalance("0");
 
     return $request;
 }

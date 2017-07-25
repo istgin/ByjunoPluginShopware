@@ -94,6 +94,49 @@ class ByjunoPayments extends Plugin
     }
     function documentGenerated(\Enlight_Event_EventArgs $args) {
 
+        if ($args->getRequest()->getActionName() == "save"
+            && $args->getRequest()->getControllerName() == "Order")
+        {
+            $s4s5 = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_S4_S5");
+            if (!isset($s4s5) || $s4s5 != 'Enabled') {
+                return;
+            }
+            $orderId = $args->getSubject()->Request()->getParam('id', null);
+            $rowOrder = Shopware()->Db()->fetchRow("
+                SELECT *
+                FROM s_order
+                WHERE ID = ?
+                ",
+                array($orderId)
+            );
+            $S5_default_cancel_id = Shopware()->Config()->getByNamespace("ByjunoPayments", "S5_default_cancel_id");
+            $cancelId = intval($S5_default_cancel_id);
+            if ($cancelId == 0) {
+                $cancelId = 4;
+            }
+            if (!empty($rowOrder) && $rowOrder["status"] == $cancelId)
+            {
+                $request = CreateShopRequestS5Cancel($rowOrder["invoice_amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], date("Y-m-d"));
+                $statusLog = "S5 Cancel request";
+
+                $xml = $request->createRequest();
+                $byjunoCommunicator = new \ByjunoCommunicator();
+                $mode = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_mode");
+                if (isset($mode) && $mode == 'Live') {
+                    $byjunoCommunicator->setServer('live');
+                } else {
+                    $byjunoCommunicator->setServer('test');
+                }
+                $response = $byjunoCommunicator->sendS4Request($xml);
+                if (isset($response)) {
+                    $byjunoResponse = new \ByjunoS4Response();
+                    $byjunoResponse->setRawResponse($response);
+                    $byjunoResponse->processResponse();
+                    $statusCDP = $byjunoResponse->getProcessingInfoClassification();
+                    saveS5Log($request, $xml, $response, $statusCDP, $statusLog, "-", "-");
+                }
+            }
+        }
         if ($args->getRequest()->getActionName() == "createDocument"
             && $args->getRequest()->getControllerName() == "Order") {
 
@@ -127,8 +170,8 @@ class ByjunoPayments extends Plugin
                     $request = CreateShopRequestS4($row["docID"], $row["amount"], $rowOrder["invoice_amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], $row["date"]);
                     $statusLog = "S4 Request";
                 } else if (!empty($row) && !empty($rowOrder) && $documentType == 3) {
-                    $request = CreateShopRequestS5($row["docID"], $row["amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], $row["date"]);
-                    $statusLog = "S5 Request";
+                    $request = CreateShopRequestS5Refund($row["docID"], $row["amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], $row["date"]);
+                    $statusLog = "S5 Refund request";
                 } else {
                     return;
                 }
@@ -148,7 +191,7 @@ class ByjunoPayments extends Plugin
                     $statusCDP = $byjunoResponse->getProcessingInfoClassification();
                     if ($statusLog == "S4 Request") {
                         saveS4Log($request, $xml, $response, $statusCDP, $statusLog, "-", "-");
-                    } else if ($statusLog == "S5 Request") {
+                    } else if ($statusLog == "S5 Refund request") {
                         saveS5Log($request, $xml, $response, $statusCDP, $statusLog, "-", "-");
                     }
                 }

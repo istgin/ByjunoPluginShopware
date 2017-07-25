@@ -145,6 +145,11 @@
             </store>
         </element>
         <element type="text">
+            <name>S5_default_cancel_id</name>
+            <label>Shopware order cancel id</label>
+            <value>4</value>
+        </element>
+        <element type="text">
             <name>byjuno_prodemail</name>
             <label>Production email of Byjuno</label>
             <value>invoices@byjuno.ch</value>
