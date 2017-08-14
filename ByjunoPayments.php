@@ -114,6 +114,19 @@ class ByjunoPayments extends Plugin
             if ($cancelId == 0) {
                 $cancelId = 4;
             }
+			
+			$rowPayment = Shopware()->Db()->fetchRow("
+                SELECT *
+                FROM s_core_paymentmeans
+                WHERE ID = ?
+                ",
+                array($rowOrder["paymentID"])
+            );
+			if (empty($rowPayment["name"]) || 
+				($rowPayment["name"] != 'byjuno_payment_installment' && $rowPayment["name"] != 'byjuno_payment_invoice')) {
+                return;
+				
+			}
             if (!empty($rowOrder) && $rowOrder["status"] == $cancelId)
             {
                 $request = CreateShopRequestS5Cancel($rowOrder["invoice_amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], date("Y-m-d"));
@@ -165,6 +178,20 @@ class ByjunoPayments extends Plugin
                 ",
                     array($orderId)
                 );
+				
+				
+				$rowPayment = Shopware()->Db()->fetchRow("
+					SELECT *
+					FROM s_core_paymentmeans
+					WHERE ID = ?
+					",
+					array($rowOrder["paymentID"])
+				);
+				if (empty($rowPayment["name"]) || 
+					($rowPayment["name"] != 'byjuno_payment_installment' && $rowPayment["name"] != 'byjuno_payment_invoice')) {
+					return;
+					
+				}
                 $statusLog = "";
                 if (!empty($row) && !empty($rowOrder) && $documentType == 1) {
                     $request = CreateShopRequestS4($row["docID"], $row["amount"], $rowOrder["invoice_amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], $row["date"]);
