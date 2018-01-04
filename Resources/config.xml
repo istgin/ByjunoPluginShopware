@@ -156,7 +156,7 @@
         </element>
         <element type="text">
             <name>byjuno_testemail</name>
-            <label>Production email of Byjuno</label>
+            <label>Test email of Byjuno</label>
             <value>invoices-test@byjuno.ch</value>
         </element>
         <element type="text">

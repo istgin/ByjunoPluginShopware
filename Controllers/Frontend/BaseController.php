@@ -285,9 +285,9 @@ class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Contro
             $mail = $orderModule->createStatusMail($order->getId(), self::PAYMENTSTATUSPAID);
             $mail->clearRecipients();
 			if (isset($mode) && $mode == 'Live') {
-				$mail->addTo(Shopware()->Config()->get("ByjunoPayments", "byjuno_prodemail"));
+				$mail->addTo(Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_prodemail"));
             } else {
-				$mail->addTo(Shopware()->Config()->get("ByjunoPayments", "byjuno_testemail"));
+				$mail->addTo(Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_testemail"));
             }
             $orderModule->sendStatusMail($mail);
             $this->saveTransactionPaymentData($order->getId(), 'payment_plan', $this->payment_plan);
