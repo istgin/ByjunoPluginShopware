@@ -105,6 +105,23 @@
                 </option>
             </store>
         </element>
+        <element type="select">
+            <name>byjuno_allowpostal</name>
+            <label>Allow postal delivery</label>
+            <value>Enabled</value>
+            <store>
+                <option>
+                    <value>Disabled</value>
+                    <label lang="de">Disabled</label>
+                    <label lang="en">Disabled</label>
+                </option>
+                <option>
+                    <value>Enabled</value>
+                    <label lang="de">Enabled</label>
+                    <label lang="en">Enabled</label>
+                </option>
+            </store>
+        </element>
         <element type="text">
             <name>allowed_cdp</name>
             <label>Accepted CDP risks if credit check enabled</label>

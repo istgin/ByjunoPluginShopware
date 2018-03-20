@@ -302,7 +302,12 @@ class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Contro
          */
         if ($this->Request()->isPost()) {
             $this->payment_plan = $this->Request()->getParam('payment_plan');
-            $this->payment_send = $this->Request()->getParam('invoice_send');
+            $config = Shopware()->Config();
+            if ($config->getByNamespace("ByjunoPayments", "byjuno_allowpostal") == "Disabled") {
+                $this->payment_send = "email";
+            } else {
+                $this->payment_send = $this->Request()->getParam('invoice_send');
+            }
             $user = $this->getUser();
             if ($this->payment_send == "email") {
                 $this->payment_send_to = (String)$user["additional"]["user"]["email"];

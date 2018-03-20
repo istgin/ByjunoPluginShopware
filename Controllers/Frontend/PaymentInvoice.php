@@ -40,6 +40,10 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
 				if ($config->getByNamespace("ByjunoPayments", "byjuno_genderbirthday") == "Disabled") {
 					$custom_fields = 0;
 				}
+                $byjuno_allowpostal = 1;
+                if ($config->getByNamespace("ByjunoPayments", "byjuno_allowpostal") == "Disabled") {
+                    $byjuno_allowpostal = 0;
+                }
                 $checked = 'checked=\"\"';
                 $paymentplans = Array();
                 if ($config->getByNamespace("ByjunoPayments", "byjuno_invoice") == "Enabled") {
@@ -92,6 +96,7 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                             "val" => $snippets->get('ms', "Ms")
                         )
                     ),
+                    'byjuno_allowpostal' => $byjuno_allowpostal,
                     'custom_bd_enable' => $custom_fields,
                     'custom_gender_enable' => $custom_fields,
                     'customer_day' => $customer_day,
