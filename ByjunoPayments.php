@@ -88,7 +88,6 @@ class ByjunoPayments extends Plugin
             'Enlight_Controller_Dispatcher_ControllerPath_Frontend_PaymentInstallment' => 'registerControllerInstallment',
             'Enlight_Controller_Dispatcher_ControllerPath_Backend_ByjunoTransactions' => 'registerControllerTransactions',
             'Enlight_Controller_Action_PostDispatch_Backend' => 'documentGenerated',
-            'Shopware_Modules_Order_SendMail_Send' => 'sendOrderConfirmationEmail',
             'Enlight_Controller_Action_PostDispatch' => 'onPostDispatchByjunoMessage'
         ];
     }
@@ -279,29 +278,6 @@ class ByjunoPayments extends Plugin
         }
     }
 
-
-    public function sendOrderConfirmationEmail(\Enlight_Event_EventArgs $args)
-    {
-        /* @var $orderProxy \Shopware_Proxies_sOrderProxy */
-        /* @var $order \Shopware\Models\Order\Order */
-        $orderProxy = $args->get("subject");
-
-        try {
-            $paymentData = Shopware()->Modules()->Admin()->sGetPaymentMeanById($this->getPaymentId($orderProxy), Shopware()->Modules()->Admin()->sGetUserData());
-            if (!empty($paymentData["name"]) && ($paymentData["name"] == 'byjuno_payment_invoice' || $paymentData["name"] == 'byjuno_payment_installment')) {
-                /* @var $mail \Enlight_Components_Mail */
-                $mail = $args->get("mail");
-                $mail->send();
-                $mail->clearRecipients();
-                $mail->addTo(Shopware()->Config()->get("ByjunoPayments", "byjuno_email"));
-                $mail->send();
-                return false;
-            }
-        } catch (\Exception $e) {
-
-        }
-        return true;
-    }
 
     public function registerControllerTransactions(\Enlight_Event_EventArgs $args)
     {
