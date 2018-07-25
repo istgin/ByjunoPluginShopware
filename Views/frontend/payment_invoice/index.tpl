@@ -11,7 +11,7 @@
 {block name="frontend_index_content"}
     <div id="payment" class="grid_20" style="margin:10px 0 10px 0;">
 
-        <form action="{url action='confirm'}" method="post" id="proceed_byjuno_invoice" name="proceed_byjuno_invoice">
+        <form action="{url action='confirm'}" method="post" id="proceed_byjuno_invoice" name="proceed_byjuno_invoice" onsubmit="return byjuno_submit_form_fn()">
             {if $custom_gender_enable == 1}
                 <div style="padding: 0 0 5px 0"><label for="custom_gender" style="font-size: 18px"><b>{s name=gender namespace=frontend/byjuno/index}Gender{/s}</b></label></div>
                 <div style="padding: 0 0 15px 0">
@@ -92,7 +92,22 @@
                     {/foreach}
                 </div>
             {/if}
-            <button type="submit" class="btn is--primary is--large left is--icon-right"{if count($paymentplans) == 0} disabled="disabled"{/if} form="proceed_byjuno_invoice" data-preloader-button="true">{s name=proceed_payment namespace=frontend/byjuno/index}Proceed payment{/s}<i class="icon--arrow-right"></i>
+            <script>
+                var byjuno_submit = false;
+                function byjuno_submit_form_fn()
+                {
+                    if (byjuno_submit == true)
+                    {
+                        byjuno_submit = true;
+                        return true;
+                    }
+                    return false;
+                }
+                function byjuno_submit_fn() {
+                    setTimeout(function(){ document.getElementById('proceed_byjuno_invoice').submit();}, 1);
+                }
+            </script>
+            <button type="button" onclick="byjuno_submit_fn()" class="btn is--primary is--large left is--icon-right"{if count($paymentplans) == 0} disabled="disabled"{/if} form="proceed_byjuno_invoice" data-preloader-button="true">{s name=proceed_payment namespace=frontend/byjuno/index}Proceed payment{/s}<i class="icon--arrow-right"></i>
             </button>
         </form>
     </div>
