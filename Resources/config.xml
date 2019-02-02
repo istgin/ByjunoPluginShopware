@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/5.2/engine/Shopware/Components/Plugin/schema/config.xsd">
     <elements>
-        <element type="select">
+        <element type="select" required="true" scope="shop">
             <name>byjuno_mode</name>
             <label>Plugin mode</label>
             <value>Test</value>
@@ -18,7 +18,7 @@
                 </option>
             </store>
         </element>
-        <element type="select">
+        <element type="select" required="true" scope="shop">
             <name>byjuno_b2b</name>
             <label>Enable B2B check</label>
             <value>Disabled</value>
@@ -35,38 +35,38 @@
                 </option>
             </store>
         </element>
-        <element type="text">
+        <element type="text" required="true" scope="shop">
             <name>byjuno_userid</name>
             <label>User ID</label>
         </element>
-        <element type="text">
+        <element type="text" required="true" scope="shop">
             <name>byjuno_clientid</name>
             <label>Client ID</label>
         </element>
-        <element type="password">
+        <element type="password" required="true" scope="shop">
             <name>byjuno_password</name>
             <label>Password</label>
         </element>
-        <element type="text">
+        <element type="text" required="true" scope="shop">
             <name>byjuno_techemail</name>
             <label>Technical Contact (E-mail)</label>
         </element>
-        <element type="text">
+        <element type="text" required="true" scope="shop">
             <name>byjuno_minimum</name>
             <label>Mininmal amount for checkout (empty, default 10)</label>
             <value>10</value>
         </element>
-        <element type="text">
+        <element type="text" required="true" scope="shop">
             <name>byjuno_maximum</name>
             <label>Maximal amount for checkout  (empty, default 1000)</label>
             <value>1000</value>
         </element>
-        <element type="text">
+        <element type="text" required="true" scope="shop">
             <name>byjuno_timeout</name>
             <label>Connection timeout to Byjuno CDP server in seconds</label>
             <value>30</value>
         </element>
-        <element type="select">
+        <element type="select" required="true" scope="shop">
             <name>byjuno_threatmetrixenable</name>
             <label>Enable ThreatMetrix security check</label>
             <value>Disabled</value>
@@ -83,12 +83,12 @@
                 </option>
             </store>
         </element>
-        <element type="text">
+        <element type="text" required="true" scope="shop">
             <name>byjuno_threatmetrix</name>
             <label>ThreatMetrix Org Id</label>
             <value>lq866c5i</value>
         </element>
-        <element type="select">
+        <element type="select" required="true" scope="shop">
             <name>byjuno_cdpenable</name>
             <label>Credit check before submit</label>
             <value>Enabled</value>
@@ -105,7 +105,7 @@
                 </option>
             </store>
         </element>
-        <element type="select">
+        <element type="select" required="true" scope="shop">
             <name>byjuno_allowpostal</name>
             <label>Allow postal delivery</label>
             <value>Enabled</value>
@@ -122,12 +122,12 @@
                 </option>
             </store>
         </element>
-        <element type="text">
+        <element type="text" required="true" scope="shop">
             <name>allowed_cdp</name>
             <label>Accepted CDP risks if credit check enabled</label>
             <value>2</value>
         </element>
-        <element type="select">
+        <element type="select" required="true" scope="shop">
             <name>byjuno_genderbirthday</name>
             <label>Enable gender &amp; birthday selection</label>
             <value>Enabled</value>
@@ -144,7 +144,7 @@
                 </option>
             </store>
         </element>
-        <element type="select">
+        <element type="select" required="true" scope="shop">
             <name>byjuno_S4_S5</name>
             <label>S4 &amp; S5 transactions</label>
             <value>Disabled</value>
@@ -161,37 +161,37 @@
                 </option>
             </store>
         </element>
-        <element type="text">
+        <element type="text" required="true" scope="shop">
             <name>S5_default_cancel_id</name>
             <label>Shopware order cancel id</label>
             <value>4</value>
         </element>
-        <element type="text">
+        <element type="text" required="true" scope="shop">
             <name>byjuno_prodemail</name>
             <label>Production email of Byjuno</label>
             <value>invoices@byjuno.ch</value>
         </element>
-        <element type="text">
+        <element type="text" required="true" scope="shop">
             <name>byjuno_testemail</name>
             <label>Test email of Byjuno</label>
             <value>invoices-test@byjuno.ch</value>
         </element>
-        <element type="text">
+        <element type="text" scope="shop">
             <name>allowed_s2</name>
             <label>Accepted Byjuno Risk for S2</label>
             <value>2</value>
         </element>
-        <element type="text">
+        <element type="text" scope="shop">
             <name>allowed_s2_merchant</name>
             <label>Accepted Merchant Risk for S2</label>
         </element>
-        <element type="text">
+        <element type="text" scope="shop">
             <name>allowed_s3</name>
             <label>Accepted statuses for S3 response</label>
             <value>2</value>
         </element>
 
-        <element type="select">
+        <element type="select" required="true" scope="shop">
             <name>byjuno_invoice</name>
             <label>Byjuno Invoice (with partial payment option)</label>
             <value>Disabled</value>
@@ -208,7 +208,7 @@
                 </option>
             </store>
         </element>
-        <element type="select">
+        <element type="select" required="true" scope="shop">
             <name>single_invoice</name>
             <label>Byjuno Single Invoice</label>
             <value>Disabled</value>
@@ -225,7 +225,7 @@
                 </option>
             </store>
         </element>
-        <element type="select">
+        <element type="select" required="true" scope="shop">
             <name>installment_3</name>
             <label>3 installments</label>
             <value>Disabled</value>
@@ -242,7 +242,7 @@
                 </option>
             </store>
         </element>
-        <element type="select">
+        <element type="select" required="true" scope="shop">
             <name>installment_10</name>
             <label>10 installments</label>
             <value>Disabled</value>
@@ -259,7 +259,7 @@
                 </option>
             </store>
         </element>
-        <element type="select">
+        <element type="select" required="true" scope="shop">
             <name>installment_12</name>
             <label>12 installments</label>
             <value>Disabled</value>
@@ -276,7 +276,7 @@
                 </option>
             </store>
         </element>
-        <element type="select">
+        <element type="select" required="true" scope="shop">
             <name>installment_24</name>
             <label>24 installments</label>
             <value>Disabled</value>
@@ -293,7 +293,7 @@
                 </option>
             </store>
         </element>
-        <element type="select">
+        <element type="select" required="true" scope="shop">
             <name>installment_4x12</name>
             <label>4 installments in 12 months</label>
             <value>Disabled</value>
