@@ -25,8 +25,16 @@ class Shopware_Controllers_Frontend_PaymentInstallment extends Shopware_Controll
                     $this->forward('cancelminmax');
                     break;
                 }
-
                 $cdp_enabled = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_cdpenable");
+                $user = $this->getUser();
+                $billing = $user['billingaddress'];
+                $shipping = $user['shippingaddress'];
+                $b2bEnabled = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_b2b");
+                if ($b2bEnabled == 'Enabled' && !empty($billing["company"]))
+                {
+                    $this->forward('cancelcdp');
+                    break;
+                }
                 if ($cdp_enabled == 'Enabled') {
                     $allowed = $this->CDPRequest("byjuno_payment_installment");
                     if (!$allowed) {

@@ -26,6 +26,15 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                 }
 
                 $cdp_enabled = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_cdpenable");
+                $user = $this->getUser();
+                $billing = $user['billingaddress'];
+                $shipping = $user['shippingaddress'];
+                $b2bEnabled = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_b2b");
+                $IsB2BPayment = false;
+                if ($b2bEnabled == 'Enabled' && !empty($billing["company"]))
+                {
+                    $IsB2BPayment = true;
+                }
                 if ($cdp_enabled == 'Enabled') {
                     $allowed = $this->CDPRequest("byjuno_payment_invoice");
                     if (!$allowed) {
@@ -46,7 +55,7 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                 }
                 $checked = 'checked=\"\"';
                 $paymentplans = Array();
-                if ($config->getByNamespace("ByjunoPayments", "byjuno_invoice") == "Enabled") {
+                if ($config->getByNamespace("ByjunoPayments", "byjuno_invoice") == "Enabled" && !$IsB2BPayment) {
                     $paymentplans[] = Array(
                         "checked" => $checked,
                         "key" => "byjuno_invoice",
