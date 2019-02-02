@@ -37,6 +37,7 @@ class ByjunoRequest
     private $Email;
 
     private $CompanyName1;
+    private $DeliveryCompanyName1;
 
     /**
      * @param mixed $CompanyName1
@@ -52,6 +53,23 @@ class ByjunoRequest
     public function getCompanyName1()
     {
         return $this->CompanyName1;
+    }
+
+
+    /**
+     * @param mixed $DeliveryCompanyName1
+     */
+    public function setDeliveryCompanyName1($CompanyName1)
+    {
+        $this->DeliveryCompanyName1 = $CompanyName1;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDeliveryCompanyName1()
+    {
+        return $this->DeliveryCompanyName1;
     }
 
 
@@ -511,6 +529,7 @@ class ByjunoRequest
         $Customer->addAttribute("Reference", $this->CustomerReference);
         $Company = $Customer->addChild("Company");
         $Company->CompanyName1 = $this->CompanyName1;
+        $Company->Language = $this->Language;
 
         $OrderingPerson = $Company->addChild('OrderingPerson');
         $Person = $OrderingPerson->addChild("Person");
@@ -518,7 +537,6 @@ class ByjunoRequest
         $Person->FirstName = $this->FirstName;
         $Person->Gender = $this->Gender;
         $Person->DateOfBirth = $this->DateOfBirth;
-        $Person->Language = $this->Language;
 
         $CurrentAddress = $Company->addChild("CurrentAddress");
         $CurrentAddress->FirstLine = $this->FirstLine;
@@ -540,8 +558,13 @@ class ByjunoRequest
             $ExtraInfo->Name = $ei["Name"];
             $ExtraInfo->Value = $ei["Value"];
         }
+        if ($this->DeliveryCompanyName1 != "")
+        {
+            $ExtraInfo = $Company->addChild("ExtraInfo");
+            $ExtraInfo->Name = "DELIVERY_COMPANYNAME";
+            $ExtraInfo->Value = $this->DeliveryCompanyName1;
+        }
 
         return $xml->asXML();
     }
-
 }

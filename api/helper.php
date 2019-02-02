@@ -156,6 +156,9 @@ function CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $contr
     if (!empty($billing["company"])) {
         $request->setCompanyName1($billing["company"]);
     }
+    if (!empty($shipping["company"])) {
+        $request->setDeliveryCompanyName1($shipping["company"]);
+    }
 
     $request->setGender(0);
     $additionalInfo = $user["additional"]["user"];
@@ -259,111 +262,6 @@ function CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $contr
         $extraInfo["Value"] = $riskOwner;
         $request->setExtraInfo($extraInfo);
     }
-
-    $extraInfo["Name"] = 'CONNECTIVTY_MODULE';
-    $extraInfo["Value"] = 'Byjuno ShopWare module 1.0.3';
-    $request->setExtraInfo($extraInfo);
-    return $request;
-
-}
-
-function CreateShopWareShopRequest(\Shopware_Controllers_Frontend_PaymentInvoice $order)
-{
-    /* @var \Shopware\Models\Order\Billing $billing */
-    $billing = $order->getBilling();
-    /* @var \Shopware\Models\Order\Shipping $shipping */
-    $shipping = $order->getShipping();
-    $request = new \ByjunoRequest();
-    $request->setClientId(Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_clientid"));
-    $request->setUserID(Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_userid"));
-    $request->setPassword(Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_password"));
-    $request->setVersion("1.00");
-    $request->setRequestEmail(Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_techemail"));
-
-
-    $sql     = 'SELECT `locale` FROM s_core_locales WHERE id = ' . intval(Shopware()->Shop()->getLocale()->getId());
-    $langName = Shopware()->Db()->fetchRow($sql);
-    $lang = 'de';
-    if (!empty($langName["locale"]) && strlen($langName["locale"]) > 4) {
-        $lang = substr($langName["locale"], 0, 2);
-    }
-    $request->setLanguage($lang);
-
-    $request->setRequestId(uniqid((String)$billing->getId()));
-    $reference = $billing->getCustomer();
-    if (empty($reference)) {
-        $request->setCustomerReference("guest_".$billing->getId());
-    } else {
-        $request->setCustomerReference($billing->getCustomer()->getId());
-    }
-    $request->setFirstName((String)$billing->getFirstName());
-    $request->setLastName((String)$billing->getLastName());
-    $request->setFirstLine(trim((String)$billing->getStreet().' '.$billing->getAdditionalAddressLine1().' '.$billing->getAdditionalAddressLine1()));
-    $request->setCountryCode(strtoupper((String)$billing->getCountry()->getIso()));
-    $request->setPostCode((String)$billing->getZipCode());
-    $request->setTown((String)$billing->getCity());
-
-	if (!empty($reference) && !empty($billing->getCustomer()->getBirthday()) && substr($billing->getCustomer()->getBirthday(), 0, 4) != '0000') {
-		$request->setDateOfBirth((String)$billing->getCustomer()->getBirthday());
-	}
-
-    $request->setTelephonePrivate((String)$billing->getPhone());
-    if (!empty($reference)) {
-        $request->setEmail((String)$billing->getCustomer()->getEmail());
-    }
-
-    $extraInfo["Name"] = 'ORDERCLOSED';
-    $extraInfo["Value"] = 'NO';
-    $request->setExtraInfo($extraInfo);
-
-    $extraInfo["Name"] = 'ORDERAMOUNT';
-    $extraInfo["Value"] = $order->getInvoiceAmount();
-    $request->setExtraInfo($extraInfo);
-
-    $extraInfo["Name"] = 'ORDERCURRENCY';
-    $extraInfo["Value"] = $order->getCurrency();
-    $request->setExtraInfo($extraInfo);
-
-    $extraInfo["Name"] = 'IP';
-    $extraInfo["Value"] = getClientIp();
-    $request->setExtraInfo($extraInfo);
-
-    $tmx_enable = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_threatmetrixenable");
-    $tmxorgid = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_threatmetrix");
-    if (isset($tmx_enable) && $tmx_enable == 'Enabled' && isset($tmxorgid) && $tmxorgid != '' && !empty($_SESSION["byjuno_tmx"])) {
-        $extraInfo["Name"] = 'DEVICE_FINGERPRINT_ID';
-        $extraInfo["Value"] = $_SESSION["byjuno_tmx"];
-        $request->setExtraInfo($extraInfo);
-    }
-
-    /* shipping information */
-    $extraInfo["Name"] = 'DELIVERY_FIRSTNAME';
-    $extraInfo["Value"] = $shipping->getFirstName();
-    $request->setExtraInfo($extraInfo);
-
-    $extraInfo["Name"] = 'DELIVERY_LASTNAME';
-    $extraInfo["Value"] = $shipping->getLastName();
-    $request->setExtraInfo($extraInfo);
-
-    $extraInfo["Name"] = 'DELIVERY_FIRSTLINE';
-    $extraInfo["Value"] = trim((String)$shipping->getStreet().' '.$shipping->getAdditionalAddressLine1().' '.$shipping->getAdditionalAddressLine1());
-    $request->setExtraInfo($extraInfo);
-
-    $extraInfo["Name"] = 'DELIVERY_HOUSENUMBER';
-    $extraInfo["Value"] = '';
-    $request->setExtraInfo($extraInfo);
-
-    $extraInfo["Name"] = 'DELIVERY_COUNTRYCODE';
-    $extraInfo["Value"] = $shipping->getCountry()->getIso();
-    $request->setExtraInfo($extraInfo);
-
-    $extraInfo["Name"] = 'DELIVERY_POSTCODE';
-    $extraInfo["Value"] = $shipping->getZipCode();
-    $request->setExtraInfo($extraInfo);
-
-    $extraInfo["Name"] = 'DELIVERY_TOWN';
-    $extraInfo["Value"] = $shipping->getCity();
-    $request->setExtraInfo($extraInfo);
 
     $extraInfo["Name"] = 'CONNECTIVTY_MODULE';
     $extraInfo["Value"] = 'Byjuno ShopWare module 1.0.3';
