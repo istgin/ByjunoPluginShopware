@@ -156,6 +156,9 @@ function CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $contr
     if (!empty($billing["company"])) {
         $request->setCompanyName1($billing["company"]);
     }
+    if (!empty($billing["company"]) && !empty($billing["vatId"])) {
+        $request->setCompanyVatId($billing["vatId"]);
+    }
     if (!empty($shipping["company"])) {
         $request->setDeliveryCompanyName1($shipping["company"]);
     }

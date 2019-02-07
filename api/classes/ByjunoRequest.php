@@ -37,6 +37,7 @@ class ByjunoRequest
     private $Email;
 
     private $CompanyName1;
+    private $CompanyVatId;
     private $DeliveryCompanyName1;
 
     /**
@@ -53,6 +54,19 @@ class ByjunoRequest
     public function getCompanyName1()
     {
         return $this->CompanyName1;
+    }
+
+    public function setCompanyVatId($VatId)
+    {
+        $this->CompanyVatId = $VatId;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCompanyVatId()
+    {
+        return $this->CompanyVatId;
     }
 
 
@@ -563,6 +577,12 @@ class ByjunoRequest
             $ExtraInfo = $Company->addChild("ExtraInfo");
             $ExtraInfo->Name = "DELIVERY_COMPANYNAME";
             $ExtraInfo->Value = $this->DeliveryCompanyName1;
+        }
+        if ($this->CompanyVatId != "")
+        {
+            $ExtraInfo = $Company->addChild("ExtraInfo");
+            $ExtraInfo->Name = "REGISTERNUMBER";
+            $ExtraInfo->Value = $this->CompanyVatId;
         }
 
         return $xml->asXML();
