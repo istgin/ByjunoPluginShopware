@@ -5,12 +5,12 @@ use ByjunoPayments\Components\ByjunoPayment\InvoicePaymentService;
 
 class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Controllers_Frontend_Payment
 {
-    const PAYMENTSTATUSPAID = 12;
-    const PAYMENTSTATUSOPEN = 17;
-    const PAYMENTSTATUSVOID = 30;
+    private $PAYMENTSTATUSPAID = 12;
+    private $PAYMENTSTATUSOPEN = 17;
+    private $PAYMENTSTATUSVOID = 30;
 
-    const ORDERSTATUSCANCEL = 4;
-    const ORDERSTATUSINPROGRESS = 1;
+    private $ORDERSTATUSCANCEL = 4;
+    private $ORDERSTATUSINPROGRESS = 1;
 
     public $custom_birthday;
     public $custom_gender;
@@ -241,7 +241,7 @@ class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Contro
         }
         $order = null;
         if ($this->isStatusOkS2($statusS1)) {
-            $this->saveOrder(1, uniqid("byjuno_"), self::PAYMENTSTATUSOPEN);
+            $this->saveOrder(1, uniqid("byjuno_"), $this->PAYMENTSTATUSOPEN);
             /* @var $order \Shopware\Models\Order\Order */
             $order = Shopware()->Models()->getRepository('Shopware\Models\Order\Order')
                 ->findOneBy(array('number' => $this->getOrderNumber()));
@@ -278,11 +278,29 @@ class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Contro
         if ($order == null) {
             return false;
         }
+        $cancelStatusId = Shopware()->Config()->getByNamespace("ByjunoPayments", "S5_default_cancel_id");
+        $cancelStatusId = intval($cancelStatusId);
+        if ($cancelStatusId <= 0) {
+            $cancelStatusId = $this->ORDERSTATUSCANCEL;
+        }
+
+        $successStatusId = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_order_default_success_id");
+        $successStatusId = intval($successStatusId);
+        if ($successStatusId <= 0) {
+            $successStatusId = $this->ORDERSTATUSINPROGRESS;
+        }
+
+        $successPaymentStatusId = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_payment_default_success_id");
+        $successPaymentStatusId = intval($successPaymentStatusId);
+        if ($successPaymentStatusId <= 0) {
+            $successPaymentStatusId = $this->PAYMENTSTATUSPAID;
+        }
+
         $orderModule = Shopware()->Modules()->Order();
         if ($this->isStatusOkS2($statusS1) && $this->isStatusOkS3($statusS3)) {
-            $orderModule->setPaymentStatus($order->getId(), self::PAYMENTSTATUSPAID, false);
-            $orderModule->setOrderStatus($order->getId(), self::ORDERSTATUSINPROGRESS, false);
-            $mail = $orderModule->createStatusMail($order->getId(), self::PAYMENTSTATUSPAID);
+            $orderModule->setPaymentStatus($order->getId(), $successPaymentStatusId, false);
+            $orderModule->setOrderStatus($order->getId(), $successStatusId, false);
+            $mail = $orderModule->createStatusMail($order->getId(), $successPaymentStatusId);
             $mail->clearRecipients();
 			if (isset($mode) && $mode == 'Live') {
 				$mail->addTo(Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_prodemail"));
@@ -293,8 +311,8 @@ class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Contro
             $this->saveTransactionPaymentData($order->getId(), 'payment_plan', $this->payment_plan);
             return true;
         } else {
-            $orderModule->setPaymentStatus($order->getId(), self::PAYMENTSTATUSVOID, false);
-            $orderModule->setOrderStatus($order->getId(), self::ORDERSTATUSCANCEL, false);
+            $orderModule->setPaymentStatus($order->getId(), $this->PAYMENTSTATUSVOID, false);
+            $orderModule->setOrderStatus($order->getId(), $cancelStatusId, false);
         }
         return false;
     }

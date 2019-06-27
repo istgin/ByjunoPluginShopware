@@ -167,6 +167,16 @@
             <value>4</value>
         </element>
         <element type="text" required="true" scope="shop">
+            <name>byjuno_order_default_success_id</name>
+            <label>Shopware order success id</label>
+            <value>1</value>
+        </element>
+        <element type="text" required="true" scope="shop">
+            <name>byjuno_payment_default_success_id</name>
+            <label>Payment order success id</label>
+            <value>12</value>
+        </element>
+        <element type="text" required="true" scope="shop">
             <name>byjuno_prodemail</name>
             <label>Production email of Byjuno</label>
             <value>invoices@byjuno.ch</value>
