@@ -128,8 +128,25 @@
             <value>2</value>
         </element>
         <element type="select" required="true" scope="shop">
-            <name>byjuno_genderbirthday</name>
-            <label>Enable gender &amp; birthday selection</label>
+            <name>byjuno_gender</name>
+            <label>Enable gender selection</label>
+            <value>Enabled</value>
+            <store>
+                <option>
+                    <value>Disabled</value>
+                    <label lang="de">Disabled</label>
+                    <label lang="en">Disabled</label>
+                </option>
+                <option>
+                    <value>Enabled</value>
+                    <label lang="de">Enabled</label>
+                    <label lang="en">Enabled</label>
+                </option>
+            </store>
+        </element>
+        <element type="select" required="true" scope="shop">
+            <name>byjuno_birthday</name>
+            <label>Enable birthday selection</label>
             <value>Enabled</value>
             <store>
                 <option>

@@ -45,10 +45,14 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
 
                 $snippets = Shopware()->Snippets()->getNamespace('frontend/byjuno/index');
                 $config = Shopware()->Config();
-				$custom_fields = 1;
-				if ($config->getByNamespace("ByjunoPayments", "byjuno_genderbirthday") == "Disabled") {
-					$custom_fields = 0;
-				}
+                $custom_fields_gender = 1;
+                if ($config->getByNamespace("ByjunoPayments", "byjuno_gender") == "Disabled") {
+                    $custom_fields_gender = 0;
+                }
+                $custom_fields_birthday = 1;
+                if ($config->getByNamespace("ByjunoPayments", "byjuno_birthday") == "Disabled") {
+                    $custom_fields_birthday = 0;
+                }
                 $byjuno_allowpostal = 1;
                 if ($config->getByNamespace("ByjunoPayments", "byjuno_allowpostal") == "Disabled") {
                     $byjuno_allowpostal = 0;
@@ -106,8 +110,8 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                         )
                     ),
                     'byjuno_allowpostal' => $byjuno_allowpostal,
-                    'custom_bd_enable' => $custom_fields,
-                    'custom_gender_enable' => $custom_fields,
+                    'custom_bd_enable' => $custom_fields_birthday,
+                    'custom_gender_enable' => $custom_fields_gender,
                     'customer_day' => $customer_day,
                     'customer_month' => $customer_month,
                     'customer_year' => $customer_year,
