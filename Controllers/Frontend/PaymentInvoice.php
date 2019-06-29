@@ -60,7 +60,7 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                 $checked = 'checked=\"\"';
                 $paymentplans = Array();
 
-                if (IsB2bByjuno($billing)) {
+                if ($b2bEnabled && IsB2bByjuno($billing)) {
                     if ($config->getByNamespace("ByjunoPayments", "byjuno_invoice_b2b") == "Enabled" && !$IsB2BPayment) {
                         $paymentplans[] = Array(
                             "checked" => $checked,
