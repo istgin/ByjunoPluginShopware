@@ -274,7 +274,7 @@ function CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $contr
     }
 
     $extraInfo["Name"] = 'CONNECTIVTY_MODULE';
-    $extraInfo["Value"] = 'Byjuno ShopWare module 1.0.5';
+    $extraInfo["Value"] = 'Byjuno ShopWare module 1.0.6';
     $request->setExtraInfo($extraInfo);
     return $request;
 
