@@ -59,24 +59,52 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                 }
                 $checked = 'checked=\"\"';
                 $paymentplans = Array();
-                if ($config->getByNamespace("ByjunoPayments", "byjuno_invoice") == "Enabled" && !$IsB2BPayment) {
-                    $paymentplans[] = Array(
-                        "checked" => $checked,
-                        "key" => "byjuno_invoice",
-                        "val" => $snippets->get('byjuno_invoice', "Byjuno invoice"),
-                        "url" => $snippets->get('byjuno_invoice_toc_url', "http://byjuno.ch/de/terms")
-                    );
-                    $checked = '';
-                }
-                if ($config->getByNamespace("ByjunoPayments", "single_invoice") == "Enabled") {
-                    $paymentplans[] =
-                        Array(
+
+                if (IsB2bByjuno($billing)) {
+                    if ($config->getByNamespace("ByjunoPayments", "byjuno_invoice_b2b") == "Enabled" && !$IsB2BPayment) {
+                        $paymentplans[] = Array(
                             "checked" => $checked,
-                            "key" => "sinlge_invoice",
-                            "val" => $snippets->get('single_invoice', "Single invoice"),
-                            "url" => $snippets->get('single_invoice_toc_url', "http://byjuno.ch/de/terms")
+                            "key" => "byjuno_invoice",
+                            "val" => $snippets->get('byjuno_invoice', "Byjuno invoice"),
+                            "url" => $snippets->get('byjuno_invoice_toc_url', "http://byjuno.ch/de/terms")
                         );
+                        $checked = '';
+                    }
+                    if ($config->getByNamespace("ByjunoPayments", "single_invoice_b2b") == "Enabled") {
+                        $paymentplans[] =
+                            Array(
+                                "checked" => $checked,
+                                "key" => "sinlge_invoice",
+                                "val" => $snippets->get('single_invoice', "Single invoice"),
+                                "url" => $snippets->get('single_invoice_toc_url', "http://byjuno.ch/de/terms")
+                            );
+                    }
+                } else {
+                    if ($config->getByNamespace("ByjunoPayments", "byjuno_invoice") == "Enabled" && !$IsB2BPayment) {
+                        $paymentplans[] = Array(
+                            "checked" => $checked,
+                            "key" => "byjuno_invoice",
+                            "val" => $snippets->get('byjuno_invoice', "Byjuno invoice"),
+                            "url" => $snippets->get('byjuno_invoice_toc_url', "http://byjuno.ch/de/terms")
+                        );
+                        $checked = '';
+                    }
+                    if ($config->getByNamespace("ByjunoPayments", "single_invoice") == "Enabled") {
+                        $paymentplans[] =
+                            Array(
+                                "checked" => $checked,
+                                "key" => "sinlge_invoice",
+                                "val" => $snippets->get('single_invoice', "Single invoice"),
+                                "url" => $snippets->get('single_invoice_toc_url', "http://byjuno.ch/de/terms")
+                            );
+                    }
                 }
+
+                if (count($paymentplans) == 0) {
+                    $this->forward('cancelcdp');
+                    return;
+                }
+
                 $user = $this->getUser();
                 $addInfo = $user["additional"]["user"];
                 $customer_gender = 1;
@@ -126,7 +154,7 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                         )
                     )
                 );
-                if ($custom_fields == 0 && $byjuno_allowpostal == 0 && count($paymentplans) == 1) {
+                if ($custom_fields_birthday == 0 && $custom_fields_gender == 0 && $byjuno_allowpostal == 0 && count($paymentplans) == 1) {
                     $this->payment_plan = $paymentplans[0]["key"];
                     $this->payment_send = "email";
                     $this->payment_send_to = (String)$user["additional"]["user"]["email"];

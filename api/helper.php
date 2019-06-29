@@ -117,6 +117,13 @@ function CreateShopRequestS5Cancel($amount, $orderCurrency, $orderId, $customerI
     return $request;
 }
 
+function IsB2bByjuno($billing) {
+    if (!empty($billing["company"])) {
+        return true;
+    }
+    return false;
+}
+
 /* @var $controller \Shopware_Controllers_Frontend_BasebyjunoController  */
 function CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $controller, $paymentmethod, $repayment, $invoiceDelivery, $riskOwner, $orderId = "", $orderClosed = "NO") {
 

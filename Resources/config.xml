@@ -219,22 +219,22 @@
         </element>
 
         <element type="select" required="true" scope="shop">
-            <name>byjuno_invoice</name>
-            <label>Byjuno Invoice (with partial payment option)</label>
-            <value>Disabled</value>
-            <store>
-                <option>
-                    <value>Disabled</value>
-                    <label lang="de">Disabled</label>
-                    <label lang="en">Disabled</label>
-                </option>
-                <option>
-                    <value>Enabled</value>
-                    <label lang="de">Enabled</label>
-                    <label lang="en">Enabled</label>
-                </option>
-            </store>
-        </element>
+        <name>byjuno_invoice</name>
+        <label>Byjuno Invoice (with partial payment option)</label>
+        <value>Enabled</value>
+        <store>
+            <option>
+                <value>Disabled</value>
+                <label lang="de">Disabled</label>
+                <label lang="en">Disabled</label>
+            </option>
+            <option>
+                <value>Enabled</value>
+                <label lang="de">Enabled</label>
+                <label lang="en">Enabled</label>
+            </option>
+        </store>
+    </element>
         <element type="select" required="true" scope="shop">
             <name>single_invoice</name>
             <label>Byjuno Single Invoice</label>
@@ -252,6 +252,43 @@
                 </option>
             </store>
         </element>
+
+        <element type="select" required="true" scope="shop">
+            <name>byjuno_invoice_b2b</name>
+            <label>Byjuno Invoice (with partial payment option) (B2B)</label>
+            <value>Disabled</value>
+            <store>
+                <option>
+                    <value>Disabled</value>
+                    <label lang="de">Disabled</label>
+                    <label lang="en">Disabled</label>
+                </option>
+                <option>
+                    <value>Enabled</value>
+                    <label lang="de">Enabled</label>
+                    <label lang="en">Enabled</label>
+                </option>
+            </store>
+        </element>
+        <element type="select" required="true" scope="shop">
+            <name>single_invoice_b2b</name>
+            <label>Byjuno Single Invoice (B2B)</label>
+            <value>Disabled</value>
+            <store>
+                <option>
+                    <value>Disabled</value>
+                    <label lang="de">Disabled</label>
+                    <label lang="en">Disabled</label>
+                </option>
+                <option>
+                    <value>Enabled</value>
+                    <label lang="de">Enabled</label>
+                    <label lang="en">Enabled</label>
+                </option>
+            </store>
+        </element>
+
+
         <element type="select" required="true" scope="shop">
             <name>installment_3</name>
             <label>3 installments</label>
@@ -337,5 +374,92 @@
                 </option>
             </store>
         </element>
+
+        <element type="select" required="true" scope="shop">
+            <name>installment_3_b2b</name>
+            <label>3 installments (B2B)</label>
+            <value>Disabled</value>
+            <store>
+                <option>
+                    <value>Disabled</value>
+                    <label lang="de">Disabled</label>
+                    <label lang="en">Disabled</label>
+                </option>
+                <option>
+                    <value>Enabled</value>
+                    <label lang="de">Enabled</label>
+                    <label lang="en">Enabled</label>
+                </option>
+            </store>
+        </element>
+        <element type="select" required="true" scope="shop">
+            <name>installment_10_b2b</name>
+            <label>10 installments (B2B)</label>
+            <value>Disabled</value>
+            <store>
+                <option>
+                    <value>Disabled</value>
+                    <label lang="de">Disabled</label>
+                    <label lang="en">Disabled</label>
+                </option>
+                <option>
+                    <value>Enabled</value>
+                    <label lang="de">Enabled</label>
+                    <label lang="en">Enabled</label>
+                </option>
+            </store>
+        </element>
+        <element type="select" required="true" scope="shop">
+            <name>installment_12_b2b</name>
+            <label>12 installments (B2B)</label>
+            <value>Disabled</value>
+            <store>
+                <option>
+                    <value>Disabled</value>
+                    <label lang="de">Disabled</label>
+                    <label lang="en">Disabled</label>
+                </option>
+                <option>
+                    <value>Enabled</value>
+                    <label lang="de">Enabled</label>
+                    <label lang="en">Enabled</label>
+                </option>
+            </store>
+        </element>
+        <element type="select" required="true" scope="shop">
+            <name>installment_24_b2b</name>
+            <label>24 installments (B2B)</label>
+            <value>Disabled</value>
+            <store>
+                <option>
+                    <value>Disabled</value>
+                    <label lang="de">Disabled</label>
+                    <label lang="en">Disabled</label>
+                </option>
+                <option>
+                    <value>Enabled</value>
+                    <label lang="de">Enabled</label>
+                    <label lang="en">Enabled</label>
+                </option>
+            </store>
+        </element>
+        <element type="select" required="true" scope="shop">
+            <name>installment_4x12_b2b</name>
+            <label>4 installments in 12 months (B2B)</label>
+            <value>Disabled</value>
+            <store>
+                <option>
+                    <value>Disabled</value>
+                    <label lang="de">Disabled</label>
+                    <label lang="en">Disabled</label>
+                </option>
+                <option>
+                    <value>Enabled</value>
+                    <label lang="de">Enabled</label>
+                    <label lang="en">Enabled</label>
+                </option>
+            </store>
+        </element>
+
     </elements>
 </config>

@@ -59,51 +59,105 @@ class Shopware_Controllers_Frontend_PaymentInstallment extends Shopware_Controll
                 }
                 $checked = 'checked=\"\"';
                 $paymentplans = Array();
-                if ($config->getByNamespace("ByjunoPayments", "installment_3") == "Enabled") {
-                    $paymentplans[] = Array(
-                        "checked" => $checked,
-                        "key" => "installment_3",
-                        "val" => $snippets->get('installment_3', "3 Raten"),
-                        "url" => $snippets->get('installment_3_toc_url', "http://byjuno.ch/de/terms")
-                    );
-                    $checked = '';
-                }
-                if ($config->getByNamespace("ByjunoPayments", "installment_10") == "Enabled") {
-                    $paymentplans[] =
-                        Array(
+                if (IsB2bByjuno($billing)) {
+                    if ($config->getByNamespace("ByjunoPayments", "installment_3_b2b") == "Enabled") {
+                        $paymentplans[] = Array(
                             "checked" => $checked,
-                            "key" => "installment_10",
-                            "val" => $snippets->get('installment_10', "10 Raten"),
-                            "url" => $snippets->get('installment_10_toc_url', "http://byjuno.ch/de/terms")
+                            "key" => "installment_3",
+                            "val" => $snippets->get('installment_3', "3 Raten"),
+                            "url" => $snippets->get('installment_3_toc_url', "http://byjuno.ch/de/terms")
                         );
-                }
-                if ($config->getByNamespace("ByjunoPayments", "installment_12") == "Enabled") {
-                    $paymentplans[] =
-                        Array(
+                        $checked = '';
+                    }
+                    if ($config->getByNamespace("ByjunoPayments", "installment_10_b2b") == "Enabled") {
+                        $paymentplans[] =
+                            Array(
+                                "checked" => $checked,
+                                "key" => "installment_10",
+                                "val" => $snippets->get('installment_10', "10 Raten"),
+                                "url" => $snippets->get('installment_10_toc_url', "http://byjuno.ch/de/terms")
+                            );
+                    }
+                    if ($config->getByNamespace("ByjunoPayments", "installment_12_b2b") == "Enabled") {
+                        $paymentplans[] =
+                            Array(
+                                "checked" => $checked,
+                                "key" => "installment_12",
+                                "val" => $snippets->get('installment_12', "12 Raten"),
+                                "url" => $snippets->get('installment_12_toc_url', "http://byjuno.ch/de/terms")
+                            );
+                    }
+                    if ($config->getByNamespace("ByjunoPayments", "installment_24_b2b") == "Enabled") {
+                        $paymentplans[] =
+                            Array(
+                                "checked" => $checked,
+                                "key" => "installment_24",
+                                "val" => $snippets->get('installment_24', "24 Raten"),
+                                "url" => $snippets->get('installment_24_toc_url', "http://byjuno.ch/de/terms")
+                            );
+                    }
+                    if ($config->getByNamespace("ByjunoPayments", "installment_4x12_b2b") == "Enabled") {
+                        $paymentplans[] =
+                            Array(
+                                "checked" => $checked,
+                                "key" => "installment_4x12",
+                                "val" => $snippets->get('installment_4x12', "4 Raten innerhalb von 12 Monaten"),
+                                "url" => $snippets->get('installment_4x12_toc_url', "http://byjuno.ch/de/terms")
+                            );
+                    }
+                } else {
+                    if ($config->getByNamespace("ByjunoPayments", "installment_3") == "Enabled") {
+                        $paymentplans[] = Array(
                             "checked" => $checked,
-                            "key" => "installment_12",
-                            "val" => $snippets->get('installment_12', "12 Raten"),
-                            "url" => $snippets->get('installment_12_toc_url', "http://byjuno.ch/de/terms")
+                            "key" => "installment_3",
+                            "val" => $snippets->get('installment_3', "3 Raten"),
+                            "url" => $snippets->get('installment_3_toc_url', "http://byjuno.ch/de/terms")
                         );
+                        $checked = '';
+                    }
+                    if ($config->getByNamespace("ByjunoPayments", "installment_10") == "Enabled") {
+                        $paymentplans[] =
+                            Array(
+                                "checked" => $checked,
+                                "key" => "installment_10",
+                                "val" => $snippets->get('installment_10', "10 Raten"),
+                                "url" => $snippets->get('installment_10_toc_url', "http://byjuno.ch/de/terms")
+                            );
+                    }
+                    if ($config->getByNamespace("ByjunoPayments", "installment_12") == "Enabled") {
+                        $paymentplans[] =
+                            Array(
+                                "checked" => $checked,
+                                "key" => "installment_12",
+                                "val" => $snippets->get('installment_12', "12 Raten"),
+                                "url" => $snippets->get('installment_12_toc_url', "http://byjuno.ch/de/terms")
+                            );
+                    }
+                    if ($config->getByNamespace("ByjunoPayments", "installment_24") == "Enabled") {
+                        $paymentplans[] =
+                            Array(
+                                "checked" => $checked,
+                                "key" => "installment_24",
+                                "val" => $snippets->get('installment_24', "24 Raten"),
+                                "url" => $snippets->get('installment_24_toc_url', "http://byjuno.ch/de/terms")
+                            );
+                    }
+                    if ($config->getByNamespace("ByjunoPayments", "installment_4x12") == "Enabled") {
+                        $paymentplans[] =
+                            Array(
+                                "checked" => $checked,
+                                "key" => "installment_4x12",
+                                "val" => $snippets->get('installment_4x12', "4 Raten innerhalb von 12 Monaten"),
+                                "url" => $snippets->get('installment_4x12_toc_url', "http://byjuno.ch/de/terms")
+                            );
+                    }
                 }
-                if ($config->getByNamespace("ByjunoPayments", "installment_24") == "Enabled") {
-                    $paymentplans[] =
-                        Array(
-                            "checked" => $checked,
-                            "key" => "installment_24",
-                            "val" => $snippets->get('installment_24', "24 Raten"),
-                            "url" => $snippets->get('installment_24_toc_url', "http://byjuno.ch/de/terms")
-                        );
+
+                if (count($paymentplans) == 0) {
+                    $this->forward('cancelcdp');
+                    return;
                 }
-                if ($config->getByNamespace("ByjunoPayments", "installment_4x12") == "Enabled") {
-                    $paymentplans[] =
-                        Array(
-                            "checked" => $checked,
-                            "key" => "installment_4x12",
-                            "val" => $snippets->get('installment_4x12', "4 Raten innerhalb von 12 Monaten"),
-                            "url" => $snippets->get('installment_4x12_toc_url', "http://byjuno.ch/de/terms")
-                        );
-                }
+
                 $user = $this->getUser();
                 $addInfo = $user["additional"]["user"];
                 $customer_gender = 1;
@@ -153,7 +207,7 @@ class Shopware_Controllers_Frontend_PaymentInstallment extends Shopware_Controll
                         )
                     )
                 );
-                if ($custom_fields == 0 && $byjuno_allowpostal == 0 && count($paymentplans) == 1) {
+                if ($custom_fields_birthday == 0 && $custom_fields_gender == 0 && $byjuno_allowpostal == 0 && count($paymentplans) == 1) {
                     $this->payment_plan = $paymentplans[0]["key"];
                     $this->payment_send = "email";
                     $this->payment_send_to = (String)$user["additional"]["user"]["email"];
