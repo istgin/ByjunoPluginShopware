@@ -154,7 +154,14 @@ function CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $contr
     }
     $request->setFirstName((String)$billing['firstname']);
     $request->setLastName((String)$billing['lastname']);
-    $request->setFirstLine(trim((String)$billing['street'].' '.$billing['streetnumber']));
+    $addressAdd = '';
+    if (!empty($billing['additionalAddressLine1'])) {
+        $addressAdd = ' '.trim((String)$billing['additionalAddressLine1']);
+    }
+    if (!empty($billing['additionalAddressLine2'])) {
+        $addressAdd = $addressAdd.' '.trim((String)$billing['additionalAddressLine2']);
+    }
+    $request->setFirstLine(trim((String)$billing['street'].' '.$billing['streetnumber'].$addressAdd));
     $request->setCountryCode(strtoupper((String)$countryBilling));
     $request->setPostCode((String)$billing['zipcode']);
     $request->setTown((String)$billing['city']);
@@ -232,8 +239,16 @@ function CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $contr
     $extraInfo["Value"] = $shipping['lastname'];
     $request->setExtraInfo($extraInfo);
 
+    $addressShippingAdd = '';
+    if (!empty($shipping['additionalAddressLine1'])) {
+        $addressShippingAdd = ' '.trim((String)$shipping['additionalAddressLine1']);
+    }
+    if (!empty($shipping['additionalAddressLine2'])) {
+        $addressShippingAdd = $addressShippingAdd.' '.trim((String)$shipping['additionalAddressLine2']);
+    }
+
     $extraInfo["Name"] = 'DELIVERY_FIRSTLINE';
-    $extraInfo["Value"] = trim($shipping['street'].' '.$shipping['streetnumber']);
+    $extraInfo["Value"] = trim($shipping['street'].' '.$shipping['streetnumber'].$addressShippingAdd);
     $request->setExtraInfo($extraInfo);
 
     $extraInfo["Name"] = 'DELIVERY_HOUSENUMBER';

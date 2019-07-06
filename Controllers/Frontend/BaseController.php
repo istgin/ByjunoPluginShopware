@@ -83,11 +83,23 @@ class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Contro
         try {
             $accepted_S2_ij = Shopware()->Config()->getByNamespace("ByjunoPayments", "allowed_s2");
             $accepted_S2_merhcant = Shopware()->Config()->getByNamespace("ByjunoPayments", "allowed_s2_merchant");
-            $ijStatus = explode(",", $accepted_S2_ij);
-            $merchantStatus = explode(",", $accepted_S2_merhcant);
-            if (in_array($status, $ijStatus)) {
+            $ijStatus = Array();
+            if (!empty(trim($accepted_S2_ij))) {
+                $ijStatus = explode(",", trim($accepted_S2_ij));
+                foreach($ijStatus as $key => $val) {
+                    $ijStatus[$key] = intval($val);
+                }
+            }
+            $merchantStatus = Array();
+            if (!empty(trim($accepted_S2_merhcant))) {
+                $merchantStatus = explode(",", trim($accepted_S2_merhcant));
+                foreach($merchantStatus as $key => $val) {
+                    $merchantStatus[$key] = intval($val);
+                }
+            }
+            if (!empty($accepted_S2_ij) && count($ijStatus) > 0 && in_array($status, $ijStatus)) {
                 return true;
-            } else if (in_array($status, $merchantStatus)) {
+            } else if (!empty($accepted_S2_merhcant) && count($merchantStatus) > 0 && in_array($status, $merchantStatus)) {
                 return true;
             }
             return false;
@@ -100,8 +112,14 @@ class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Contro
     protected function isStatusOkCDP($status) {
         try {
             $accepted_CDP = Shopware()->Config()->getByNamespace("ByjunoPayments", "allowed_cdp");
-            $ijStatus = explode(",", $accepted_CDP);
-            if (in_array($status, $ijStatus)) {
+            $ijStatus = Array();
+            if (!empty(trim($accepted_CDP))) {
+                $ijStatus = explode(",", trim($accepted_CDP));
+                foreach($ijStatus as $key => $val) {
+                    $ijStatus[$key] = intval($val);
+                }
+            }
+            if (!empty($accepted_CDP) && count($ijStatus) > 0 && in_array($status, $ijStatus)) {
                 return true;
             }
             return false;
@@ -115,8 +133,14 @@ class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Contro
     protected function isStatusOkS3($status) {
         try {
             $accepted_S3 = Shopware()->Config()->getByNamespace("ByjunoPayments", "allowed_s3");
-            $ijStatus = explode(",", $accepted_S3);
-            if (in_array($status, $ijStatus)) {
+            $ijStatus = Array();
+            if (!empty(trim($accepted_S3))) {
+                $ijStatus = explode(",", trim($accepted_S3));
+                foreach($ijStatus as $key => $val) {
+                    $ijStatus[$key] = intval($val);
+                }
+            }
+            if (!empty($accepted_S3) && count($ijStatus) > 0 && in_array($status, $ijStatus)) {
                 return true;
             }
             return false;
@@ -130,11 +154,23 @@ class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Contro
         try {
             $accepted_S2_ij = Shopware()->Config()->getByNamespace("ByjunoPayments", "allowed_s2");
             $accepted_S2_merhcant = Shopware()->Config()->getByNamespace("ByjunoPayments", "allowed_s2_merchant");
-            $ijStatus = explode(",", $accepted_S2_ij);
-            $merchantStatus = explode(",", $accepted_S2_merhcant);
-            if (in_array($status, $ijStatus)) {
+            $ijStatus = Array();
+            if (!empty(trim($accepted_S2_ij))) {
+                $ijStatus = explode(",", trim($accepted_S2_ij));
+                foreach($ijStatus as $key => $val) {
+                    $ijStatus[$key] = intval($val);
+                }
+            }
+            $merchantStatus = Array();
+            if (!empty(trim($accepted_S2_merhcant))) {
+                $merchantStatus = explode(",", trim($accepted_S2_merhcant));
+                foreach($merchantStatus as $key => $val) {
+                    $merchantStatus[$key] = intval($val);
+                }
+            }
+            if (!empty($accepted_S2_ij) && count($ijStatus) > 0 && in_array($status, $ijStatus)) {
                 return "IJ";
-            } else if (in_array($status, $merchantStatus)) {
+            } else if (!empty($accepted_S2_merhcant) && count($merchantStatus) > 0 && in_array($status, $merchantStatus)) {
                 return "CLIENT";
             }
             return "No owner";
