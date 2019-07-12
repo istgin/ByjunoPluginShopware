@@ -165,6 +165,22 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                         $this->forward('cancel');
                         break;
                     }
+                } else if ($custom_fields_birthday == 1 && $custom_fields_gender == 0 && $byjuno_allowpostal == 0 && count($paymentplans) == 1) {
+                    $additionalInfo = $user["additional"]["user"];
+                    if (!empty($additionalInfo['birthday']) && substr($additionalInfo['birthday'], 0, 4) != '0000') {
+                        $this->payment_plan = $paymentplans[0]["key"];
+                        $this->payment_send = "email";
+                        $this->payment_send_to = (String)$user["additional"]["user"]["email"];
+                        if ($this->gatewayAction('byjuno_payment_invoice')) {
+                            $this->redirect(['controller' => 'checkout', 'action' => 'finish']);
+                            break;
+                        } else {
+                            $this->forward('cancel');
+                            break;
+                        }
+                    } else {
+                        $this->View()->assign($viewAssignments);
+                    }
                 } else {
                     $this->View()->assign($viewAssignments);
                 }

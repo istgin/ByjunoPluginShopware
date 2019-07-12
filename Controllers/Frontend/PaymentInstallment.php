@@ -3,7 +3,8 @@
 use ByjunoPayments\Components\ByjunoPayment\PaymentResponse;
 use ByjunoPayments\Components\ByjunoPayment\InvoicePaymentService;
 
-include(__DIR__."/BaseController.php");
+include(__DIR__ . "/BaseController.php");
+
 class Shopware_Controllers_Frontend_PaymentInstallment extends Shopware_Controllers_Frontend_BasebyjunoController
 {
     /**
@@ -30,8 +31,7 @@ class Shopware_Controllers_Frontend_PaymentInstallment extends Shopware_Controll
                 $billing = $user['billingaddress'];
                 $shipping = $user['shippingaddress'];
                 $b2bEnabled = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_b2b");
-                if ($b2bEnabled == 'Enabled' && !empty($billing["company"]))
-                {
+                if ($b2bEnabled == 'Enabled' && !empty($billing["company"])) {
                     $this->forward('cancelcdp');
                     break;
                 }
@@ -45,10 +45,10 @@ class Shopware_Controllers_Frontend_PaymentInstallment extends Shopware_Controll
 
                 $snippets = Shopware()->Snippets()->getNamespace('frontend/byjuno/index');
                 $config = Shopware()->Config();
-				$custom_fields_gender = 1;
-				if ($config->getByNamespace("ByjunoPayments", "byjuno_gender") == "Disabled") {
+                $custom_fields_gender = 1;
+                if ($config->getByNamespace("ByjunoPayments", "byjuno_gender") == "Disabled") {
                     $custom_fields_gender = 0;
-				}
+                }
                 $custom_fields_birthday = 1;
                 if ($config->getByNamespace("ByjunoPayments", "byjuno_birthday") == "Disabled") {
                     $custom_fields_birthday = 0;
@@ -180,7 +180,7 @@ class Shopware_Controllers_Frontend_PaymentInstallment extends Shopware_Controll
                     }
                 }
                 $billing = $user['billingaddress'];
-                $address = trim(trim((String)$billing['street'].' '.$billing['streetnumber']).', '.(String)$billing['city'].', '.(String)$billing['zipcode']);
+                $address = trim(trim((String)$billing['street'] . ' ' . $billing['streetnumber']) . ', ' . (String)$billing['city'] . ', ' . (String)$billing['zipcode']);
                 $viewAssignments = array(
                     'genders' => Array(
                         Array("key" => "1",
@@ -218,6 +218,22 @@ class Shopware_Controllers_Frontend_PaymentInstallment extends Shopware_Controll
                         $this->forward('cancel');
                         break;
                     }
+                } else if ($custom_fields_birthday == 1 && $custom_fields_gender == 0 && $byjuno_allowpostal == 0 && count($paymentplans) == 1) {
+                    $additionalInfo = $user["additional"]["user"];
+                    if (!empty($additionalInfo['birthday']) && substr($additionalInfo['birthday'], 0, 4) != '0000') {
+                        $this->payment_plan = $paymentplans[0]["key"];
+                        $this->payment_send = "email";
+                        $this->payment_send_to = (String)$user["additional"]["user"]["email"];
+                        if ($this->gatewayAction('byjuno_payment_installment')) {
+                            $this->redirect(['controller' => 'checkout', 'action' => 'finish']);
+                            break;
+                        } else {
+                            $this->forward('cancel');
+                            break;
+                        }
+                    } else {
+                        $this->View()->assign($viewAssignments);
+                    }
                 } else {
                     $this->View()->assign($viewAssignments);
                 }
@@ -227,6 +243,7 @@ class Shopware_Controllers_Frontend_PaymentInstallment extends Shopware_Controll
                 break;
         }
     }
+
     public function confirmAction()
     {
         $this->baseConfirmActions();

@@ -73,7 +73,7 @@
             <div style="padding: 0 0 5px 0"><label for="payment_plan" style="font-size: 18px"><b>{s name=select_payment_plan namespace=frontend/byjuno/index}Select payment plan{/s}</b></label></div>
             <div style="padding: 0 0 15px 0">
                 {foreach from=$paymentplans item=paymentplan}
-                    <input type="radio" name="payment_plan" {$paymentplan.checked} value="{$paymentplan.key}"> &nbsp;{$paymentplan.val} <a href="{$paymentplan.url}" target="_blank">(T&C)</a><br>
+                    <input type="radio" name="payment_plan" {$paymentplan.checked} value="{$paymentplan.key}"> &nbsp;{$paymentplan.val} <a href="{$paymentplan.url}" target="_blank">{s name=t_and_c namespace=frontend/byjuno/index}(T&C){/s}</a><br>
                 {/foreach}
                 {if count($paymentplans) == 0}
                     {s name=payment_plans_not_available namespace=frontend/byjuno/index}No any payment plans are available{/s}
