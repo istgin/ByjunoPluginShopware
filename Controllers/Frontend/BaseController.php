@@ -322,7 +322,7 @@ class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Contro
 
         $successStatusId = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_order_default_success_id");
         $successStatusId = intval($successStatusId);
-        if ($successStatusId <= 0) {
+        if ($successStatusId < 0) {
             $successStatusId = $this->ORDERSTATUSINPROGRESS;
         }
 

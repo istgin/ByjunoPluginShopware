@@ -178,6 +178,23 @@
                 </option>
             </store>
         </element>
+        <element type="select" required="true" scope="shop">
+            <name>byjuno_S5_reversal</name>
+            <label>S5 on Reversal Invoice</label>
+            <value>Disabled</value>
+            <store>
+                <option>
+                    <value>Disabled</value>
+                    <label lang="de">Disabled</label>
+                    <label lang="en">Disabled</label>
+                </option>
+                <option>
+                    <value>Enabled</value>
+                    <label lang="de">Enabled</label>
+                    <label lang="en">Enabled</label>
+                </option>
+            </store>
+        </element>
         <element type="text" required="true" scope="shop">
             <name>S5_default_cancel_id</name>
             <label>Shopware order cancel id</label>
