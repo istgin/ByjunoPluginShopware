@@ -382,7 +382,16 @@ class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Contro
 
             if ($custom_birthday != null && isset($custom_birthday["day"]) && isset($custom_birthday["month"]) && isset($custom_birthday["year"])) {
                 $this->custom_birthday = $custom_birthday["year"]."-".$custom_birthday["month"]."-".$custom_birthday["day"];
+                if (!empty($user["additional"]["user"]["id"])) {
+                    /* @var $customer \Shopware\Models\Customer\Customer */
+                    $customer = Shopware()->Models()->getRepository('Shopware\Models\Customer\Customer')
+                        ->findOneBy(array('id' => $user["additional"]["user"]["id"]));
+                    $customer->setBirthday(new \DateTime($this->custom_birthday));
+                    Shopware()->Models()->persist($customer);
+                    Shopware()->Models()->flush();
+                }
             }
+
         }
     }
 

@@ -49,9 +49,10 @@ class Shopware_Controllers_Frontend_PaymentInstallment extends Shopware_Controll
                 if ($config->getByNamespace("ByjunoPayments", "byjuno_gender") == "Disabled") {
                     $custom_fields_gender = 0;
                 }
-                $custom_fields_birthday = 1;
-                if ($config->getByNamespace("ByjunoPayments", "byjuno_birthday") == "Disabled") {
-                    $custom_fields_birthday = 0;
+                $custom_fields_birthday = 0;
+                if ($config->getByNamespace("ByjunoPayments", "byjuno_birthday") == "Enabled"
+                    && (empty($additionalInfo['birthday']) || substr($additionalInfo['birthday'], 0, 4) != '0000')) {
+                    $custom_fields_birthday = 1;
                 }
                 $byjuno_allowpostal = 1;
                 if ($config->getByNamespace("ByjunoPayments", "byjuno_allowpostal") == "Disabled") {
