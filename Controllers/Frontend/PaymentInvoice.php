@@ -155,6 +155,7 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                         )
                     )
                 );
+                $_SESSION["byjuno"]["processing"] = false;
                 if ($custom_fields_birthday == 0 && $custom_fields_gender == 0 && $byjuno_allowpostal == 0 && count($paymentplans) == 1) {
                     $this->payment_plan = $paymentplans[0]["key"];
                     $this->payment_send = "email";

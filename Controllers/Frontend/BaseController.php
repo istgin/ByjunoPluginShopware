@@ -243,6 +243,10 @@ class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Contro
      */
     protected function gatewayAction($paymentMethod)
     {
+        if (!empty($_SESSION["byjuno"]["processing"]) && $_SESSION["byjuno"]["processing"] == true) {
+            return false;
+        }
+        $_SESSION["byjuno"]["processing"] = true;
         $mode = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_mode");
         $b2b = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_b2b");
         $user = $this->getUser();
@@ -309,9 +313,11 @@ class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Contro
                 }
             }
         } else {
+            $_SESSION["byjuno"]["processing"] = false;
             return false;
         }
         if ($order == null) {
+            $_SESSION["byjuno"]["processing"] = false;
             return false;
         }
         $cancelStatusId = Shopware()->Config()->getByNamespace("ByjunoPayments", "S5_default_cancel_id");
@@ -345,11 +351,13 @@ class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Contro
             }
             $orderModule->sendStatusMail($mail);
             $this->saveTransactionPaymentData($order->getId(), 'payment_plan', $this->payment_plan);
+            $_SESSION["byjuno"]["processing"] = false;
             return true;
         } else {
             $orderModule->setPaymentStatus($order->getId(), $this->PAYMENTSTATUSVOID, false);
             $orderModule->setOrderStatus($order->getId(), $cancelStatusId, false);
         }
+        $_SESSION["byjuno"]["processing"] = false;
         return false;
     }
 
