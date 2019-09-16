@@ -195,6 +195,23 @@
                 </option>
             </store>
         </element>
+        <element type="select" required="true" scope="shop">
+            <name>byjuno_S4_activation</name>
+            <label>S4 &amp; S5 activation place</label>
+            <value>Button</value>
+            <store>
+                <option>
+                    <value>Button</value>
+                    <label lang="de">Button</label>
+                    <label lang="en">Button</label>
+                </option>
+                <option>
+                    <value>Invoice</value>
+                    <label lang="de">Invoice</label>
+                    <label lang="en">Invoice</label>
+                </option>
+            </store>
+        </element>
         <element type="text" required="true" scope="shop">
             <name>S5_default_cancel_id</name>
             <label>Shopware order cancel id</label>

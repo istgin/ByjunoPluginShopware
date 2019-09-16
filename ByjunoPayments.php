@@ -96,7 +96,8 @@ class ByjunoPayments extends Plugin
 
         $s4s5 = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_S4_S5");
         $s5Rev = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_S5_reversal");
-        if ((isset($s4s5) && $s4s5 == 'Enabled') || (isset($s5Rev) && $s5Rev == 'Enabled')) {
+        $s4_trigger = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_S4_activation");
+        if ($s4_trigger == 'Invoice' && ((isset($s4s5) && $s4s5 == 'Enabled') || (isset($s5Rev) && $s5Rev == 'Enabled'))) {
             /* @var $doc \Shopware_Components_Document */
             $doc = $args->get("subject");
             $reflection = new \ReflectionClass($doc);
@@ -237,6 +238,86 @@ class ByjunoPayments extends Plugin
                     $statusCDP = $byjunoResponse->getProcessingInfoClassification();
                     saveS5Log($request, $xml, $response, $statusCDP, $statusLog, "-", "-");
                 }
+            }
+        }
+
+        $s4_trigger = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_S4_activation");
+        if ($s4_trigger == 'Button' &&
+            $args->getRequest()->getActionName() == "createDocument"
+            && $args->getRequest()->getControllerName() == "Order") {
+            $s4s5 = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_S4_S5");
+            $s5Rev = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_S5_reversal");
+            if ((isset($s4s5) && $s4s5 == 'Enabled') || (isset($s5Rev) && $s5Rev == 'Enabled')) {
+                $orderId = $args->getSubject()->Request()->getParam('orderId', null);
+                $documentType = $args->getSubject()->Request()->getParam('documentType', null);
+                $preview = $args->getSubject()->Request()->getParam('preview', null);
+                if (!empty($orderId) && !empty($documentType) && !isset($preview)) {
+                    $row = Shopware()->Db()->fetchRow("
+                        SELECT *
+                        FROM s_order_documents
+                        WHERE orderID = ? AND type = ?
+                        ORDER BY ID DESC
+                        ",
+                        array($orderId, $documentType)
+                    );
+                    $rowOrder = Shopware()->Db()->fetchRow("
+                        SELECT *
+                        FROM s_order
+                        WHERE ID = ?
+                        ",
+                        array($orderId)
+                    );
+                    $rowPayment = Shopware()->Db()->fetchRow("
+                        SELECT *
+                        FROM s_core_paymentmeans
+                        WHERE ID = ?
+					",
+                        array($rowOrder["paymentID"])
+                    );
+                    if (empty($rowPayment["name"]) ||
+                        ($rowPayment["name"] != 'byjuno_payment_installment' && $rowPayment["name"] != 'byjuno_payment_invoice')
+                    ) {
+                        return;
+                    }
+                    $statusLog = "";
+                    if (!empty($row) && !empty($rowOrder) && $documentType == 1 && $s4s5 == 'Enabled') {
+                        $request = CreateShopRequestS4($row["docID"], $row["amount"], $rowOrder["invoice_amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], $row["date"]);
+                        $statusLog = "S4 Request";
+                    } else if (!empty($row) && !empty($rowOrder) && $documentType == 3 && $s4s5 == 'Enabled') {
+                        $request = CreateShopRequestS5Refund($row["docID"], $row["amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], $row["date"]);
+                        $statusLog = "S5 Refund request";
+                    } else if (!empty($row) && !empty($rowOrder) && $documentType == 4 && $s5Rev == 'Enabled' ) {
+                        if ($row["amount"] < 0) {
+                            $row["amount"] = $row["amount"] * (-1);
+                        }
+                        $request = CreateShopRequestS5Refund($row["docID"], $row["amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], $row["date"]);
+                        $statusLog = "S5 Reversal invoice request";
+                    } else {
+                        return;
+                    }
+                    $xml = $request->createRequest();
+                    $byjunoCommunicator = new \ByjunoCommunicator();
+                    $mode = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_mode");
+                    if (isset($mode) && $mode == 'Live') {
+                        $byjunoCommunicator->setServer('live');
+                    } else {
+                        $byjunoCommunicator->setServer('test');
+                    }
+                    $response = $byjunoCommunicator->sendS4Request($xml);
+                    if (isset($response)) {
+                        $byjunoResponse = new \ByjunoS4Response();
+                        $byjunoResponse->setRawResponse($response);
+                        $byjunoResponse->processResponse();
+                        $statusCDP = $byjunoResponse->getProcessingInfoClassification();
+                        if ($statusLog == "S4 Request") {
+                            saveS4Log($request, $xml, $response, $statusCDP, $statusLog, "-", "-");
+                        } else if ($statusLog == "S5 Refund request" || $statusLog == "S5 Reversal invoice request") {
+                            saveS5Log($request, $xml, $response, $statusCDP, $statusLog, "-", "-");
+                        }
+                    }
+                }
+            } else {
+                return;
             }
         }
     }
