@@ -51,7 +51,7 @@ class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Contro
         $user = $this->getUser();
         $billing = $user['billingaddress'];
         $shipping = $user['shippingaddress'];
-        $request = CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $this, $paymentMethod, "", "", "", "",  "NO");
+        $request = Byjuno_CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $this, $paymentMethod, "", "", "", "",  "NO");
         $statusLog = "CDP request";
         if ($request->getCompanyName1() != '' && $b2b == 'Enabled') {
             $statusLog = "CDP request for company";
@@ -254,7 +254,7 @@ class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Contro
         $shipping = $user['shippingaddress'];
         $statusS1 = 0;
         $statusS3 = 0;
-        $request = CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $this, $paymentMethod, $this->payment_plan, $this->payment_send, "", "",  "NO");
+        $request = Byjuno_CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $this, $paymentMethod, $this->payment_plan, $this->payment_send, "", "",  "NO");
         $statusLog = "Order request (S1)";
         if ($request->getCompanyName1() != '' && $b2b == 'Enabled') {
             $statusLog = "Order request for company (S1)";
@@ -287,7 +287,7 @@ class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Contro
                 ->findOneBy(array('number' => $this->getOrderNumber()));
 
             $risk = $this->getStatusRisk($statusS1);
-            $request = CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $this, $paymentMethod, $this->payment_plan, $this->payment_send, $risk, $order->getNumber(), "YES");
+            $request = Byjuno_CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $this, $paymentMethod, $this->payment_plan, $this->payment_send, $risk, $order->getNumber(), "YES");
             $statusLog = "Order complete (S3)";
             if ($request->getCompanyName1() != '' && $b2b == 'Enabled') {
                 $statusLog = "Order complete for company (S3)";

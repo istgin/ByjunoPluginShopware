@@ -143,16 +143,16 @@ class ByjunoPayments extends Plugin
                 }
                 $statusLog = "";
                 if (!empty($row) && !empty($rowOrder) && $documentType == 1 && $s4s5 == 'Enabled') {
-                    $request = CreateShopRequestS4($row["docID"], $row["amount"], $rowOrder["invoice_amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], $row["date"]);
+                    $request = Byjuno_CreateShopRequestS4($row["docID"], $row["amount"], $rowOrder["invoice_amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], $row["date"]);
                     $statusLog = "S4 Request";
                 } else if (!empty($row) && !empty($rowOrder) && $documentType == 3 && $s4s5 == 'Enabled') {
-                    $request = CreateShopRequestS5Refund($row["docID"], $row["amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], $row["date"]);
+                    $request = Byjuno_CreateShopRequestS5Refund($row["docID"], $row["amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], $row["date"]);
                     $statusLog = "S5 Refund request";
                 } else if (!empty($row) && !empty($rowOrder) && $documentType == 4 && $s5Rev == 'Enabled' ) {
                     if ($row["amount"] < 0) {
                         $row["amount"] = $row["amount"] * (-1);
                     }
-                    $request = CreateShopRequestS5Refund($row["docID"], $row["amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], $row["date"]);
+                    $request = Byjuno_CreateShopRequestS5Refund($row["docID"], $row["amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], $row["date"]);
                     $statusLog = "S5 Reversal invoice request";
                 } else {
                     return;
@@ -172,9 +172,9 @@ class ByjunoPayments extends Plugin
                     $byjunoResponse->processResponse();
                     $statusCDP = $byjunoResponse->getProcessingInfoClassification();
                     if ($statusLog == "S4 Request") {
-                        saveS4Log($request, $xml, $response, $statusCDP, $statusLog, "-", "-");
+                        Byjuno_saveS4Log($request, $xml, $response, $statusCDP, $statusLog, "-", "-");
                     } else if ($statusLog == "S5 Refund request" || $statusLog == "S5 Reversal invoice request") {
-                        saveS5Log($request, $xml, $response, $statusCDP, $statusLog, "-", "-");
+                        Byjuno_saveS5Log($request, $xml, $response, $statusCDP, $statusLog, "-", "-");
                     }
                 }
             }
@@ -219,7 +219,7 @@ class ByjunoPayments extends Plugin
 			}
             if (!empty($rowOrder) && $rowOrder["status"] == $cancelId)
             {
-                $request = CreateShopRequestS5Cancel($rowOrder["invoice_amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], date("Y-m-d"));
+                $request = Byjuno_CreateShopRequestS5Cancel($rowOrder["invoice_amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], date("Y-m-d"));
                 $statusLog = "S5 Cancel request";
 
                 $xml = $request->createRequest();
@@ -236,7 +236,7 @@ class ByjunoPayments extends Plugin
                     $byjunoResponse->setRawResponse($response);
                     $byjunoResponse->processResponse();
                     $statusCDP = $byjunoResponse->getProcessingInfoClassification();
-                    saveS5Log($request, $xml, $response, $statusCDP, $statusLog, "-", "-");
+                    Byjuno_saveS5Log($request, $xml, $response, $statusCDP, $statusLog, "-", "-");
                 }
             }
         }
@@ -281,16 +281,16 @@ class ByjunoPayments extends Plugin
                     }
                     $statusLog = "";
                     if (!empty($row) && !empty($rowOrder) && $documentType == 1 && $s4s5 == 'Enabled') {
-                        $request = CreateShopRequestS4($row["docID"], $row["amount"], $rowOrder["invoice_amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], $row["date"]);
+                        $request = Byjuno_CreateShopRequestS4($row["docID"], $row["amount"], $rowOrder["invoice_amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], $row["date"]);
                         $statusLog = "S4 Request";
                     } else if (!empty($row) && !empty($rowOrder) && $documentType == 3 && $s4s5 == 'Enabled') {
-                        $request = CreateShopRequestS5Refund($row["docID"], $row["amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], $row["date"]);
+                        $request = Byjuno_CreateShopRequestS5Refund($row["docID"], $row["amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], $row["date"]);
                         $statusLog = "S5 Refund request";
                     } else if (!empty($row) && !empty($rowOrder) && $documentType == 4 && $s5Rev == 'Enabled' ) {
                         if ($row["amount"] < 0) {
                             $row["amount"] = $row["amount"] * (-1);
                         }
-                        $request = CreateShopRequestS5Refund($row["docID"], $row["amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], $row["date"]);
+                        $request = Byjuno_CreateShopRequestS5Refund($row["docID"], $row["amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], $row["date"]);
                         $statusLog = "S5 Reversal invoice request";
                     } else {
                         return;
@@ -310,9 +310,9 @@ class ByjunoPayments extends Plugin
                         $byjunoResponse->processResponse();
                         $statusCDP = $byjunoResponse->getProcessingInfoClassification();
                         if ($statusLog == "S4 Request") {
-                            saveS4Log($request, $xml, $response, $statusCDP, $statusLog, "-", "-");
+                            Byjuno_saveS4Log($request, $xml, $response, $statusCDP, $statusLog, "-", "-");
                         } else if ($statusLog == "S5 Refund request" || $statusLog == "S5 Reversal invoice request") {
-                            saveS5Log($request, $xml, $response, $statusCDP, $statusLog, "-", "-");
+                            Byjuno_saveS5Log($request, $xml, $response, $statusCDP, $statusLog, "-", "-");
                         }
                     }
                 }

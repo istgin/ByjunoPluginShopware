@@ -1,6 +1,6 @@
 <?php
 
-function mapMethod($method) {
+function Byjuno_mapMethod($method) {
     if ($method == 'byjuno_payment_installment') {
         return "INSTALLMENT";
     } else {
@@ -8,7 +8,7 @@ function mapMethod($method) {
     }
 }
 
-function getClientIp() {
+function Byjuno_getClientIp() {
     $ipaddress = '';
     if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
         $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
@@ -29,7 +29,7 @@ function getClientIp() {
     return trim(end($ipd));
 }
 
-function mapRepayment($type) {
+function Byjuno_mapRepayment($type) {
     if ($type == 'installment_3') {
         return "10";
     } else if ($type == 'installment_10') {
@@ -49,7 +49,7 @@ function mapRepayment($type) {
     }
 }
 
-function CreateShopRequestS4($doucmentId, $amount, $orderAmount, $orderCurrency, $orderId, $customerId, $date)
+function Byjuno_CreateShopRequestS4($doucmentId, $amount, $orderAmount, $orderCurrency, $orderId, $customerId, $date)
 {
     $request = new \ByjunoS4Request();
     $request->setClientId(Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_clientid"));
@@ -72,7 +72,7 @@ function CreateShopRequestS4($doucmentId, $amount, $orderAmount, $orderCurrency,
 
 }
 
-function CreateShopRequestS5Refund($doucmentId, $amount, $orderCurrency, $orderId, $customerId, $date)
+function Byjuno_CreateShopRequestS5Refund($doucmentId, $amount, $orderCurrency, $orderId, $customerId, $date)
 {
 
     $request = new \ByjunoS5Request();
@@ -94,7 +94,7 @@ function CreateShopRequestS5Refund($doucmentId, $amount, $orderCurrency, $orderI
     return $request;
 }
 
-function CreateShopRequestS5Cancel($amount, $orderCurrency, $orderId, $customerId, $date)
+function Byjuno_CreateShopRequestS5Cancel($amount, $orderCurrency, $orderId, $customerId, $date)
 {
 
     $request = new \ByjunoS5Request();
@@ -117,7 +117,7 @@ function CreateShopRequestS5Cancel($amount, $orderCurrency, $orderId, $customerI
     return $request;
 }
 
-function IsB2bByjuno($billing) {
+function Byjuno_IsB2bByjuno($billing) {
     if (!empty($billing["company"])) {
         return true;
     }
@@ -125,7 +125,7 @@ function IsB2bByjuno($billing) {
 }
 
 /* @var $controller \Shopware_Controllers_Frontend_BasebyjunoController  */
-function CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $controller, $paymentmethod, $repayment, $invoiceDelivery, $riskOwner, $orderId = "", $orderClosed = "NO") {
+function Byjuno_CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $controller, $paymentmethod, $repayment, $invoiceDelivery, $riskOwner, $orderId = "", $orderClosed = "NO") {
 
     $sql     = 'SELECT `countryiso` FROM s_core_countries WHERE id = ' . intval($billing["countryID"]);
     $countryBilling = Shopware()->Db()->fetchOne($sql);
@@ -213,7 +213,7 @@ function CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $contr
     $request->setExtraInfo($extraInfo);
 
     $extraInfo["Name"] = 'IP';
-    $extraInfo["Value"] = getClientIp();
+    $extraInfo["Value"] = Byjuno_getClientIp();
     $request->setExtraInfo($extraInfo);
 
     $tmx_enable = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_threatmetrixenable");
@@ -273,12 +273,12 @@ function CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $contr
         $request->setExtraInfo($extraInfo);
     }
     $extraInfo["Name"] = 'PAYMENTMETHOD';
-    $extraInfo["Value"] = mapMethod($paymentmethod);
+    $extraInfo["Value"] = Byjuno_mapMethod($paymentmethod);
     $request->setExtraInfo($extraInfo);
 
     if ($repayment != "") {
         $extraInfo["Name"] = 'REPAYMENTTYPE';
-        $extraInfo["Value"] = mapRepayment($repayment);
+        $extraInfo["Value"] = Byjuno_mapRepayment($repayment);
         $request->setExtraInfo($extraInfo);
     }
 
@@ -289,13 +289,13 @@ function CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $contr
     }
 
     $extraInfo["Name"] = 'CONNECTIVTY_MODULE';
-    $extraInfo["Value"] = 'Byjuno ShopWare module 1.0.9';
+    $extraInfo["Value"] = 'Byjuno ShopWare module 1.1.0';
     $request->setExtraInfo($extraInfo);
     return $request;
 
 }
 
-function SaveS4Log(ByjunoS4Request $request, $xml_request, $xml_response, $status, $type, $firstName, $lastName)
+function Byjuno_SaveS4Log(ByjunoS4Request $request, $xml_request, $xml_response, $status, $type, $firstName, $lastName)
 {
     $sql     = '
             INSERT INTO s_plugin_byjuno_transactions (requestid, requesttype, firstname, lastname, ip, status, datecolumn, xml_request, xml_responce)
@@ -314,7 +314,7 @@ function SaveS4Log(ByjunoS4Request $request, $xml_request, $xml_response, $statu
     ));
 }
 
-function SaveS5Log(ByjunoS5Request $request, $xml_request, $xml_response, $status, $type, $firstName, $lastName)
+function Byjuno_SaveS5Log(ByjunoS5Request $request, $xml_request, $xml_response, $status, $type, $firstName, $lastName)
 {
     $sql     = '
             INSERT INTO s_plugin_byjuno_transactions (requestid, requesttype, firstname, lastname, ip, status, datecolumn, xml_request, xml_responce)
