@@ -89,7 +89,8 @@ class ByjunoPayments extends Plugin
             'Enlight_Controller_Dispatcher_ControllerPath_Backend_ByjunoTransactions' => 'registerControllerTransactions',
             'Shopware_Components_Document_Render_FilterHtml' => 'documentGenerated_backend',
             'Enlight_Controller_Action_PostDispatch_Backend' => 'documentGenerated',
-            'Enlight_Controller_Action_PostDispatch' => 'onPostDispatchByjunoMessage'
+            'Enlight_Controller_Action_PostDispatch' => 'onPostDispatchByjunoMessage',
+            'Shopware_Modules_Admin_GetPaymentMeans_DataFilter' => 'Byjuno_CdpStatusCall'
         ];
     }
     function documentGenerated_backend(\Enlight_Event_EventArgs $args) {
@@ -514,5 +515,148 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
             $payment->setActive($active);
         }
         $em->flush();
+    }
+
+    protected function isStatusOkCDP($status) {
+        try {
+            $accepted_CDP = Shopware()->Config()->getByNamespace("ByjunoPayments", "allowed_cdp");
+            $ijStatus = Array();
+            if (!empty(trim($accepted_CDP))) {
+                $ijStatus = explode(",", trim($accepted_CDP));
+                foreach($ijStatus as $key => $val) {
+                    $ijStatus[$key] = intval($val);
+                }
+            }
+            if (!empty($accepted_CDP) && count($ijStatus) > 0 && in_array($status, $ijStatus)) {
+                return true;
+            }
+            return false;
+
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    protected function CDPRequest()
+    {
+        $statusCDP = 0;
+        $mode = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_mode");
+        $b2b = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_b2b");
+        $user = $this->getUser();
+        $billing = $user['billingaddress'];
+        $shipping = $user['shippingaddress'];
+        $basket = Shopware()->Modules()->Basket()->sGetAmount();
+        $request = Byjuno_CreateShopWareShopRequestUserBillingCDP($user, $billing, $shipping, $basket['totalAmount'], "", "", "", "", "",  "NO");
+        $statusLog = "CDP request";
+        if ($request->getCompanyName1() != '' && $b2b == 'Enabled') {
+            $statusLog = "CDP request for company";
+            $xml = $request->createRequestCompany();
+        } else {
+            $xml = $request->createRequest();
+        }
+        $byjunoCommunicator = new \ByjunoCommunicator();
+        if (isset($mode) && $mode == 'Live') {
+            $byjunoCommunicator->setServer('live');
+        } else {
+            $byjunoCommunicator->setServer('test');
+        }
+        $response = $byjunoCommunicator->sendRequest($xml);
+        if (isset($response)) {
+            $byjunoResponse = new \ByjunoResponse();
+            $byjunoResponse->setRawResponse($response);
+            $byjunoResponse->processResponse();
+            $statusCDP = (int)$byjunoResponse->getCustomerRequestStatus();
+            $this->saveLog($request, $xml, $response, $statusCDP, $statusLog);
+            if (intval($statusCDP) > 15) {
+                $statusCDP = 0;
+            }
+        }
+        return $this->isStatusOkCDP($statusCDP);
+    }
+
+    public function SaveLog(\ByjunoRequest $request, $xml_request, $xml_response, $status, $type) {
+        $sql     = '
+            INSERT INTO s_plugin_byjuno_transactions (requestid, requesttype, firstname, lastname, ip, status, datecolumn, xml_request, xml_responce)
+                    VALUES (?,?,?,?,?,?,?,?,?)
+        ';
+        Shopware()->Db()->query($sql, Array(
+            $request->getRequestId(),
+            $type,
+            $request->getFirstName(),
+            $request->getLastName(),
+            $_SERVER['REMOTE_ADDR'],
+            (($status != 0) ? $status : 'Error'),
+            date('Y-m-d\TH:i:sP'),
+            $xml_request,
+            $xml_response
+        ));
+    }
+
+    public static $sesStatusString = '';
+    public function Byjuno_CdpStatusCall(\Enlight_Event_EventArgs $args)
+    {
+        $cdp_enabled = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_cdpenable");
+        $user = $this->getUser();
+        $methods = $args->getReturn();
+
+        $needToCheck = false;
+        foreach($methods as $m) {
+            if ($m["name"] == 'byjuno_payment_invoice' || $m["name"] == 'byjuno_payment_installment') {
+                $needToCheck = true;
+                break;
+            }
+        }
+        if (!$needToCheck) {
+            return $methods;
+        }
+
+        if (empty($user) || empty($user['billingaddress']) || empty($user['shippingaddress'])) {
+            return $methods;
+        }
+        $min = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_minimum");
+        $max = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_maximum");
+        $basket = Shopware()->Modules()->Basket()->sGetAmount();
+        if ($basket == null || $min > $basket['totalAmount'] || $max < $basket['totalAmount']) {
+            return $methods;
+        }
+        if ($cdp_enabled == 'Enabled') {
+            if (!empty(self::$sesStatusString)) {
+                if (self::$sesStatusString == 'true') {
+                    $sesStatus = true;
+                } else {
+                    $sesStatus = false;
+                }
+            }
+            if (!isset($sesStatus)) {
+                $allowed = $this->CDPRequest();
+                $converted_res = $allowed ? 'true' : 'false';
+                self::$sesStatusString = $converted_res;
+            } else {
+                $allowed = $sesStatus;
+            }
+            $return = Array();
+            foreach($methods as $m) {
+                if (($m["name"] == 'byjuno_payment_invoice' || $m["name"] == 'byjuno_payment_installment') && !$allowed) {
+                    continue;
+                }
+                $return[] = $m;
+            }
+            return $return;
+        }
+        return $methods;
+    }
+
+    public function getUser()
+    {
+        try {
+            $userData = Shopware()->Modules()->Admin()->sGetUserData();
+            if (!empty($userData)) {
+                return $userData;
+            } else {
+                return null;
+            }
+        } catch(\Exception $e) {
+            return null;
+        }
     }
 }
