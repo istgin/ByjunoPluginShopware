@@ -76,6 +76,9 @@ class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Contro
                 $statusCDP = 0;
             }
         }
+        if ($statusCDP == 0) {
+            return false;
+        }
         return $this->isStatusOkCDP($statusCDP);
     }
 
