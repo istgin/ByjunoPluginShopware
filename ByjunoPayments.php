@@ -104,10 +104,13 @@ class ByjunoPayments extends Plugin
             $reflection = new \ReflectionClass($doc);
             $property_order = $reflection->getProperty("_order");
             $property_typID = $reflection->getProperty("_typID");
+            $property_config = $reflection->getProperty("_config");
             $property_order->setAccessible(true);
             $property_typID->setAccessible(true);
+            $property_config->setAccessible(true);
             $_order = $property_order->getValue($doc);
             $_typID = $property_typID->getValue($doc);
+            $_config = $property_config->getValue($doc);
             $orderId = $_order->order->id;
             $documentType = $_typID;
             if (!empty($orderId) && !empty($documentType)) {
@@ -147,13 +150,13 @@ class ByjunoPayments extends Plugin
                     $request = Byjuno_CreateShopRequestS4($row["docID"], $row["amount"], $rowOrder["invoice_amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], $row["date"]);
                     $statusLog = "S4 Request";
                 } else if (!empty($row) && !empty($rowOrder) && $documentType == 3 && $s4s5 == 'Enabled') {
-                    $request = Byjuno_CreateShopRequestS5Refund($row["docID"], $row["amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], $row["date"]);
+                    $request = Byjuno_CreateShopRequestS5Refund($_config["bid"], $row["amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], $row["date"]);
                     $statusLog = "S5 Refund request";
                 } else if (!empty($row) && !empty($rowOrder) && $documentType == 4 && $s5Rev == 'Enabled' ) {
                     if ($row["amount"] < 0) {
                         $row["amount"] = $row["amount"] * (-1);
                     }
-                    $request = Byjuno_CreateShopRequestS5Refund($row["docID"], $row["amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], $row["date"]);
+                    $request = Byjuno_CreateShopRequestS5Refund($_config["bid"], $row["amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], $row["date"]);
                     $statusLog = "S5 Reversal invoice request";
                 } else {
                     return;
@@ -285,13 +288,15 @@ class ByjunoPayments extends Plugin
                         $request = Byjuno_CreateShopRequestS4($row["docID"], $row["amount"], $rowOrder["invoice_amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], $row["date"]);
                         $statusLog = "S4 Request";
                     } else if (!empty($row) && !empty($rowOrder) && $documentType == 3 && $s4s5 == 'Enabled') {
-                        $request = Byjuno_CreateShopRequestS5Refund($row["docID"], $row["amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], $row["date"]);
+                        $invoiceNumber = $args->getSubject()->Request()->getParam('invoiceNumber', null);
+                        $request = Byjuno_CreateShopRequestS5Refund($invoiceNumber, $row["amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], $row["date"]);
                         $statusLog = "S5 Refund request";
                     } else if (!empty($row) && !empty($rowOrder) && $documentType == 4 && $s5Rev == 'Enabled' ) {
                         if ($row["amount"] < 0) {
                             $row["amount"] = $row["amount"] * (-1);
                         }
-                        $request = Byjuno_CreateShopRequestS5Refund($row["docID"], $row["amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], $row["date"]);
+                        $invoiceNumber = $args->getSubject()->Request()->getParam('invoiceNumber', null);
+                        $request = Byjuno_CreateShopRequestS5Refund($invoiceNumber, $row["amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], $row["date"]);
                         $statusLog = "S5 Reversal invoice request";
                     } else {
                         return;
