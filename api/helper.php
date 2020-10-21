@@ -125,7 +125,7 @@ function Byjuno_IsB2bByjuno($billing) {
 }
 
 /* @var $controller \Shopware_Controllers_Frontend_BasebyjunoController  */
-function Byjuno_CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $controller, $paymentmethod, $repayment, $invoiceDelivery, $riskOwner, $orderId = "", $orderClosed = "NO") {
+function Byjuno_CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $controller, $paymentmethod, $repayment, $invoiceDelivery, $riskOwner, $orderId = "", $orderClosed = "NO", $transactionNumber = "") {
 
     $sql     = 'SELECT `countryiso` FROM s_core_countries WHERE id = ' . intval($billing["countryID"]);
     $countryBilling = Shopware()->Db()->fetchOne($sql);
@@ -199,6 +199,12 @@ function Byjuno_CreateShopWareShopRequestUserBilling($user, $billing, $shipping,
 
     $request->setTelephonePrivate((String)$billing['phone']);
     $request->setEmail((String)$user["additional"]["user"]["email"]);
+
+    if ($transactionNumber != "") {
+        $extraInfo["Name"] = 'TRANSACTIONNUMBER';
+        $extraInfo["Value"] = $transactionNumber;
+        $request->setExtraInfo($extraInfo);
+    }
 
     $extraInfo["Name"] = 'ORDERCLOSED';
     $extraInfo["Value"] = $orderClosed;

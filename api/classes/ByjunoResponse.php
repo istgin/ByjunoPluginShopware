@@ -211,10 +211,29 @@ class ByjunoResponse
     private $ProcessingInfoDescription;
 
     private $CustomerRequestStatus;
+
+    /**
+     * @return mixed
+     */
+    public function getTransactionNumber()
+    {
+        return $this->TransactionNumber;
+    }
+
+    /**
+     * @param mixed $TransactionNumber
+     */
+    public function setTransactionNumber($TransactionNumber)
+    {
+        $this->TransactionNumber = $TransactionNumber;
+    }
+
     private $CustomerLastStatusChange;
     private $CustomerProcessingInfoCode;
     private $CustomerProcessingInfoClassification;
     private $CustomerProcessingInfoDescription;
+
+    private $TransactionNumber;
 
     public function processResponse()
     {
