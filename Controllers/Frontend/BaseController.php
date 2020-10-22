@@ -47,7 +47,8 @@ class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Contro
     {
         $statusCDP = 0;
         $mode = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_mode");
-        $b2b = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_b2b");
+        $b2b = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_b2b");		
+        $timeout = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_timeout");
         $user = $this->getUser();
         $billing = $user['billingaddress'];
         $shipping = $user['shippingaddress'];
@@ -65,7 +66,7 @@ class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Contro
         } else {
             $byjunoCommunicator->setServer('test');
         }
-        $response = $byjunoCommunicator->sendRequest($xml);
+        $response = $byjunoCommunicator->sendRequest($xml, $timeout);
         if (isset($response)) {
             $byjunoResponse = new \ByjunoResponse();
             $byjunoResponse->setRawResponse($response);
@@ -250,7 +251,8 @@ class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Contro
             return false;
         }
         $_SESSION["byjuno"]["processing"] = true;
-        $mode = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_mode");
+        $mode = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_mode");		
+        $timeout = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_timeout");
         $b2b = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_b2b");
         $user = $this->getUser();
         $billing = $user['billingaddress'];
@@ -271,7 +273,7 @@ class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Contro
         } else {
             $byjunoCommunicator->setServer('test');
         }
-        $response = $byjunoCommunicator->sendRequest($xml);
+        $response = $byjunoCommunicator->sendRequest($xml, $timeout);
         $transactionNumber = "";
         if (isset($response)) {
             $byjunoResponse = new \ByjunoResponse();
@@ -306,7 +308,7 @@ class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Contro
             } else {
                 $byjunoCommunicator->setServer('test');
             }
-            $response = $byjunoCommunicator->sendRequest($xml);
+            $response = $byjunoCommunicator->sendRequest($xml, $timeout);
             if (isset($response)) {
                 $byjunoResponse = new \ByjunoResponse();
                 $byjunoResponse->setRawResponse($response);

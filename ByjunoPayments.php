@@ -546,7 +546,8 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
     {
         $statusCDP = 0;
         $mode = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_mode");
-        $b2b = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_b2b");
+        $b2b = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_b2b");		
+        $timeout = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_timeout");
         $user = $this->getUser();
         $billing = $user['billingaddress'];
         $shipping = $user['shippingaddress'];
@@ -565,7 +566,7 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
         } else {
             $byjunoCommunicator->setServer('test');
         }
-        $response = $byjunoCommunicator->sendRequest($xml);
+        $response = $byjunoCommunicator->sendRequest($xml, $timeout);
         if (isset($response)) {
             $byjunoResponse = new \ByjunoResponse();
             $byjunoResponse->setRawResponse($response);
