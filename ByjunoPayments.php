@@ -90,6 +90,7 @@ class ByjunoPayments extends Plugin
             'Shopware_Components_Document_Render_FilterHtml' => 'documentGenerated_backend',
             'Enlight_Controller_Action_PostDispatch_Backend' => 'documentGenerated',
             'Enlight_Controller_Action_PostDispatch' => 'onPostDispatchByjunoMessage',
+            'Enlight_Controller_Action_PreDispatch' => 'onPreDispatchByjunoMessage',
             'Shopware_Modules_Admin_GetPaymentMeans_DataFilter' => 'Byjuno_CdpStatusCall'
         ];
     }
@@ -327,7 +328,18 @@ class ByjunoPayments extends Plugin
             }
         }
     }
+
+    public static $controller = "";
+    public static $action = "";
+    function onPreDispatchByjunoMessage(\Enlight_Event_EventArgs $args) {
+        self::$controller = $args->getRequest()->getControllerName();
+        self::$action = $args->getRequest()->getActionName();
+    }
+
     function onPostDispatchByjunoMessage(\Enlight_Event_EventArgs $args) {
+
+        self::$controller = $args->getRequest()->getControllerName();
+        self::$action = $args->getRequest()->getActionName();
         if (!empty($_SESSION["byjuno"]["message"])) {
             if ($args->getSubject()->View()->hasTemplate()){
                 $args->getSubject()->View()->assign("sBasketInfo", $_SESSION["byjuno"]["message"]);
@@ -604,6 +616,9 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
         $cdp_enabled = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_cdpenable");
         $user = $this->getUser();
         $methods = $args->getReturn();
+        if (self::$controller != "checkout" || self::$action != "shippingPayment") {
+            return $methods;
+        }
 
         $needToCheck = false;
         foreach($methods as $m) {
