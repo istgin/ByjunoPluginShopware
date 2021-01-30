@@ -269,9 +269,9 @@ class ByjunoS5Request
         $Transaction->TransactionDate = $this->TransactionDate;
         $Transaction->TransactionAmount = $this->TransactionAmount;
         $Transaction->TransactionCurrency = $this->TransactionCurrency;
-        if ($this->Additional2 != '') {
-            $Transaction->Additional2 = $this->Additional2;
-        }
+        //if ($this->Additional2 != '') {
+           // $Transaction->Additional2 = $this->Additional2;
+        //}
         $Transaction->OpenBalance = $this->OpenBalance;
 
         return $xml->asXML();

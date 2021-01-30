@@ -212,6 +212,28 @@
                 </option>
             </store>
         </element>
+        <element type="select" required="true" scope="shop">
+            <name>S4_confirmation_trigger</name>
+            <label>S4 Invoice Confirmation Trigger</label>
+            <value>Invoice-Document</value>
+            <store>
+                <option>
+                    <value>Invoice-Document</value>
+                    <label lang="de">Invoice-Document</label>
+                    <label lang="en">Invoice-Document</label>
+                </option>
+                <option>
+                    <value>Orderstatus</value>
+                    <label lang="de">Orderstatus</label>
+                    <label lang="en">Orderstatus</label>
+                </option>
+            </store>
+        </element>
+        <element type="text" required="true" scope="shop">
+            <name>S4_confirmation_order_id</name>
+            <label>S4 Invoice Order Status</label>
+            <value>2</value>
+        </element>
         <element type="text" required="true" scope="shop">
             <name>S5_default_cancel_id</name>
             <label>Shopware order cancel id</label>
