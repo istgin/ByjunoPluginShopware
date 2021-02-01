@@ -104,7 +104,7 @@ class ByjunoPayments extends Plugin
         $s4s5 = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_S4_S5");
         $s5Rev = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_S5_reversal");
         $s4_trigger = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_S4_activation");
-        if ($s4_trigger == 'Invoice' && $S4_trigger_order == "Invoice-Document" && ((isset($s4s5) && $s4s5 == 'Enabled') || (isset($s5Rev) && $s5Rev == 'Enabled'))) {
+        if ($s4_trigger == 'Invoice' && ((isset($s4s5) && $s4s5 == 'Enabled') || (isset($s5Rev) && $s5Rev == 'Enabled'))) {
             /* @var $doc \Shopware_Components_Document */
             $doc = $args->get("subject");
             $reflection = new \ReflectionClass($doc);
@@ -153,6 +153,9 @@ class ByjunoPayments extends Plugin
                 }
                 $statusLog = "";
                 if (!empty($row) && !empty($rowOrder) && $documentType == 1 && $s4s5 == 'Enabled') {
+                    if ($S4_trigger_order == "Orderstatus") {
+                        return;
+                    }
                     $request = Byjuno_CreateShopRequestS4($row["docID"], $row["amount"], $rowOrder["invoice_amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], $row["date"]);
                     $statusLog = "S4 Request";
                 } else if (!empty($row) && !empty($rowOrder) && $documentType == 3 && $s4s5 == 'Enabled') {
@@ -279,7 +282,7 @@ class ByjunoPayments extends Plugin
         }
 
         $s4_trigger = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_S4_activation");
-        if ($s4_trigger == 'Button' && $S4_trigger_order == "Invoice-Document" &&
+        if ($s4_trigger == 'Button' &&
             $args->getRequest()->getActionName() == "createDocument"
             && $args->getRequest()->getControllerName() == "Order") {
             $s4s5 = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_S4_S5");
@@ -318,6 +321,9 @@ class ByjunoPayments extends Plugin
                     }
                     $statusLog = "";
                     if (!empty($row) && !empty($rowOrder) && $documentType == 1 && $s4s5 == 'Enabled') {
+                        if ($S4_trigger_order == "Orderstatus") {
+                            return;
+                        }
                         $request = Byjuno_CreateShopRequestS4($row["docID"], $row["amount"], $rowOrder["invoice_amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], $row["date"]);
                         $statusLog = "S4 Request";
                     } else if (!empty($row) && !empty($rowOrder) && $documentType == 3 && $s4s5 == 'Enabled') {
