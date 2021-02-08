@@ -88,6 +88,7 @@ class ByjunoPayments extends Plugin
             'Enlight_Controller_Dispatcher_ControllerPath_Frontend_PaymentInstallment' => 'registerControllerInstallment',
             'Enlight_Controller_Dispatcher_ControllerPath_Backend_ByjunoTransactions' => 'registerControllerTransactions',
             'Shopware_Components_Document_Render_FilterHtml' => 'documentGenerated_backend',
+            'Shopware\Models\Order\Order::postUpdate' => 'documentGenerated_order',
             'Enlight_Controller_Action_PostDispatch_Backend' => 'documentGenerated',
             'Enlight_Controller_Action_PostDispatch' => 'onPostDispatchByjunoMessage',
             'Enlight_Controller_Action_PreDispatch' => 'onPreDispatchByjunoMessage',
@@ -195,90 +196,103 @@ class ByjunoPayments extends Plugin
             return;
         }
     }
+
+    function documentGenerated_order(\Enlight_Event_EventArgs $args) {
+
+        /* @var $order \Shopware\Models\Order\Order */
+        $order = $args->getEntity();
+        if (!($order instanceof \Shopware\Models\Order\Order)) {
+            return;
+        }
+        $S4_confirmation_trigger = Shopware()->Config()->getByNamespace("ByjunoPayments", "S4_confirmation_trigger");
+        $S4_trigger_order = "Invoice-Document";
+        if (isset($S4_confirmation_trigger) && $S4_confirmation_trigger == "Orderstatus") {
+            $S4_trigger_order = $S4_confirmation_trigger;
+        }
+        $s4s5 = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_S4_S5");
+        if (isset($s4s5) && $s4s5 == 'Enabled') {
+            $orderId = $order->getId();
+            $rowOrder = Shopware()->Db()->fetchRow("
+            SELECT *
+            FROM s_order
+            WHERE ID = ?
+            ",
+                array($orderId)
+            );
+            $S5_default_cancel_id = Shopware()->Config()->getByNamespace("ByjunoPayments", "S5_default_cancel_id");
+            $cancelId = intval($S5_default_cancel_id);
+            if ($cancelId == 0) {
+                $cancelId = 4;
+            }
+
+            $rowPayment = Shopware()->Db()->fetchRow("
+            SELECT *
+            FROM s_core_paymentmeans
+            WHERE ID = ?
+            ",
+                array($rowOrder["paymentID"])
+            );
+            if (empty($rowPayment["name"]) ||
+                ($rowPayment["name"] != 'byjuno_payment_installment' && $rowPayment["name"] != 'byjuno_payment_invoice')) {
+                return;
+
+            }
+            $S4_confirmation_order_id = Shopware()->Config()->getByNamespace("ByjunoPayments", "S4_confirmation_order_id");
+            if (!empty($rowOrder) && $rowOrder["status"] == $cancelId)
+            {
+                $request = Byjuno_CreateShopRequestS5Cancel($rowOrder["invoice_amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], date("Y-m-d"));
+                $statusLog = "S5 Cancel request";
+
+                $xml = $request->createRequest();
+                $byjunoCommunicator = new \ByjunoCommunicator();
+                $mode = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_mode");
+                if (isset($mode) && $mode == 'Live') {
+                    $byjunoCommunicator->setServer('live');
+                } else {
+                    $byjunoCommunicator->setServer('test');
+                }
+                $response = $byjunoCommunicator->sendS4Request($xml);
+                if (isset($response)) {
+                    $byjunoResponse = new \ByjunoS4Response();
+                    $byjunoResponse->setRawResponse($response);
+                    $byjunoResponse->processResponse();
+                    $statusCDP = $byjunoResponse->getProcessingInfoClassification();
+                    Byjuno_saveS5Log($request, $xml, $response, $statusCDP, $statusLog, "-", "-");
+                }
+            }
+            else if (!empty($rowOrder) && $S4_trigger_order == "Orderstatus" && isset($S4_confirmation_order_id) && $rowOrder["status"] == $S4_confirmation_order_id)
+            {
+                $request = Byjuno_CreateShopRequestS4($rowOrder["ordernumber"], $rowOrder["invoice_amount"], $rowOrder["invoice_amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], date("Y-m-d"));
+                $statusLog = "S4 Request";
+                $xml = $request->createRequest();
+                $byjunoCommunicator = new \ByjunoCommunicator();
+                $mode = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_mode");
+                if (isset($mode) && $mode == 'Live') {
+                    $byjunoCommunicator->setServer('live');
+                } else {
+                    $byjunoCommunicator->setServer('test');
+                }
+                $response = $byjunoCommunicator->sendS4Request($xml);
+                if (isset($response)) {
+                    $byjunoResponse = new \ByjunoS4Response();
+                    $byjunoResponse->setRawResponse($response);
+                    $byjunoResponse->processResponse();
+                    $statusCDP = $byjunoResponse->getProcessingInfoClassification();
+                    Byjuno_saveS4Log($request, $xml, $response, $statusCDP, $statusLog, "-", "-");
+                }
+            }
+            return;
+        }
+
+    }
+
+
     function documentGenerated(\Enlight_Event_EventArgs $args) {
 
         $S4_confirmation_trigger = Shopware()->Config()->getByNamespace("ByjunoPayments", "S4_confirmation_trigger");
         $S4_trigger_order = "Invoice-Document";
         if (isset($S4_confirmation_trigger) && $S4_confirmation_trigger == "Orderstatus") {
             $S4_trigger_order = $S4_confirmation_trigger;
-        }
-        if ($args->getRequest()->getActionName() == "save"
-            && $args->getRequest()->getControllerName() == "Order")
-        {
-            $s4s5 = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_S4_S5");
-            if (isset($s4s5) && $s4s5 == 'Enabled') {
-                $orderId = $args->getSubject()->Request()->getParam('id', null);
-                $rowOrder = Shopware()->Db()->fetchRow("
-                SELECT *
-                FROM s_order
-                WHERE ID = ?
-                ",
-                    array($orderId)
-                );
-                $S5_default_cancel_id = Shopware()->Config()->getByNamespace("ByjunoPayments", "S5_default_cancel_id");
-                $cancelId = intval($S5_default_cancel_id);
-                if ($cancelId == 0) {
-                    $cancelId = 4;
-                }
-
-                $rowPayment = Shopware()->Db()->fetchRow("
-                SELECT *
-                FROM s_core_paymentmeans
-                WHERE ID = ?
-                ",
-                    array($rowOrder["paymentID"])
-                );
-                if (empty($rowPayment["name"]) ||
-                    ($rowPayment["name"] != 'byjuno_payment_installment' && $rowPayment["name"] != 'byjuno_payment_invoice')) {
-                    return;
-
-                }
-                $S4_confirmation_order_id = Shopware()->Config()->getByNamespace("ByjunoPayments", "S4_confirmation_order_id");
-                if (!empty($rowOrder) && $rowOrder["status"] == $cancelId)
-                {
-                    $request = Byjuno_CreateShopRequestS5Cancel($rowOrder["invoice_amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], date("Y-m-d"));
-                    $statusLog = "S5 Cancel request";
-
-                    $xml = $request->createRequest();
-                    $byjunoCommunicator = new \ByjunoCommunicator();
-                    $mode = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_mode");
-                    if (isset($mode) && $mode == 'Live') {
-                        $byjunoCommunicator->setServer('live');
-                    } else {
-                        $byjunoCommunicator->setServer('test');
-                    }
-                    $response = $byjunoCommunicator->sendS4Request($xml);
-                    if (isset($response)) {
-                        $byjunoResponse = new \ByjunoS4Response();
-                        $byjunoResponse->setRawResponse($response);
-                        $byjunoResponse->processResponse();
-                        $statusCDP = $byjunoResponse->getProcessingInfoClassification();
-                        Byjuno_saveS5Log($request, $xml, $response, $statusCDP, $statusLog, "-", "-");
-                    }
-                }
-                else if (!empty($rowOrder) && $S4_trigger_order == "Orderstatus" && isset($S4_confirmation_order_id) && $rowOrder["status"] == $S4_confirmation_order_id)
-                {
-                    $request = Byjuno_CreateShopRequestS4($rowOrder["ordernumber"], $rowOrder["invoice_amount"], $rowOrder["invoice_amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], date("Y-m-d"));
-                    $statusLog = "S4 Request";
-                    $xml = $request->createRequest();
-                    $byjunoCommunicator = new \ByjunoCommunicator();
-                    $mode = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_mode");
-                    if (isset($mode) && $mode == 'Live') {
-                        $byjunoCommunicator->setServer('live');
-                    } else {
-                        $byjunoCommunicator->setServer('test');
-                    }
-                    $response = $byjunoCommunicator->sendS4Request($xml);
-                    if (isset($response)) {
-                        $byjunoResponse = new \ByjunoS4Response();
-                        $byjunoResponse->setRawResponse($response);
-                        $byjunoResponse->processResponse();
-                        $statusCDP = $byjunoResponse->getProcessingInfoClassification();
-                        Byjuno_saveS4Log($request, $xml, $response, $statusCDP, $statusLog, "-", "-");
-                    }
-                }
-                return;
-            }
         }
 
         $s4_trigger = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_S4_activation");
