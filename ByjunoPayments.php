@@ -88,6 +88,7 @@ class ByjunoPayments extends Plugin
             'Enlight_Controller_Dispatcher_ControllerPath_Frontend_PaymentInstallment' => 'registerControllerInstallment',
             'Enlight_Controller_Dispatcher_ControllerPath_Backend_ByjunoTransactions' => 'registerControllerTransactions',
             'Shopware_Components_Document_Render_FilterHtml' => 'documentGenerated_backend',
+            'Shopware\Models\Order\Order::preUpdate' => 'documentPreGenerated_order',
             'Shopware\Models\Order\Order::postUpdate' => 'documentGenerated_order',
             'Enlight_Controller_Action_PostDispatch_Backend' => 'documentGenerated',
             'Enlight_Controller_Action_PostDispatch' => 'onPostDispatchByjunoMessage',
@@ -196,6 +197,25 @@ class ByjunoPayments extends Plugin
             return;
         }
     }
+    private static $previousStatus = 0;
+    function documentPreGenerated_order(\Enlight_Event_EventArgs $args) {
+        $order = $args->getEntity();
+        if (!($order instanceof \Shopware\Models\Order\Order)) {
+            return;
+        }
+        $s4s5 = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_S4_S5");
+        if (isset($s4s5) && $s4s5 == 'Enabled') {
+            $orderId = $order->getId();
+            $rowOrder = Shopware()->Db()->fetchRow("
+            SELECT *
+            FROM s_order
+            WHERE ID = ?
+            ",
+                array($orderId)
+            );
+            self::$previousStatus = $rowOrder["status"];
+        }
+    }
 
     function documentGenerated_order(\Enlight_Event_EventArgs $args) {
 
@@ -260,7 +280,7 @@ class ByjunoPayments extends Plugin
                     Byjuno_saveS5Log($request, $xml, $response, $statusCDP, $statusLog, "-", "-");
                 }
             }
-            else if (!empty($rowOrder) && $S4_trigger_order == "Orderstatus" && isset($S4_confirmation_order_id) && $rowOrder["status"] == $S4_confirmation_order_id)
+            else if (!empty($rowOrder) && $S4_trigger_order == "Orderstatus" && isset($S4_confirmation_order_id) && $rowOrder["status"] == $S4_confirmation_order_id && $rowOrder["status"] != self::$previousStatus)
             {
                 $request = Byjuno_CreateShopRequestS4($rowOrder["ordernumber"], $rowOrder["invoice_amount"], $rowOrder["invoice_amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], date("Y-m-d"));
                 $statusLog = "S4 Request";
