@@ -673,7 +673,8 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
         $cdp_enabled = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_cdpenable");
         $user = $this->getUser();
         $methods = $args->getReturn();
-        if (self::$controller != "checkout" || self::$action != "shippingPayment" || self::$method != "GET") {
+        if (self::$controller != "checkout" ||
+            (self::$action != "shippingPayment" && self::$action != "saveShippingPayment")) {
             return $methods;
         }
 
