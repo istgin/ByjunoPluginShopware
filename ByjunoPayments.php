@@ -258,7 +258,7 @@ class ByjunoPayments extends Plugin
 
             }
             $S4_confirmation_order_id = Shopware()->Config()->getByNamespace("ByjunoPayments", "S4_confirmation_order_id");
-            if (!empty($rowOrder) && $rowOrder["status"] == $cancelId)
+            if (!empty($rowOrder) && $rowOrder["status"] == $cancelId && $rowOrder["status"] != self::$previousStatus)
             {
                 $request = Byjuno_CreateShopRequestS5Cancel($rowOrder["invoice_amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], date("Y-m-d"));
                 $statusLog = "S5 Cancel request";
