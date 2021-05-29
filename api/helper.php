@@ -134,14 +134,14 @@ function Byjuno_CreateShopRequestS5Refund($doucmentId, $amount, $orderCurrency, 
     return $request;
 }
 
-function Byjuno_CreateShopRequestS5Cancel_DB($doucmentId, $amount, $orderCurrency, $orderId, $customerId, $date)
+function Byjuno_CreateShopRequestS5Cancel_DB($amount, $orderCurrency, $orderId, $customerId, $date)
 {
     $sql     = '
             INSERT INTO s_plugin_byjuno_documents (document_id, amount, order_amount, order_currency, order_id, customer_id, date, document_type, document_sent, document_try_time)
                     VALUES (?,?,?,?,?,?,?,?,?,?)
         ';
     Shopware()->Db()->query($sql, Array(
-        $doucmentId,
+        "",
         $amount,
         0,
         $orderCurrency,
@@ -392,6 +392,44 @@ function Byjuno_SaveS5Log(ByjunoS5Request $request, $xml_request, $xml_response,
         $firstName,
         $lastName,
         $_SERVER['REMOTE_ADDR'],
+        (($status != "") ? $status : 'Error'),
+        date('Y-m-d\TH:i:sP'),
+        $xml_request,
+        $xml_response
+    ));
+}
+
+function Byjuno_SaveS4LogCron(ByjunoS4Request $request, $xml_request, $xml_response, $status, $type, $firstName, $lastName)
+{
+    $sql     = '
+            INSERT INTO s_plugin_byjuno_transactions (requestid, requesttype, firstname, lastname, ip, status, datecolumn, xml_request, xml_responce)
+                    VALUES (?,?,?,?,?,?,?,?,?)
+        ';
+    Shopware()->Db()->query($sql, Array(
+        $request->getRequestId(),
+        $type,
+        $firstName,
+        $lastName,
+        "Cron",
+        (($status != "") ? $status : 'Error'),
+        date('Y-m-d\TH:i:sP'),
+        $xml_request,
+        $xml_response
+    ));
+}
+
+function Byjuno_SaveS5LogCron(ByjunoS5Request $request, $xml_request, $xml_response, $status, $type, $firstName, $lastName)
+{
+    $sql     = '
+            INSERT INTO s_plugin_byjuno_transactions (requestid, requesttype, firstname, lastname, ip, status, datecolumn, xml_request, xml_responce)
+                    VALUES (?,?,?,?,?,?,?,?,?)
+        ';
+    Shopware()->Db()->query($sql, Array(
+        $request->getRequestId(),
+        $type,
+        $firstName,
+        $lastName,
+        "Cron",
         (($status != "") ? $status : 'Error'),
         date('Y-m-d\TH:i:sP'),
         $xml_request,

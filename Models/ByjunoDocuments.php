@@ -59,22 +59,6 @@ class ByjunoDocuments extends ModelEntity
     private $customerId;
 
     /**
-     * @return mixed
-     */
-    public function getCustomerId()
-    {
-        return $this->customerId;
-    }
-
-    /**
-     * @param mixed $customerId
-     */
-    public function setCustomerId($customerId)
-    {
-        $this->customerId = $customerId;
-    }
-
-    /**
      * @ORM\Column(name="date", type="string", precision=0, scale=0, nullable=false, unique=false)
      */
     private $date;
@@ -108,6 +92,22 @@ class ByjunoDocuments extends ModelEntity
     public function setId($id)
     {
         $this->id = $id;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCustomerId()
+    {
+        return $this->customerId;
+    }
+
+    /**
+     * @param mixed $customerId
+     */
+    public function setCustomerId($customerId)
+    {
+        $this->customerId = $customerId;
     }
 
     /**
