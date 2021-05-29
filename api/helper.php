@@ -49,6 +49,26 @@ function Byjuno_mapRepayment($type) {
     }
 }
 
+function Byjuno_CreateShopRequestS4_DB($doucmentId, $amount, $orderAmount, $orderCurrency, $orderId, $customerId, $date)
+{
+    $sql     = '
+            INSERT INTO s_plugin_byjuno_documents (document_id, amount, order_amount, order_currency, order_id, customer_id, date, document_type, document_sent, document_try_time)
+                    VALUES (?,?,?,?,?,?,?,?,?,?)
+        ';
+    Shopware()->Db()->query($sql, Array(
+        $doucmentId,
+        $amount,
+        $orderAmount,
+        $orderCurrency,
+        $orderId,
+        $customerId,
+        $date,
+        1,
+        false,
+        0
+    ));
+}
+
 function Byjuno_CreateShopRequestS4($doucmentId, $amount, $orderAmount, $orderCurrency, $orderId, $customerId, $date)
 {
     $request = new \ByjunoS4Request();
@@ -72,6 +92,26 @@ function Byjuno_CreateShopRequestS4($doucmentId, $amount, $orderAmount, $orderCu
 
 }
 
+function Byjuno_CreateShopRequestS5Refund_DB($doucmentId, $amount, $orderCurrency, $orderId, $customerId, $date)
+{
+    $sql     = '
+            INSERT INTO s_plugin_byjuno_documents (document_id, amount, order_amount, order_currency, order_id, customer_id, date, document_type, document_sent, document_try_time)
+                    VALUES (?,?,?,?,?,?,?,?,?,?)
+        ';
+    Shopware()->Db()->query($sql, Array(
+        $doucmentId,
+        $amount,
+        0,
+        $orderCurrency,
+        $orderId,
+        $customerId,
+        $date,
+        2,
+        false,
+        0
+    ));
+}
+
 function Byjuno_CreateShopRequestS5Refund($doucmentId, $amount, $orderCurrency, $orderId, $customerId, $date)
 {
 
@@ -92,6 +132,26 @@ function Byjuno_CreateShopRequestS5Refund($doucmentId, $amount, $orderCurrency, 
     $request->setAdditional2($doucmentId);
 
     return $request;
+}
+
+function Byjuno_CreateShopRequestS5Cancel_DB($doucmentId, $amount, $orderCurrency, $orderId, $customerId, $date)
+{
+    $sql     = '
+            INSERT INTO s_plugin_byjuno_documents (document_id, amount, order_amount, order_currency, order_id, customer_id, date, document_type, document_sent, document_try_time)
+                    VALUES (?,?,?,?,?,?,?,?,?,?)
+        ';
+    Shopware()->Db()->query($sql, Array(
+        $doucmentId,
+        $amount,
+        0,
+        $orderCurrency,
+        $orderId,
+        $customerId,
+        $date,
+        3,
+        false,
+        0
+    ));
 }
 
 function Byjuno_CreateShopRequestS5Cancel($amount, $orderCurrency, $orderId, $customerId, $date)
