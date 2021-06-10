@@ -690,8 +690,8 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
                 'action'           => 'ByjunoPaymentCron',
                 'next'             => new \DateTime(),
                 'start'            => null,
-                '`interval`'       => '0',
-                'active'           => 1,
+                '`interval`'       => '30',
+                'active'           => true,
                 'end'              => null,
                 'pluginID'         => null
             ],
