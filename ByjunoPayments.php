@@ -745,7 +745,7 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
                 $byjunoCommunicator->setServer('test');
             }
             $response = $byjunoCommunicator->sendS4Request($xml);
-            if (isset($response)) {
+            if (!empty($response)) {
                 $byjunoResponse = new \ByjunoS4Response();
                 $byjunoResponse->setRawResponse($response);
                 $byjunoResponse->processResponse();
@@ -760,6 +760,7 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
                 $sql = 'UPDATE `s_plugin_byjuno_documents` SET `document_sent`= true WHERE id = ?';
                 Shopware()->Db()->query($sql, array($document["id"]));
             } else {
+                Byjuno_saveS5LogCron($request, $xml, "", 0, $statusLog, "-", "-");
                 $sql = 'UPDATE `s_plugin_byjuno_documents` SET `document_try_time`= true WHERE id = ?';
                 Shopware()->Db()->query($sql, array(time(), $document["id"]));
             }
