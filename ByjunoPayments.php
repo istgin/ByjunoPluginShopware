@@ -739,12 +739,13 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
             $xml = $request->createRequest();
             $byjunoCommunicator = new \ByjunoCommunicator();
             $mode = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_mode");
+            $timeout = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_timeout");
             if (isset($mode) && $mode == 'Live') {
                 $byjunoCommunicator->setServer('live');
             } else {
                 $byjunoCommunicator->setServer('test');
             }
-            $response = $byjunoCommunicator->sendS4Request($xml);
+            $response = $byjunoCommunicator->sendS4Request($xml, $timeout);
             if (!empty($response)) {
                 $byjunoResponse = new \ByjunoS4Response();
                 $byjunoResponse->setRawResponse($response);
