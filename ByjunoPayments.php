@@ -761,7 +761,13 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
                 $sql = 'UPDATE `s_plugin_byjuno_documents` SET `document_sent`= true WHERE id = ?';
                 Shopware()->Db()->query($sql, array($document["id"]));
             } else {
-                Byjuno_saveS5LogCron($request, $xml, "", 0, $statusLog, "-", "-");
+                if ($document["document_type"] == 1) {
+                    Byjuno_SaveS4LogCron($request, $xml, "", 0, $statusLog, "-", "-");
+                } else if ($document["document_type"] == 2) {
+                    Byjuno_SaveS5LogCron($request, $xml, "", 0, $statusLog, "-", "-");
+                } else if ($document["document_type"] == 3) {
+                    Byjuno_saveS5LogCron($request, $xml, "", 0, $statusLog, "-", "-");
+                }
                 $sql = 'UPDATE `s_plugin_byjuno_documents` SET `document_try_time`= true WHERE id = ?';
                 Shopware()->Db()->query($sql, array(time(), $document["id"]));
             }
