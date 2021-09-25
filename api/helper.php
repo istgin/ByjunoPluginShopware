@@ -49,14 +49,14 @@ function Byjuno_mapRepayment($type) {
     }
 }
 
-function Byjuno_CreateShopRequestS4_DB($doucmentId, $amount, $orderAmount, $orderCurrency, $orderId, $customerId, $date)
+function Byjuno_CreateShopRequestS4_DB($documentId, $amount, $orderAmount, $orderCurrency, $orderId, $customerId, $date)
 {
     $sql     = '
             INSERT INTO s_plugin_byjuno_documents (document_id, amount, order_amount, order_currency, order_id, customer_id, date, document_type, document_sent, document_try_time)
                     VALUES (?,?,?,?,?,?,?,?,?,?)
         ';
     Shopware()->Db()->query($sql, Array(
-        $doucmentId,
+        $documentId,
         $amount,
         $orderAmount,
         $orderCurrency,
@@ -69,7 +69,7 @@ function Byjuno_CreateShopRequestS4_DB($doucmentId, $amount, $orderAmount, $orde
     ));
 }
 
-function Byjuno_CreateShopRequestS4($doucmentId, $amount, $orderAmount, $orderCurrency, $orderId, $customerId, $date)
+function Byjuno_CreateShopRequestS4($documentId, $amount, $orderAmount, $orderCurrency, $orderId, $customerId, $date)
 {
     $request = new \ByjunoS4Request();
     $request->setClientId(Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_clientid"));
@@ -85,21 +85,21 @@ function Byjuno_CreateShopRequestS4($doucmentId, $amount, $orderAmount, $orderCu
     $request->setTransactionAmount(number_format($amount, 2, '.', ''));
     $request->setTransactionCurrency($orderCurrency);
     $request->setAdditional1("INVOICE");
-    $request->setAdditional2($doucmentId);
+    $request->setAdditional2($documentId);
     $request->setOpenBalance(number_format($orderAmount, 2, '.', ''));
 
     return $request;
 
 }
 
-function Byjuno_CreateShopRequestS5Refund_DB($doucmentId, $amount, $orderCurrency, $orderId, $customerId, $date)
+function Byjuno_CreateShopRequestS5Refund_DB($documentId, $amount, $orderCurrency, $orderId, $customerId, $date)
 {
     $sql     = '
             INSERT INTO s_plugin_byjuno_documents (document_id, amount, order_amount, order_currency, order_id, customer_id, date, document_type, document_sent, document_try_time)
                     VALUES (?,?,?,?,?,?,?,?,?,?)
         ';
     Shopware()->Db()->query($sql, Array(
-        $doucmentId,
+        $documentId,
         $amount,
         0,
         $orderCurrency,
@@ -112,7 +112,7 @@ function Byjuno_CreateShopRequestS5Refund_DB($doucmentId, $amount, $orderCurrenc
     ));
 }
 
-function Byjuno_CreateShopRequestS5Refund($doucmentId, $amount, $orderCurrency, $orderId, $customerId, $date)
+function Byjuno_CreateShopRequestS5Refund($documentId, $amount, $orderCurrency, $orderId, $customerId, $date)
 {
 
     $request = new \ByjunoS5Request();
@@ -129,7 +129,7 @@ function Byjuno_CreateShopRequestS5Refund($doucmentId, $amount, $orderCurrency, 
     $request->setTransactionAmount(number_format($amount, 2, '.', ''));
     $request->setTransactionCurrency($orderCurrency);
     $request->setTransactionType("REFUND");
-    $request->setAdditional2($doucmentId);
+    $request->setAdditional2($documentId);
 
     return $request;
 }

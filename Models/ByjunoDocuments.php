@@ -15,7 +15,7 @@ use Shopware\Components\Model\ModelEntity,
  * @ORM\Entity(repositoryClass="ByjunoRepository")
  * @ORM\Table(name="s_plugin_byjuno_documents")
  */
-//$doucmentId, $amount, $orderAmount, $orderCurrency, $orderId, $customerId, $date
+//$documentId, $amount, $orderAmount, $orderCurrency, $orderId, $customerId, $date
 class ByjunoDocuments extends ModelEntity
 {
 
@@ -34,12 +34,12 @@ class ByjunoDocuments extends ModelEntity
     private $documentId;
 
     /**
-     * @ORM\Column(name="amount", type="decimal", precision=0, scale=0, nullable=false, unique=false)
+     * @ORM\Column(name="amount", type="decimal", precision=65, scale=2, nullable=false, unique=false)
      */
     private $amount;
 
     /**
-     * @ORM\Column(name="order_amount", type="decimal", precision=0, scale=0, nullable=false, unique=false)
+     * @ORM\Column(name="order_amount", type="decimal", precision=65, scale=2, nullable=false, unique=false)
      */
     private $orderAmount;
 
