@@ -348,7 +348,9 @@ class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Contro
         $orderModule = Shopware()->Modules()->Order();
         if ($this->isStatusOkS2($statusS1) && $this->isStatusOkS3($statusS3)) {
             $orderModule->setPaymentStatus($order->getId(), $successPaymentStatusId, false);
-            $orderModule->setOrderStatus($order->getId(), $successStatusId, false);
+            if ($successStatusId != 0) {
+                $orderModule->setOrderStatus($order->getId(), $successStatusId, false);
+            }
             $mail = $orderModule->createStatusMail($order->getId(), $successPaymentStatusId);
             $mail->clearRecipients();
 			if (isset($mode) && $mode == 'Live') {

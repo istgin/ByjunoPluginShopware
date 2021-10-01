@@ -241,7 +241,7 @@
         </element>
         <element type="text" required="true" scope="shop">
             <name>byjuno_order_default_success_id</name>
-            <label>Shopware order success id</label>
+            <label>Shopware order success id (0 will not change order status)</label>
             <value>1</value>
         </element>
         <element type="text" required="true" scope="shop">
