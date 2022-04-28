@@ -93,21 +93,18 @@
                 </div>
             {/if}
             <script>
-                var byjuno_submit = false;
+                var form_submited = false;
                 function byjuno_submit_form_fn()
                 {
-                    if (byjuno_submit == true)
-                    {
-                        byjuno_submit = true;
-                        return true;
+                    if (form_submited) {
+                        return false;
                     }
+                    form_submited = true;
+                    setTimeout(function(){ document.getElementById('proceed_byjuno_invoice').submit();}, 1);
                     return false;
                 }
-                function byjuno_submit_fn() {
-                    setTimeout(function(){ document.getElementById('proceed_byjuno_invoice').submit();}, 1);
-                }
             </script>
-            <button type="button" onclick="byjuno_submit_fn()" class="btn is--primary is--large left is--icon-right"{if count($paymentplans) == 0} disabled="disabled"{/if} form="proceed_byjuno_invoice" data-preloader-button="true">{s name=proceed_payment namespace=frontend/byjuno/index}Proceed payment{/s}<i class="icon--arrow-right"></i>
+            <button type="submit" class="btn is--primary is--large left is--icon-right"{if count($paymentplans) == 0} disabled="disabled"{/if} form="proceed_byjuno_invoice" data-preloader-button="true">{s name=proceed_payment namespace=frontend/byjuno/index}Proceed payment{/s}<i class="icon--arrow-right"></i>
             </button>
         </form>
     </div>

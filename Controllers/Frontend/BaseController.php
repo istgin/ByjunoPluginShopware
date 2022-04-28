@@ -1,9 +1,9 @@
 <?php
 
-use ByjunoPayments\Components\ByjunoPayment\PaymentResponse;
-use ByjunoPayments\Components\ByjunoPayment\InvoicePaymentService;
 
-class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Controllers_Frontend_Payment
+use Shopware\Components\Logger;
+
+abstract class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Controllers_Frontend_Payment
 {
     private $PAYMENTSTATUSPAID = 12;
     private $PAYMENTSTATUSOPEN = 17;
@@ -11,7 +11,6 @@ class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Contro
 
     private $ORDERSTATUSCANCEL = 4;
     private $ORDERSTATUSINPROGRESS = 1;
-
     public $custom_birthday;
     public $custom_gender;
     protected $payment_plan;
@@ -397,15 +396,20 @@ class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Contro
             }
             $custom_birthday = $this->Request()->getParam('custom_birthday');
 
-            if ($custom_birthday != null && isset($custom_birthday["day"]) && isset($custom_birthday["month"]) && isset($custom_birthday["year"])) {
+            if ($custom_birthday != null && !empty($custom_birthday["day"]) && !empty($custom_birthday["month"]) && !empty($custom_birthday["year"])) {
                 $this->custom_birthday = $custom_birthday["year"]."-".$custom_birthday["month"]."-".$custom_birthday["day"];
                 if (!empty($user["additional"]["user"]["id"])) {
                     /* @var $customer \Shopware\Models\Customer\Customer */
                     $customer = Shopware()->Models()->getRepository('Shopware\Models\Customer\Customer')
                         ->findOneBy(array('id' => $user["additional"]["user"]["id"]));
-                    $customer->setBirthday(new \DateTime($this->custom_birthday));
-                    Shopware()->Models()->persist($customer);
-                    Shopware()->Models()->flush();
+                    try {
+                        $customer->setBirthday(new \DateTime($this->custom_birthday));
+                        Shopware()->Models()->persist($customer);
+                        Shopware()->Models()->flush();
+                    } catch (Exception $e) {
+                        $logger = Shopware()->Container()->get('corelogger');
+                        $logger->log(Logger::ERROR, $e->getMessage());
+                    }
                 }
             }
 
