@@ -7,10 +7,15 @@
     {$sBreadcrumb = [['name'=>"{s name=pay_byjuno_invoice namespace=frontend/byjuno/index}Pay with byjuno invoice{/s}"]]}
 {/block}
 
+{block name='frontend_index_breadcrumb' prepend}
+    {if $messagebyjuno != ''}
+        {include file="frontend/_includes/messages.tpl" type="error" content="$messagebyjuno"}
+    {/if}
+{/block}
+
 {* Main content *}
 {block name="frontend_index_content"}
     <div id="payment" class="grid_20" style="margin:10px 0 10px 0;">
-
         <form action="{url action='confirm'}" method="post" id="proceed_byjuno_invoice" name="proceed_byjuno_invoice" onsubmit="return byjuno_submit_form_fn()">
             {if $custom_gender_enable == 1}
                 <div style="padding: 0 0 5px 0"><label for="custom_gender" style="font-size: 18px"><b>{s name=gender namespace=frontend/byjuno/index}Gender{/s}</b></label></div>

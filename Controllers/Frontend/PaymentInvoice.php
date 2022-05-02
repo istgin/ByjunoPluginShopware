@@ -28,7 +28,6 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                 $cdp_enabled = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_cdpenable");
                 $user = $this->getUser();
                 $billing = $user['billingaddress'];
-                $shipping = $user['shippingaddress'];
                 $b2bEnabled = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_b2b");
                 $IsB2BPayment = false;
                 if ($b2bEnabled == 'Enabled' && !empty($billing["company"]))
@@ -129,6 +128,11 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                 }
                 $billing = $user['billingaddress'];
                 $address = trim(trim((String)$billing['street'].' '.$billing['streetnumber']).', '.(String)$billing['city'].', '.(String)$billing['zipcode']);
+                $messagebyjuno = '';
+                if (!empty($_SESSION["byjuno"]["controllerMessage"])) {
+                    $messagebyjuno = $_SESSION["byjuno"]["controllerMessage"];
+                    unset($_SESSION["byjuno"]["controllerMessage"]);
+                }
                 $viewAssignments = array(
                     'genders' => Array(
                         Array("key" => "1",
@@ -146,6 +150,7 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                     'customer_year' => $customer_year,
                     'customer_gender' => $customer_gender,
                     'paymentplans' => $paymentplans,
+                    'messagebyjuno' => $messagebyjuno,
                     'paymentdelivery' => Array(
                         Array("key" => "email",
                             "val" => (String)$user["additional"]["user"]["email"]
@@ -194,7 +199,19 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
     }
     public function confirmAction()
     {
-        $this->baseConfirmActions();
+        $_SESSION["byjuno"]["controllerMessage"] = null;
+        try {
+            $this->baseConfirmActions();
+        } catch (Exception $e) {
+            $snippets = Shopware()->Snippets()->getNamespace('frontend/byjuno/index');
+            if ($e->getMessage() == 'wrong_dob') {
+                $_SESSION["byjuno"]["controllerMessage"] = $snippets->get('dob_error', "Wrong date of birth");
+            } else {
+                $_SESSION["byjuno"]["controllerMessage"] = $snippets->get('payment_canceled', "Payment cancelled");
+            }
+            $this->redirect(['controller' => 'PaymentInvoice']);
+            return;
+        }
         switch ($this->getPaymentShortName()) {
             case 'byjuno_payment_invoice':
                 if ($this->gatewayAction('byjuno_payment_invoice')) {

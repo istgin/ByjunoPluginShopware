@@ -1,8 +1,5 @@
 <?php
 
-use ByjunoPayments\Components\ByjunoPayment\PaymentResponse;
-use ByjunoPayments\Components\ByjunoPayment\InvoicePaymentService;
-
 include(__DIR__ . "/BaseController.php");
 
 class Shopware_Controllers_Frontend_PaymentInstallment extends Shopware_Controllers_Frontend_BasebyjunoController
@@ -28,7 +25,6 @@ class Shopware_Controllers_Frontend_PaymentInstallment extends Shopware_Controll
                 $cdp_enabled = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_cdpenable");
                 $user = $this->getUser();
                 $billing = $user['billingaddress'];
-                $shipping = $user['shippingaddress'];
                 $b2bEnabled = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_b2b");
                 if ($b2bEnabled == 'Enabled' && !empty($billing["company"])) {
                     $this->forward('cancelcdp');
@@ -50,7 +46,7 @@ class Shopware_Controllers_Frontend_PaymentInstallment extends Shopware_Controll
                 }
                 $custom_fields_birthday = 0;
                 if ($config->getByNamespace("ByjunoPayments", "byjuno_birthday") == "Enabled"
-                    && (empty($additionalInfo['birthday']) || substr($additionalInfo['birthday'], 0, 4) != '0000')) {
+                    && (empty($user["additional"]["user"]['birthday']) || substr($user["additional"]["user"]['birthday'], 0, 4) == '0000')) {
                     $custom_fields_birthday = 1;
                 }
                 $byjuno_allowpostal = 1;
@@ -152,7 +148,6 @@ class Shopware_Controllers_Frontend_PaymentInstallment extends Shopware_Controll
                             );
                     }
                 }
-
                 if (count($paymentplans) == 0) {
                     $this->forward('cancelcdp');
                     return;
@@ -181,6 +176,11 @@ class Shopware_Controllers_Frontend_PaymentInstallment extends Shopware_Controll
                 }
                 $billing = $user['billingaddress'];
                 $address = trim(trim((String)$billing['street'] . ' ' . $billing['streetnumber']) . ', ' . (String)$billing['city'] . ', ' . (String)$billing['zipcode']);
+                $messagebyjuno = '';
+                if (!empty($_SESSION["byjuno"]["controllerMessage"])) {
+                    $messagebyjuno = $_SESSION["byjuno"]["controllerMessage"];
+                    unset($_SESSION["byjuno"]["controllerMessage"]);
+                }
                 $viewAssignments = array(
                     'genders' => Array(
                         Array("key" => "1",
@@ -198,6 +198,7 @@ class Shopware_Controllers_Frontend_PaymentInstallment extends Shopware_Controll
                     'customer_year' => $customer_year,
                     'customer_gender' => $customer_gender,
                     'paymentplans' => $paymentplans,
+                    'messagebyjuno' => $messagebyjuno,
                     'paymentdelivery' => Array(
                         Array("key" => "email",
                             "val" => (String)$user["additional"]["user"]["email"]
@@ -247,7 +248,19 @@ class Shopware_Controllers_Frontend_PaymentInstallment extends Shopware_Controll
 
     public function confirmAction()
     {
-        $this->baseConfirmActions();
+        $_SESSION["byjuno"]["controllerMessage"] = null;
+        try {
+            $this->baseConfirmActions();
+        } catch (Exception $e) {
+            $snippets = Shopware()->Snippets()->getNamespace('frontend/byjuno/index');
+            if ($e->getMessage() == 'wrong_dob') {
+                $_SESSION["byjuno"]["controllerMessage"] = $snippets->get('dob_error', "Wrong date of birth");
+            } else {
+                $_SESSION["byjuno"]["controllerMessage"] = $snippets->get('payment_canceled', "Payment cancelled");
+            }
+            $this->redirect(['controller' => 'PaymentInstallment']);
+            return;
+        }
         switch ($this->getPaymentShortName()) {
             case 'byjuno_payment_installment':
                 if ($this->gatewayAction('byjuno_payment_installment')) {

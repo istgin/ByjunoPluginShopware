@@ -395,10 +395,12 @@ abstract class Shopware_Controllers_Frontend_BasebyjunoController extends Shopwa
                 $this->custom_gender = $custom_gender;
             }
             $custom_birthday = $this->Request()->getParam('custom_birthday');
-
             if ($custom_birthday != null && !empty($custom_birthday["day"]) && !empty($custom_birthday["month"]) && !empty($custom_birthday["year"])) {
                 $this->custom_birthday = $custom_birthday["year"]."-".$custom_birthday["month"]."-".$custom_birthday["day"];
                 if (!empty($user["additional"]["user"]["id"])) {
+                    if (!checkdate($custom_birthday["month"], $custom_birthday["day"], $custom_birthday["year"])) {
+                        throw new \Exception("wrong_dob");
+                    }
                     /* @var $customer \Shopware\Models\Customer\Customer */
                     $customer = Shopware()->Models()->getRepository('Shopware\Models\Customer\Customer')
                         ->findOneBy(array('id' => $user["additional"]["user"]["id"]));
