@@ -417,6 +417,11 @@ abstract class Shopware_Controllers_Frontend_BasebyjunoController extends Shopwa
 
         }
     }
+    protected function getSnippet(array $snippet)
+    {
+        $snippets = Shopware()->Snippets();
+        return $snippets->getNamespace($snippet['namespace'])->get($snippet['name'], $snippet['default'], true);
+    }
 
 
 }

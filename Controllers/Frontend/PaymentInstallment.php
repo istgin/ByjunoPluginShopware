@@ -1,5 +1,7 @@
 <?php
 
+use Shopware\Bundle\AccountBundle\Form\Account\PersonalFormType;
+
 include(__DIR__ . "/BaseController.php");
 
 class Shopware_Controllers_Frontend_PaymentInstallment extends Shopware_Controllers_Frontend_BasebyjunoController
@@ -254,7 +256,7 @@ class Shopware_Controllers_Frontend_PaymentInstallment extends Shopware_Controll
         } catch (Exception $e) {
             $snippets = Shopware()->Snippets()->getNamespace('frontend/byjuno/index');
             if ($e->getMessage() == 'wrong_dob') {
-                $_SESSION["byjuno"]["controllerMessage"] = $snippets->get('dob_error', "Wrong date of birth");
+                $_SESSION["byjuno"]["controllerMessage"] = $this->getSnippet(PersonalFormType::SNIPPET_BIRTHDAY);
             } else {
                 $_SESSION["byjuno"]["controllerMessage"] = $snippets->get('payment_canceled', "Payment cancelled");
             }
