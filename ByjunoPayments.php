@@ -158,7 +158,7 @@ class ByjunoPayments extends Plugin
                     if ($S4_trigger_order == "Orderstatus") {
                         return;
                     }
-                     Byjuno_CreateShopRequestS4_DB($row["docID"], $row["amount"], $rowOrder["invoice_amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], $row["date"]);
+                    Byjuno_CreateShopRequestS4_DB($row["docID"], $row["amount"], $rowOrder["invoice_amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], $row["date"]);
                 } else if (!empty($row) && !empty($rowOrder) && $documentType == 3 && $s4s5 == 'Enabled') {
                     Byjuno_CreateShopRequestS5Refund_DB($_config["bid"], $row["amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], $row["date"]);
                 } else if (!empty($row) && !empty($rowOrder) && $documentType == 4 && $s5Rev == 'Enabled' ) {
@@ -293,11 +293,10 @@ class ByjunoPayments extends Plugin
                     ) {
                         return;
                     }
-
-                    if ($S4_trigger_order == "Orderstatus") {
-                        return;
-                    }
                     if (!empty($row) && !empty($rowOrder) && $documentType == 1 && $s4s5 == 'Enabled') {
+                        if ($S4_trigger_order == "Orderstatus") {
+                            return;
+                        }
                         Byjuno_CreateShopRequestS4_DB($row["docID"], $row["amount"], $rowOrder["invoice_amount"], $rowOrder["currency"], $rowOrder["ordernumber"], $rowOrder["userID"], $row["date"]);
                     } else if (!empty($row) && !empty($rowOrder) && $documentType == 3 && $s4s5 == 'Enabled') {
                         $invoiceNumber = $args->getSubject()->Request()->getParam('invoiceNumber', null);
