@@ -636,7 +636,14 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
         $max = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_maximum");
         $basket = Shopware()->Modules()->Basket()->sGetAmount();
         if ($basket == null || $min > $basket['totalAmount'] || $max < $basket['totalAmount']) {
-            return $methods;
+            $return = Array();
+            foreach($methods as $m) {
+                if (($m["name"] == 'byjuno_payment_invoice' || $m["name"] == 'byjuno_payment_installment')) {
+                    continue;
+                }
+                $return[] = $m;
+            }
+            return $return;
         }
         if ($cdp_enabled == 'Enabled') {
             if (!empty(self::$sesStatusString)) {
