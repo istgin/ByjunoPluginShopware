@@ -2,12 +2,12 @@
 <plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/5.2/engine/Shopware/Components/Plugin/schema/plugin.xsd">
 
-    <label lang="en">Byjuno Payment</label>
-    <label lang="de">Byjuno Payment</label>
+    <label lang="en">CembraPay Payment</label>
+    <label lang="de">CembraPay Payment</label>
 
-    <version>1.3.3</version>
-    <copyright>(c) Byjuno AG</copyright>
-    <author>Byjuno AG</author>
+    <version>1.4.0</version>
+    <copyright>(c) CembraPay</copyright>
+    <author>CembraPay</author>
 
     <compatibility minVersion="5.2.13"/>
 </plugin>

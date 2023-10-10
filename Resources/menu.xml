@@ -3,8 +3,8 @@
     <entries>
         <entry>
             <name>ByjunoTransactionLog</name>
-            <label lang="en">Byjuno Transaction log</label>
-            <label lang="de">Byjuno Transaction log</label>
+            <label lang="en">CembraPay Transaction log</label>
+            <label lang="de">CembraPay Transaction log</label>
             <controller>ByjunoTransactions</controller>
             <action>index</action>
             <class>sprite-cards-stack</class>

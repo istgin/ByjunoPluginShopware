@@ -4,7 +4,7 @@
 
 {* Breadcrumb *}
 {block name='frontend_index_start' append}
-    {$sBreadcrumb = [['name'=>"{s name=pay_byjuno_invoice namespace=frontend/byjuno/index}Pay with byjuno invoice{/s}"]]}
+    {$sBreadcrumb = [['name'=>"{s name=pay_byjuno_invoice namespace=frontend/byjuno/index}Pay with CembraPay invoice{/s}"]]}
 {/block}
 
 {block name='frontend_index_breadcrumb' prepend}

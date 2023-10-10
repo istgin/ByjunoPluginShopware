@@ -63,7 +63,7 @@
         </element>
         <element type="text" required="true" scope="shop">
             <name>byjuno_timeout</name>
-            <label>Connection timeout to Byjuno CDP server in seconds</label>
+            <label>Connection timeout to CembraPay CDP server in seconds</label>
             <value>30</value>
         </element>
         <element type="select" required="true" scope="shop">
@@ -251,17 +251,17 @@
         </element>
         <element type="text" required="true" scope="shop">
             <name>byjuno_prodemail</name>
-            <label>Production email of Byjuno</label>
+            <label>Production email of CembraPay</label>
             <value>invoices@byjuno.ch</value>
         </element>
         <element type="text" required="true" scope="shop">
             <name>byjuno_testemail</name>
-            <label>Test email of Byjuno</label>
+            <label>Test email of CembraPay</label>
             <value>invoices-test@byjuno.ch</value>
         </element>
         <element type="text" scope="shop">
             <name>allowed_s2</name>
-            <label>Accepted Byjuno Risk for S2</label>
+            <label>Accepted CembraPay Risk for S2</label>
             <value>2</value>
         </element>
         <element type="text" scope="shop">
@@ -276,7 +276,7 @@
 
         <element type="select" required="true" scope="shop">
         <name>byjuno_invoice</name>
-        <label>Byjuno Invoice (with partial payment option)</label>
+        <label>CembraPay Invoice (with partial payment option)</label>
         <value>Enabled</value>
         <store>
             <option>
@@ -293,7 +293,7 @@
     </element>
         <element type="select" required="true" scope="shop">
             <name>single_invoice</name>
-            <label>Byjuno Single Invoice</label>
+            <label>CembraPay Single Invoice</label>
             <value>Disabled</value>
             <store>
                 <option>
@@ -311,7 +311,7 @@
 
         <element type="select" required="true" scope="shop">
             <name>byjuno_invoice_b2b</name>
-            <label>Byjuno Invoice (with partial payment option) (B2B)</label>
+            <label>CembraPay Invoice (with partial payment option) (B2B)</label>
             <value>Disabled</value>
             <store>
                 <option>
@@ -328,7 +328,7 @@
         </element>
         <element type="select" required="true" scope="shop">
             <name>single_invoice_b2b</name>
-            <label>Byjuno Single Invoice (B2B)</label>
+            <label>CembraPay Single Invoice (B2B)</label>
             <value>Disabled</value>
             <store>
                 <option>

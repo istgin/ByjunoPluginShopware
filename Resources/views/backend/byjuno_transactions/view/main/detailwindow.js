@@ -10,7 +10,7 @@
 //{block name="backend/byjuno_transactions/view/main/detailwindow"}
 Ext.define('Shopware.apps.ByjunoTransactions.view.main.Detailwindow', {
 	extend: 'Enlight.app.Window',
-    title: '{s name=window_detail_title}Byjuno transactions details{/s}',
+    title: '{s name=window_detail_title}CembraPay transactions details{/s}',
     cls: Ext.baseCSSPrefix + 'detail-window',
     alias: 'widget.ByjunoApilogMainDetailWindow',
     border: false,
