@@ -132,7 +132,7 @@ Ext.define('Shopware.apps.ByjunoTransactions.view.log.List', {
     data.push(Ext.DomHelper.markup({
       tag: 'img',
       class: 'x-action-col-icon sprite-minus-circle',
-      tooltip: '{s name=grid/actioncolumn/buttonTooltip}Delete log{/s}',
+      tooltip: '{s name="grid/actioncolumn/buttonTooltip"}Delete log{/s}',
       cls: 'sprite-minus-circle',
       onclick: "Ext.getCmp('" + this.id + "').fireEvent('deleteColumn', " + rowIndex + ");"
     }));
