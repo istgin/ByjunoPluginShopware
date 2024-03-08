@@ -355,7 +355,7 @@ function Byjuno_CreateShopWareShopRequestUserBilling($user, $billing, $shipping,
     }
 
     $extraInfo["Name"] = 'CONNECTIVTY_MODULE';
-    $extraInfo["Value"] = 'CembraPay ShopWare module 1.4.0';
+    $extraInfo["Value"] = 'CembraPay ShopWare module 1.4.1';
     $request->setExtraInfo($extraInfo);
     return $request;
 
@@ -596,7 +596,7 @@ function Byjuno_CreateShopWareShopRequestUserBillingCDP($user, $billing, $shippi
     }
 
     $extraInfo["Name"] = 'CONNECTIVTY_MODULE';
-    $extraInfo["Value"] = 'CembraPay ShopWare module 1.4.0';
+    $extraInfo["Value"] = 'CembraPay ShopWare module 1.4.1';
     $request->setExtraInfo($extraInfo);
     return $request;
 
