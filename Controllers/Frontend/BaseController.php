@@ -207,7 +207,7 @@ abstract class Shopware_Controllers_Frontend_BasebyjunoController extends Shopwa
     public function cancelcdpAction()
     {
         $snippets = Shopware()->Snippets()->getNamespace('frontend/byjuno/index');
-        $_SESSION["byjuno"]["paymentMessage"] = $snippets->get('paymentcdp_canceled', "Byjuno invoice");
+        $_SESSION["byjuno"]["paymentMessage"] = $snippets->get('paymentcdp_canceled', "CembraPay invoice");
         $this->redirect(array(
             'controller' => 'checkout',
             'action' => 'payment'
@@ -220,7 +220,7 @@ abstract class Shopware_Controllers_Frontend_BasebyjunoController extends Shopwa
     public function cancelAction()
     {
         $snippets = Shopware()->Snippets()->getNamespace('frontend/byjuno/index');
-        $_SESSION["byjuno"]["paymentMessage"] = $snippets->get('payment_canceled', "Byjuno invoice");
+        $_SESSION["byjuno"]["paymentMessage"] = $snippets->get('payment_canceled', "CembraPay invoice");
         $this->redirect(array(
             'controller' => 'checkout',
             'action' => 'payment'
@@ -232,7 +232,7 @@ abstract class Shopware_Controllers_Frontend_BasebyjunoController extends Shopwa
     public function cancelminmaxAction()
     {
         $snippets = Shopware()->Snippets()->getNamespace('frontend/byjuno/index');
-        $_SESSION["byjuno"]["paymentMessage"] = $snippets->get('paymentminmax_canceled', "Byjuno invoice");
+        $_SESSION["byjuno"]["paymentMessage"] = $snippets->get('paymentminmax_canceled', "CembraPay invoice");
         $this->redirect(array(
             'controller' => 'checkout',
             'action' => 'payment'

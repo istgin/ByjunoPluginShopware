@@ -67,7 +67,7 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                         $paymentplans[] = Array(
                             "checked" => $checked,
                             "key" => "byjuno_invoice",
-                            "val" => $snippets->get('byjuno_invoice', "Byjuno invoice"),
+                            "val" => $snippets->get('byjuno_invoice', "CembraPay invoice"),
                             "url" => $snippets->get('byjuno_invoice_toc_url', "http://byjuno.ch/de/terms")
                         );
                         $checked = '';
@@ -86,7 +86,7 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                         $paymentplans[] = Array(
                             "checked" => $checked,
                             "key" => "byjuno_invoice",
-                            "val" => $snippets->get('byjuno_invoice', "Byjuno invoice"),
+                            "val" => $snippets->get('byjuno_invoice', "CembraPay invoice"),
                             "url" => $snippets->get('byjuno_invoice_toc_url', "http://byjuno.ch/de/terms")
                         );
                         $checked = '';

@@ -450,7 +450,7 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
 
         $options = [
             'name' => 'byjuno_payment_invoice',
-            'description' => 'Byjuno invoice',
+            'description' => 'CembraPay invoice',
             'action' => 'PaymentInvoice',
             'active' => 0,
             'position' => 0,
@@ -461,7 +461,7 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
 
         $options = [
             'name' => 'byjuno_payment_installment',
-            'description' => 'Byjuno installment',
+            'description' => 'CembraPay installment',
             'action' => 'PaymentInstallment',
             'active' => 0,
             'position' => 0,
