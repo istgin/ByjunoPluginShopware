@@ -36,20 +36,20 @@
             </store>
         </element>
         <element type="text" required="true" scope="shop">
-            <name>byjuno_userid</name>
-            <label>User ID</label>
+            <name>cembra_clientid_live</name>
+            <label>Production ClientId</label>
         </element>
         <element type="text" required="true" scope="shop">
-            <name>byjuno_clientid</name>
-            <label>Client ID</label>
-        </element>
-        <element type="password" required="true" scope="shop">
-            <name>byjuno_password</name>
-            <label>Password</label>
+            <name>cembra_password_live</name>
+            <label>Production Password</label>
         </element>
         <element type="text" required="true" scope="shop">
-            <name>byjuno_techemail</name>
-            <label>Technical Contact (E-mail)</label>
+            <name>cembra_clientid_test</name>
+            <label>Test ClientId</label>
+        </element>
+        <element type="text" required="true" scope="shop">
+            <name>cembra_password_test</name>
+            <label>Test Password</label>
         </element>
         <element type="text" required="true" scope="shop">
             <name>byjuno_minimum</name>
@@ -90,7 +90,7 @@
         </element>
         <element type="select" required="true" scope="shop">
             <name>byjuno_cdpenable</name>
-            <label>Credit check before submit</label>
+            <label>Screening before submit</label>
             <value>Enabled</value>
             <store>
                 <option>
@@ -122,28 +122,6 @@
                 </option>
             </store>
         </element>
-        <element type="text" required="true" scope="shop">
-            <name>allowed_cdp</name>
-            <label>Accepted CDP risks if credit check enabled</label>
-            <value>2</value>
-        </element>
-        <element type="select" required="true" scope="shop">
-            <name>byjuno_gender</name>
-            <label>Enable gender selection</label>
-            <value>Enabled</value>
-            <store>
-                <option>
-                    <value>Disabled</value>
-                    <label lang="de">Disabled</label>
-                    <label lang="en">Disabled</label>
-                </option>
-                <option>
-                    <value>Enabled</value>
-                    <label lang="de">Enabled</label>
-                    <label lang="en">Enabled</label>
-                </option>
-            </store>
-        </element>
         <element type="select" required="true" scope="shop">
             <name>byjuno_birthday</name>
             <label>Enable birthday selection</label>
@@ -160,84 +138,6 @@
                     <label lang="en">Enabled</label>
                 </option>
             </store>
-        </element>
-        <element type="select" required="true" scope="shop">
-            <name>byjuno_S4_S5</name>
-            <label>S4 &amp; S5 transactions</label>
-            <value>Disabled</value>
-            <store>
-                <option>
-                    <value>Disabled</value>
-                    <label lang="de">Disabled</label>
-                    <label lang="en">Disabled</label>
-                </option>
-                <option>
-                    <value>Enabled</value>
-                    <label lang="de">Enabled</label>
-                    <label lang="en">Enabled</label>
-                </option>
-            </store>
-        </element>
-        <element type="select" required="true" scope="shop">
-            <name>byjuno_S5_reversal</name>
-            <label>S5 on Reversal Invoice</label>
-            <value>Disabled</value>
-            <store>
-                <option>
-                    <value>Disabled</value>
-                    <label lang="de">Disabled</label>
-                    <label lang="en">Disabled</label>
-                </option>
-                <option>
-                    <value>Enabled</value>
-                    <label lang="de">Enabled</label>
-                    <label lang="en">Enabled</label>
-                </option>
-            </store>
-        </element>
-        <element type="select" required="true" scope="shop">
-            <name>byjuno_S4_activation</name>
-            <label>S4 &amp; S5 activation place</label>
-            <value>Button</value>
-            <store>
-                <option>
-                    <value>Button</value>
-                    <label lang="de">Button</label>
-                    <label lang="en">Button</label>
-                </option>
-                <option>
-                    <value>Invoice</value>
-                    <label lang="de">Invoice</label>
-                    <label lang="en">Invoice</label>
-                </option>
-            </store>
-        </element>
-        <element type="select" required="true" scope="shop">
-            <name>S4_confirmation_trigger</name>
-            <label>S4 Invoice Confirmation Trigger</label>
-            <value>Invoice-Document</value>
-            <store>
-                <option>
-                    <value>Invoice-Document</value>
-                    <label lang="de">Invoice-Document</label>
-                    <label lang="en">Invoice-Document</label>
-                </option>
-                <option>
-                    <value>Orderstatus</value>
-                    <label lang="de">Orderstatus</label>
-                    <label lang="en">Orderstatus</label>
-                </option>
-            </store>
-        </element>
-        <element type="text" required="true" scope="shop">
-            <name>S4_confirmation_order_id</name>
-            <label>S4 Invoice Order Status</label>
-            <value>2</value>
-        </element>
-        <element type="text" required="true" scope="shop">
-            <name>S5_default_cancel_id</name>
-            <label>Shopware order cancel id</label>
-            <value>4</value>
         </element>
         <element type="text" required="true" scope="shop">
             <name>byjuno_order_default_success_id</name>
@@ -258,20 +158,6 @@
             <name>byjuno_testemail</name>
             <label>Test email of CembraPay</label>
             <value>invoices-test@byjuno.ch</value>
-        </element>
-        <element type="text" scope="shop">
-            <name>allowed_s2</name>
-            <label>Accepted CembraPay Risk for S2</label>
-            <value>2</value>
-        </element>
-        <element type="text" scope="shop">
-            <name>allowed_s2_merchant</name>
-            <label>Accepted Merchant Risk for S2</label>
-        </element>
-        <element type="text" scope="shop">
-            <name>allowed_s3</name>
-            <label>Accepted statuses for S3 response</label>
-            <value>2</value>
         </element>
 
         <element type="select" required="true" scope="shop">
@@ -363,8 +249,25 @@
             </store>
         </element>
         <element type="select" required="true" scope="shop">
-            <name>installment_10</name>
-            <label>10 installments</label>
+            <name>installment_4</name>
+            <label>4 installments</label>
+            <value>Disabled</value>
+            <store>
+                <option>
+                    <value>Disabled</value>
+                    <label lang="de">Disabled</label>
+                    <label lang="en">Disabled</label>
+                </option>
+                <option>
+                    <value>Enabled</value>
+                    <label lang="de">Enabled</label>
+                    <label lang="en">Enabled</label>
+                </option>
+            </store>
+        </element>
+        <element type="select" required="true" scope="shop">
+            <name>installment_6</name>
+            <label>6 installments</label>
             <value>Disabled</value>
             <store>
                 <option>
@@ -414,8 +317,25 @@
             </store>
         </element>
         <element type="select" required="true" scope="shop">
-            <name>installment_4x12</name>
-            <label>4 installments in 12 months</label>
+            <name>installment_36</name>
+            <label>36 installments</label>
+            <value>Disabled</value>
+            <store>
+                <option>
+                    <value>Disabled</value>
+                    <label lang="de">Disabled</label>
+                    <label lang="en">Disabled</label>
+                </option>
+                <option>
+                    <value>Enabled</value>
+                    <label lang="de">Enabled</label>
+                    <label lang="en">Enabled</label>
+                </option>
+            </store>
+        </element>
+        <element type="select" required="true" scope="shop">
+            <name>installment_48</name>
+            <label>48 installments</label>
             <value>Disabled</value>
             <store>
                 <option>
@@ -449,8 +369,25 @@
             </store>
         </element>
         <element type="select" required="true" scope="shop">
-            <name>installment_10_b2b</name>
-            <label>10 installments (B2B)</label>
+            <name>installment_4_b2b</name>
+            <label>4 installments (B2B)</label>
+            <value>Disabled</value>
+            <store>
+                <option>
+                    <value>Disabled</value>
+                    <label lang="de">Disabled</label>
+                    <label lang="en">Disabled</label>
+                </option>
+                <option>
+                    <value>Enabled</value>
+                    <label lang="de">Enabled</label>
+                    <label lang="en">Enabled</label>
+                </option>
+            </store>
+        </element>
+        <element type="select" required="true" scope="shop">
+            <name>installment_6_b2b</name>
+            <label>6 installments (B2B)</label>
             <value>Disabled</value>
             <store>
                 <option>
@@ -500,8 +437,25 @@
             </store>
         </element>
         <element type="select" required="true" scope="shop">
-            <name>installment_4x12_b2b</name>
-            <label>4 installments in 12 months (B2B)</label>
+            <name>installment_36_b2b</name>
+            <label>36 installments (B2B)</label>
+            <value>Disabled</value>
+            <store>
+                <option>
+                    <value>Disabled</value>
+                    <label lang="de">Disabled</label>
+                    <label lang="en">Disabled</label>
+                </option>
+                <option>
+                    <value>Enabled</value>
+                    <label lang="de">Enabled</label>
+                    <label lang="en">Enabled</label>
+                </option>
+            </store>
+        </element>
+        <element type="select" required="true" scope="shop">
+            <name>installment_48_b2b</name>
+            <label>48 installments (B2B)</label>
             <value>Disabled</value>
             <store>
                 <option>
