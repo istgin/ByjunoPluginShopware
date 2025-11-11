@@ -15,6 +15,8 @@ use Doctrine\ORM\Tools\SchemaTool;
 
 require (__DIR__) . '/api/byjuno.php';
 require (__DIR__) . '/api/helper.php';
+require (__DIR__) . '/bcdp/cembrapay.php';
+require (__DIR__) . '/bcdp/bcdphelper.php';
 
 class ByjunoPayments extends Plugin
 {
