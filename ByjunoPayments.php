@@ -3,6 +3,8 @@
 
 namespace ByjunoPayments;
 
+use Byjuno\ByjunoPayments\Api\CembraPayCommunicator;
+use Byjuno\ByjunoPayments\Api\CembraPayConstants;
 use Shopware\Components\Plugin;
 use Shopware\Components\Plugin\Context\ActivateContext;
 use Shopware\Components\Plugin\Context\DeactivateContext;
@@ -564,45 +566,46 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
         $shipping = $user['shippingaddress'];
         $basket = Shopware()->Modules()->Basket()->sGetAmount();
         $request = Cembrapay_CreateShopWareShopRequestUserBillingCDP($user, $billing, $shipping, $basket['totalAmount']);
-        $statusLog = "CDP request";
-        if ($request->getCompanyName1() != '' && $b2b == 'Enabled') {
-            $statusLog = "CDP request for company";
-            $xml = $request->createRequestCompany();
-        } else {
-            $xml = $request->createRequest();
+        $statusLog = "Screening request";
+        if ($request->custDetails->custType == CembraPayConstants::$CUSTOMER_BUSINESS && $b2b) {
+            $statusLog = "Screening request company";
         }
-        $byjunoCommunicator = new \ByjunoCommunicator();
+        $json = $request->createRequest();
+        $cembrapayCommunicator = new CembraPayCommunicator($this->cembraPayAzure);
         if (isset($mode) && $mode == 'Live') {
-            $byjunoCommunicator->setServer('live');
+            $cembrapayCommunicator->setServer('live');
         } else {
-            $byjunoCommunicator->setServer('test');
+            $cembrapayCommunicator->setServer('test');
         }
-        $response = $byjunoCommunicator->sendRequest($xml, $timeout);
-        if (isset($response)) {
-            $byjunoResponse = new \ByjunoResponse();
-            $byjunoResponse->setRawResponse($response);
-            $byjunoResponse->processResponse();
-            $statusCDP = (int)$byjunoResponse->getCustomerRequestStatus();
-            $this->saveLog($request, $xml, $response, $statusCDP, $statusLog);
-            if (intval($statusCDP) > 15) {
-                $statusCDP = 0;
-            }
+        $response = $cembrapayCommunicator->sendScreeningRequest($json, $accessData, function ($object, $token, $accessData) {
+            $object->saveToken($token, $accessData);
+        });
+        if (empty($response)) {
+            $responseRes = CembraPayConstants::screeningResponse($response);
+            $screeningStatus = $responseRes->processingStatus;
+            $this->saveLog($request->requestMsgId, $request->custDetails->firstName, $request->custDetails->lastName, $json, $response, $screeningStatus, $statusLog);
+        } else {
+            $screeningStatus = CembraPayConstants::$SCREENING_NET_ERROR;
+            $this->saveLog($request->requestMsgId, $request->custDetails->firstName, $request->custDetails->lastName, $json, "", $screeningStatus, $statusLog);
         }
-        return $this->isStatusOkCDP($statusCDP);
+        if ($screeningStatus == CembraPayConstants::$SCREENING_OK) {
+            return true;
+        }
+        return false;
     }
 
-    public function SaveLog(\ByjunoRequest $request, $xml_request, $xml_response, $status, $type) {
+    public function SaveLog($requestId, $firstname, $lastname, $xml_request, $xml_response, $status, $type) {
         $sql     = '
             INSERT INTO s_plugin_byjuno_transactions (requestid, requesttype, firstname, lastname, ip, status, datecolumn, xml_request, xml_responce)
                     VALUES (?,?,?,?,?,?,?,?,?)
         ';
         Shopware()->Db()->query($sql, Array(
-            $request->getRequestId(),
+            $requestId,
             $type,
-            $request->getFirstName(),
-            $request->getLastName(),
+            $firstname,
+            $lastname,
             $_SERVER['REMOTE_ADDR'],
-            (($status != 0) ? $status : 'Error'),
+            $status,
             date('Y-m-d\TH:i:sP'),
             $xml_request,
             $xml_response

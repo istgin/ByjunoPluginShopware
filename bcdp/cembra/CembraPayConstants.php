@@ -35,6 +35,7 @@ class CembraPayConstants
     public static $DELIVERY_VIRTUAL = 'DIGITAL';
 
     public static $SCREENING_OK = 'SCREENING-APPROVED';
+    public static $SCREENING_NET_ERROR = 'NET-ERROR';
 
     public static $SETTLE_OK = 'SETTLED';
     public static $SETTLE_STATUSES = ['SETTLED', 'PARTIALLY-SETTLED'];
