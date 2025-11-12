@@ -5,6 +5,7 @@ namespace ByjunoPayments;
 
 use Byjuno\ByjunoPayments\Api\CembraPayCommunicator;
 use Byjuno\ByjunoPayments\Api\CembraPayConstants;
+use Byjuno\ByjunoPayments\Api\CembraPayLoginDto;
 use Shopware\Components\Plugin;
 use Shopware\Components\Plugin\Context\ActivateContext;
 use Shopware\Components\Plugin\Context\DeactivateContext;
@@ -571,12 +572,13 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
             $statusLog = "Screening request company";
         }
         $json = $request->createRequest();
-        $cembrapayCommunicator = new CembraPayCommunicator($this->cembraPayAzure);
+        $cembrapayCommunicator = new CembraPayCommunicator();
         if (isset($mode) && $mode == 'Live') {
             $cembrapayCommunicator->setServer('live');
         } else {
             $cembrapayCommunicator->setServer('test');
         }
+        $accessData = $this->getAccessData($mode);
         $response = $cembrapayCommunicator->sendScreeningRequest($json, $accessData, function ($object, $token, $accessData) {
             $object->saveToken($token, $accessData);
         });
@@ -784,6 +786,25 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
             }
         }
         return true;
+    }
+
+    public function getAccessData($mode) {
+        $accessData = new CembraPayLoginDto();
+        $accessData->helperObject = $this;
+        $accessData->timeout = (int)Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_timeout");
+        if ($accessData->timeout < 0) {
+            $accessData->timeout = 30;
+        }
+        if ($mode == 'test') {
+            $accessData->mode = 'test';
+            $accessData->username = Shopware()->Config()->getByNamespace("ByjunoPayments", "cembra_clientid_live");
+            $accessData->password = Shopware()->Config()->getByNamespace("ByjunoPayments", "cembra_password_live");
+        } else {
+            $accessData->mode = 'live';
+            $accessData->username = Shopware()->Config()->getByNamespace("ByjunoPayments", "cembra_clientid_test");
+            $accessData->password = Shopware()->Config()->getByNamespace("ByjunoPayments", "cembra_password_test");
+        }
+        return $accessData;
     }
 
 }

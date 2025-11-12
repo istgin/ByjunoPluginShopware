@@ -5,17 +5,7 @@ namespace Byjuno\ByjunoPayments\Api;
 class CembraPayCommunicator
 {
 
-    /**
-     * @var CembraPayAzure
-     */
-    public $cembraPayAzure;
 
-    public function __construct(
-        CembraPayAzure $cembraPayAzure
-    )
-    {
-        $this->cembraPayAzure = $cembraPayAzure;
-    }
     private $server;
 
     /**
@@ -67,14 +57,7 @@ class CembraPayCommunicator
     }
 
     private function sendRequest($xmlRequest, $endpoint, CembraPayLoginDto $accessData, $cb) {
-        $token = $accessData->accessToken;
-        if (!CembraPayAzure::validToken($token)) {
-            $token = $this->cembraPayAzure->getToken($accessData);
-        }
-        if (empty($token)) {
-            $cb($accessData->helperObject, $token, $accessData);
-            return "";
-        }
+
         $response = "";
         if (intval($accessData->timeout) < 0) {
             $timeout = 30;
@@ -91,8 +74,7 @@ class CembraPayCommunicator
         $headers = [
             "Content-type: application/json",
             "accept: text/plain",
-            "Connection: close",
-            "Authorization: Bearer ".$token
+            "Connection: close"
         ];
         $userAgent = "ChembraPay Plugin";
         $curl = curl_init();
@@ -109,11 +91,11 @@ class CembraPayCommunicator
         curl_setopt($curl, CURLOPT_POST, 1);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $request_data);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_USERPWD, $accessData->username.":".$accessData->password);
 
         $response = @curl_exec($curl);
         curl_close($curl);
         $output = trim($response);
-        $cb($accessData->helperObject, $token, $accessData);
         return $output;
     }
 
