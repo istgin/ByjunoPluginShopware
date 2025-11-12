@@ -1,5 +1,9 @@
 <?php
 
+use Byjuno\ByjunoPayments\Api\CembraPayCheckoutAutRequest;
+use Byjuno\ByjunoPayments\Api\CembraPayConstants;
+use Byjuno\ByjunoPayments\Api\CustomerConsents;
+
 function Cembrapay_mapMethod($method) {
     if ($method == 'byjuno_payment_installment') {
         return "INSTALLMENT";
@@ -437,18 +441,15 @@ function Cembrapay_SaveS5LogCron(ByjunoS5Request $request, $xml_request, $xml_re
     ));
 }
 
-function Cembrapay_CreateShopWareShopRequestUserBillingCDP($user, $billing, $shipping, $amount, $paymentmethod, $repayment, $invoiceDelivery, $riskOwner, $orderId = "", $orderClosed = "NO") {
+function Cembrapay_CreateShopWareShopRequestUserBillingCDP($user, $billing, $shipping, $amount) {
+
+    $b2b = true; // TODO
 
     $sql     = 'SELECT `countryiso` FROM s_core_countries WHERE id = ' . intval($billing["countryID"]);
     $countryBilling = Shopware()->Db()->fetchOne($sql);
+
     $sql     = 'SELECT `countryiso` FROM s_core_countries WHERE id = ' . intval($shipping["countryID"]);
     $countryShipping = Shopware()->Db()->fetchOne($sql);
-    $request = new \ByjunoRequest();
-    $request->setClientId(Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_clientid"));
-    $request->setUserID(Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_userid"));
-    $request->setPassword(Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_password"));
-    $request->setVersion("1.00");
-    $request->setRequestEmail(Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_techemail"));
 
     $sql     = 'SELECT `locale` FROM s_core_locales WHERE id = ' . intval(Shopware()->Shop()->getLocale()->getId());
     $langName = Shopware()->Db()->fetchRow($sql);
@@ -456,16 +457,48 @@ function Cembrapay_CreateShopWareShopRequestUserBillingCDP($user, $billing, $shi
     if (!empty($langName["locale"]) && strlen($langName["locale"]) > 4) {
         $lang = substr($langName["locale"], 0, 2);
     }
-    $request->setLanguage($lang);
-    $request->setRequestId(uniqid((String)$billing["id"]."_"));
+
+    $request = new CembraPayCheckoutAutRequest();
+    $request->requestMsgType = CembraPayConstants::$MESSAGE_SCREENING;
+    $request->requestMsgId = CembraPayCheckoutAutRequest::GUID();
+    $request->requestMsgDateTime = CembraPayCheckoutAutRequest::Date();
+    $request->merchantOrderRef = null;
+    $request->amount = round(number_format($amount, 2, '.', '') * 100);
+    $request->currency = Shopware()->Config()->currency;
+
     $reference = $billing["id"];
     if (empty($reference)) {
-        $request->setCustomerReference(uniqid("guest_"));
+        $request->custDetails->merchantCustRef = uniqid("guest_");
+        $request->custDetails->loggedIn = false;
     } else {
-        $request->setCustomerReference($billing["id"]);
+        $request->custDetails->merchantCustRef = (string)$reference;
+        $request->custDetails->loggedIn = true;
     }
-    $request->setFirstName((String)$billing['firstname']);
-    $request->setLastName((String)$billing['lastname']);
+
+    if (!empty($billing["company"]) && $b2b) {
+        $request->custDetails->custType = CembraPayConstants::$CUSTOMER_BUSINESS;
+        $request->custDetails->companyName = $billing["company"];
+    } else {
+        $request->custDetails->custType = CembraPayConstants::$CUSTOMER_PRIVATE;
+    }
+
+    $request->custDetails->firstName = html_entity_decode((String)$billing['firstname'], ENT_COMPAT, 'UTF-8');
+    $request->custDetails->lastName = html_entity_decode((String)$billing['lastname'], ENT_COMPAT, 'UTF-8');
+    $request->custDetails->language = $lang;
+
+    $request->custDetails->salutation = CembraPayConstants::$GENTER_UNKNOWN;
+    $additionalInfo = $user["additional"]["user"];
+    if (!empty($additionalInfo['salutation'])) {
+        if (strtolower($additionalInfo['salutation']) == 'ms') {
+            $request->custDetails->salutation = CembraPayConstants::$GENTER_FEMALE;
+        } else if (strtolower($additionalInfo['salutation']) == 'mr') {
+            $request->custDetails->salutation = CembraPayConstants::$GENTER_MALE;
+        }
+    }
+
+    if (!empty($additionalInfo['birthday']) && substr($additionalInfo['birthday'], 0, 4) != '0000') {
+        $request->custDetails->dateOfBirth = (String)$additionalInfo['birthday'];
+    }
     $addressAdd = '';
     if (!empty($billing['additionalAddressLine1'])) {
         $addressAdd = ' '.trim((String)$billing['additionalAddressLine1']);
@@ -473,78 +506,20 @@ function Cembrapay_CreateShopWareShopRequestUserBillingCDP($user, $billing, $shi
     if (!empty($billing['additionalAddressLine2'])) {
         $addressAdd = $addressAdd.' '.trim((String)$billing['additionalAddressLine2']);
     }
-    $request->setFirstLine(trim((String)$billing['street'].' '.$billing['streetnumber'].$addressAdd));
-    $request->setCountryCode(strtoupper((String)$countryBilling));
-    $request->setPostCode((String)$billing['zipcode']);
-    $request->setTown((String)$billing['city']);
-    $request->setFax((String)$billing['fax']);
+    $request->billingAddr->addrFirstLine = html_entity_decode(trim((String)$billing['street'].' '.$billing['streetnumber'].$addressAdd), ENT_COMPAT, 'UTF-8');
+    $request->billingAddr->postalCode = (String)$billing['zipcode'];
+    $request->billingAddr->town = html_entity_decode((String)$billing['city'], ENT_COMPAT, 'UTF-8');
+    $request->billingAddr->country = strtoupper((String)$countryBilling);
+    $request->custContacts->email = (String)$user["additional"]["user"]["email"];
+    $request->custContacts->phonePrivate = (String)$billing['phone'];
 
-    if (!empty($billing["company"])) {
-        $request->setCompanyName1($billing["company"]);
+    $request->deliveryDetails->deliveryDetailsDifferent = true;
+    $request->deliveryDetails->deliveryFirstName = html_entity_decode($shipping['firstname'], ENT_COMPAT, 'UTF-8');
+    $request->deliveryDetails->deliverySecondName =  html_entity_decode($shipping['lastname'], ENT_COMPAT, 'UTF-8');
+    if (!empty($shipping["company"]) && $b2b) {
+        $request->deliveryDetails->deliveryCompanyName = html_entity_decode($shipping["company"], ENT_COMPAT, 'UTF-8');
     }
-    if (!empty($billing["company"]) && !empty($billing["vatId"])) {
-        $request->setCompanyVatId($billing["vatId"]);
-    }
-    if (!empty($shipping["company"])) {
-        $request->setDeliveryCompanyName1($shipping["company"]);
-    }
-
-    $request->setGender(0);
-    $additionalInfo = $user["additional"]["user"];
-    if (!empty($additionalInfo['salutation'])) {
-        if (strtolower($additionalInfo['salutation']) == 'ms') {
-            $request->setGender(2);
-        } else if (strtolower($additionalInfo['salutation']) == 'mr') {
-            $request->setGender(1);
-        }
-    }
-
-    if (!empty($additionalInfo['birthday']) && substr($additionalInfo['birthday'], 0, 4) != '0000') {
-        $request->setDateOfBirth((String)$additionalInfo['birthday']);
-    }
-
-    $request->setTelephonePrivate((String)$billing['phone']);
-    $request->setEmail((String)$user["additional"]["user"]["email"]);
-
-    $extraInfo["Name"] = 'ORDERCLOSED';
-    $extraInfo["Value"] = $orderClosed;
-    $request->setExtraInfo($extraInfo);
-
-    $extraInfo["Name"] = 'ORDERAMOUNT';
-    $extraInfo["Value"] = $amount;
-    $request->setExtraInfo($extraInfo);
-
-    $extraInfo["Name"] = 'ORDERCURRENCY';
-    $extraInfo["Value"] = Shopware()->Config()->currency;
-    $request->setExtraInfo($extraInfo);
-
-    $extraInfo["Name"] = 'IP';
-    $extraInfo["Value"] = Byjuno_getClientIp();
-    $request->setExtraInfo($extraInfo);
-
-    $tmx_enable = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_threatmetrixenable");
-    $tmxorgid = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_threatmetrix");
-    if (isset($tmx_enable) && $tmx_enable == 'Enabled' && isset($tmxorgid) && $tmxorgid != '' && !empty($_SESSION["byjuno_tmx"])) {
-        $extraInfo["Name"] = 'DEVICE_FINGERPRINT_ID';
-        $extraInfo["Value"] = $_SESSION["byjuno_tmx"];
-        $request->setExtraInfo($extraInfo);
-    }
-
-    if ($invoiceDelivery == 'postal') {
-        $extraInfo["Name"] = 'PAPER_INVOICE';
-        $extraInfo["Value"] = 'YES';
-        $request->setExtraInfo($extraInfo);
-    }
-
-    /* shipping information */
-    $extraInfo["Name"] = 'DELIVERY_FIRSTNAME';
-    $extraInfo["Value"] = $shipping['firstname'];
-    $request->setExtraInfo($extraInfo);
-
-    $extraInfo["Name"] = 'DELIVERY_LASTNAME';
-    $extraInfo["Value"] = $shipping['lastname'];
-    $request->setExtraInfo($extraInfo);
-
+    $request->deliveryDetails->deliverySalutation = null;
     $addressShippingAdd = '';
     if (!empty($shipping['additionalAddressLine1'])) {
         $addressShippingAdd = ' '.trim((String)$shipping['additionalAddressLine1']);
@@ -552,52 +527,27 @@ function Cembrapay_CreateShopWareShopRequestUserBillingCDP($user, $billing, $shi
     if (!empty($shipping['additionalAddressLine2'])) {
         $addressShippingAdd = $addressShippingAdd.' '.trim((String)$shipping['additionalAddressLine2']);
     }
+    $request->deliveryDetails->deliveryAddrFirstLine = html_entity_decode(trim($shipping['street'].' '.$shipping['streetnumber'].$addressShippingAdd), ENT_COMPAT, 'UTF-8');
+    $request->deliveryDetails->deliveryAddrPostalCode = $shipping['zipcode'];
+    $request->deliveryDetails->deliveryAddrTown = html_entity_decode($shipping['city'], ENT_COMPAT, 'UTF-8');
+    $request->deliveryDetails->deliveryAddrCountry = strtoupper($countryShipping);
 
-    $extraInfo["Name"] = 'DELIVERY_FIRSTLINE';
-    $extraInfo["Value"] = trim($shipping['street'].' '.$shipping['streetnumber'].$addressShippingAdd);
-    $request->setExtraInfo($extraInfo);
-
-    $extraInfo["Name"] = 'DELIVERY_HOUSENUMBER';
-    $extraInfo["Value"] = '';
-    $request->setExtraInfo($extraInfo);
-
-    $extraInfo["Name"] = 'DELIVERY_COUNTRYCODE';
-    $extraInfo["Value"] = $countryShipping;
-    $request->setExtraInfo($extraInfo);
-
-    $extraInfo["Name"] = 'DELIVERY_POSTCODE';
-    $extraInfo["Value"] = $shipping['zipcode'];
-    $request->setExtraInfo($extraInfo);
-
-    $extraInfo["Name"] = 'DELIVERY_TOWN';
-    $extraInfo["Value"] = $shipping['city'];
-    $request->setExtraInfo($extraInfo);
-
-    if (!empty($orderId)) {
-        $extraInfo["Name"] = 'ORDERID';
-        $extraInfo["Value"] = $orderId;
-        $request->setExtraInfo($extraInfo);
-    }
-    if (!empty($paymentmethod)) {
-        $extraInfo["Name"] = 'PAYMENTMETHOD';
-        $extraInfo["Value"] = Byjuno_mapMethod($paymentmethod);
-        $request->setExtraInfo($extraInfo);
-    }
-    if ($repayment != "") {
-        $extraInfo["Name"] = 'REPAYMENTTYPE';
-        $extraInfo["Value"] = Byjuno_mapRepayment($repayment);
-        $request->setExtraInfo($extraInfo);
+    if (isset($tmx_enable) && $tmx_enable == 'Enabled' && isset($tmxorgid) && $tmxorgid != '' && !empty($_SESSION["byjuno_tmx"])) {
+        $request->sessionInfo->tmxSessionId = $_SESSION["byjuno_tmx"];
     }
 
-    if ($riskOwner != "") {
-        $extraInfo["Name"] = 'RISKOWNER';
-        $extraInfo["Value"] = $riskOwner;
-        $request->setExtraInfo($extraInfo);
-    }
+    $request->cembraPayDetails->riskOnlyOnCembraPay = true;
+    $request->sessionInfo->sessionIp = Cembrapay_getClientIp();
 
-    $extraInfo["Name"] = 'CONNECTIVTY_MODULE';
-    $extraInfo["Value"] = 'CembraPay ShopWare module 1.4.1';
-    $request->setExtraInfo($extraInfo);
+    $customerConsents = new CustomerConsents();
+    $customerConsents->consentType = "SCREENING";
+    $customerConsents->consentProvidedAt = "MERCHANT";
+    $customerConsents->consentDate = CembraPayCheckoutAutRequest::Date();
+    $customerConsents->consentReference = "MERCHANT DATA PRIVACY";
+    $request->customerConsents = array($customerConsents);
+
+    $request->merchantDetails->transactionChannel = "WEB";
+    $request->merchantDetails->integrationModule = "CembraPay Shopware 5.7.X module 2.0.0";
+
     return $request;
-
 }

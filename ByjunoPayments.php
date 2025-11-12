@@ -563,7 +563,7 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
         $billing = $user['billingaddress'];
         $shipping = $user['shippingaddress'];
         $basket = Shopware()->Modules()->Basket()->sGetAmount();
-        $request = Byjuno_CreateShopWareShopRequestUserBillingCDP($user, $billing, $shipping, $basket['totalAmount'], "", "", "", "", "",  "NO");
+        $request = Cembrapay_CreateShopWareShopRequestUserBillingCDP($user, $billing, $shipping, $basket['totalAmount']);
         $statusLog = "CDP request";
         if ($request->getCompanyName1() != '' && $b2b == 'Enabled') {
             $statusLog = "CDP request for company";
