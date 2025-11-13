@@ -70,13 +70,37 @@ class Shopware_Controllers_Backend_ByjunoTransactions extends Shopware_Controlle
     $result = $builder->getQuery()->getArrayResult();
     $domOutput = new DOMDocument();
     $domOutput->preserveWhiteSpace = FALSE;
+    $isJson = false;
+    $prettyjson = "";
     if ($type == 'response') {
-        $domOutput->loadXML($result[0]["xml_responce"]);
+        if (empty($result[0]["xml_responce"])) {
+            $isJson = true;
+            $prettyjson = "no response";
+        } else if ($result[0]["xml_responce"][0] === '{') {
+            $isJson = true;
+            $decoded = json_decode($result[0]["xml_responce"], true);
+            $prettyjson = json_encode($decoded, JSON_PRETTY_PRINT);
+        } else {
+            $domOutput->loadXML($result[0]["xml_responce"]);
+        }
     } else {
-        $domOutput->loadXML($result[0]["xml_request"]);
+        if (empty($result[0]["xml_request"])) {
+            $isJson = true;
+            $prettyjson = "no request";
+        } else if ($result[0]["xml_request"][0] === '{') {
+            $isJson = true;
+            $decoded = json_decode($result[0]["xml_request"], true);
+            $prettyjson = json_encode($decoded, JSON_PRETTY_PRINT);
+        } else {
+            $domOutput->loadXML($result[0]["xml_request"]);
+        }
     }
     $domOutput->formatOutput = TRUE;
-    echo '<pre>'.htmlspecialchars($domOutput->saveXML()).'</pre>';
+    if ($isJson) {
+        echo '<pre>' . $prettyjson . '</pre>';
+    } else {
+        echo '<pre>' . htmlspecialchars($domOutput->saveXML()) . '</pre>';
+    }
     exit();
   }
 
