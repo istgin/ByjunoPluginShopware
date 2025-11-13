@@ -558,10 +558,8 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
 
     protected function CDPRequest()
     {
-        $statusCDP = 0;
         $mode = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_mode");
-        $b2b = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_b2b");		
-        $timeout = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_timeout");
+        $b2b = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_b2b");
         $user = $this->getUser();
         $billing = $user['billingaddress'];
         $shipping = $user['shippingaddress'];
@@ -582,7 +580,7 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
         $response = $cembrapayCommunicator->sendScreeningRequest($json, $accessData, function ($object, $token, $accessData) {
             $object->saveToken($token, $accessData);
         });
-        if (empty($response)) {
+        if (!empty($response)) {
             $responseRes = CembraPayConstants::screeningResponse($response);
             $screeningStatus = $responseRes->processingStatus;
             $this->saveLog($request->requestMsgId, $request->custDetails->firstName, $request->custDetails->lastName, $json, $response, $screeningStatus, $statusLog);
