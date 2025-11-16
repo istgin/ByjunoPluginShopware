@@ -139,7 +139,7 @@ function Cembrapay_IsB2bByjuno($billing) {
 }
 
 /* @var $controller \Shopware_Controllers_Frontend_BasebyjunoController  */
-function Cembrapay_CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $controller, $paymentmethod, $repayment, $invoiceDelivery, $riskOwner, $orderId = "", $orderClosed = "NO", $transactionNumber = "") {
+function Cembrapay_CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $controller, $repayment, $invoiceDelivery, $orderId) {
 
     $b2b = false;
     $b2bEnabled = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_b2b");

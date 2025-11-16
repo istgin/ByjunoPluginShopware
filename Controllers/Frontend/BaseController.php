@@ -1,6 +1,7 @@
 <?php
 
 
+use Byjuno\ByjunoPayments\Api\CembraPayCheckoutAuthorizationResponse;
 use Byjuno\ByjunoPayments\Api\CembraPayCommunicator;
 use Byjuno\ByjunoPayments\Api\CembraPayConstants;
 use Byjuno\ByjunoPayments\Api\CembraPayLoginDto;
@@ -196,77 +197,39 @@ abstract class Shopware_Controllers_Frontend_BasebyjunoController extends Shopwa
             return false;
         }
         $_SESSION["byjuno"]["processing"] = true;
-        $mode = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_mode");		
-        $timeout = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_timeout");
-        $b2b = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_b2b");
+        $mode = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_mode");
         $user = $this->getUser();
         $billing = $user['billingaddress'];
         $shipping = $user['shippingaddress'];
-        $statusS1 = 0;
-        $statusS3 = 0;
-        $request = Byjuno_CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $this, $paymentMethod, $this->payment_plan, $this->payment_send, "", "",  "NO", "");
-        $statusLog = "Order request (S1)";
-        if ($request->getCompanyName1() != '' && $b2b == 'Enabled') {
-            $statusLog = "Order request for company (S1)";
-            $xml = $request->createRequestCompany();
-        } else {
-            $xml = $request->createRequest();
-        }
-        $byjunoCommunicator = new \ByjunoCommunicator();
-        if (isset($mode) && $mode == 'Live') {
-            $byjunoCommunicator->setServer('live');
-        } else {
-            $byjunoCommunicator->setServer('test');
-        }
-        $response = $byjunoCommunicator->sendRequest($xml, $timeout);
-        $transactionNumber = "";
-        if (isset($response)) {
-            $byjunoResponse = new \ByjunoResponse();
-            $byjunoResponse->setRawResponse($response);
-            $byjunoResponse->processResponse();
-            $statusS1 = (int)$byjunoResponse->getCustomerRequestStatus();
-            $this->saveLog($request, $xml, $response, $statusS1, $statusLog);
-            $transactionNumber = $byjunoResponse->getTransactionNumber();
-            if (intval($statusS1) > 15) {
-                $statusS1 = 0;
-            }
-        }
-        $order = null;
-        if ($this->isStatusOkS2($statusS1)) {
-            $this->saveOrder(1, uniqid("byjuno_"), $this->PAYMENTSTATUSOPEN);
-            /* @var $order \Shopware\Models\Order\Order */
-            $order = Shopware()->Models()->getRepository('Shopware\Models\Order\Order')
-                ->findOneBy(array('number' => $this->getOrderNumber()));
+        $this->saveOrder(1, uniqid("byjuno_"), $this->PAYMENTSTATUSOPEN);
+        /* @var $order \Shopware\Models\Order\Order */
+        $order = Shopware()->Models()->getRepository('Shopware\Models\Order\Order')
+            ->findOneBy(array('number' => $this->getOrderNumber()));
 
-            $risk = $this->getStatusRisk($statusS1);
-            $request = Byjuno_CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $this, $paymentMethod, $this->payment_plan, $this->payment_send, $risk, $order->getNumber(), "YES", $transactionNumber);
-            $statusLog = "Order complete (S3)";
-            if ($request->getCompanyName1() != '' && $b2b == 'Enabled') {
-                $statusLog = "Order complete for company (S3)";
-                $xml = $request->createRequestCompany();
-            } else {
-                $xml = $request->createRequest();
-            }
-            $byjunoCommunicator = new \ByjunoCommunicator();
-            if (isset($mode) && $mode == 'Live') {
-                $byjunoCommunicator->setServer('live');
-            } else {
-                $byjunoCommunicator->setServer('test');
-            }
-            $response = $byjunoCommunicator->sendRequest($xml, $timeout);
-            if (isset($response)) {
-                $byjunoResponse = new \ByjunoResponse();
-                $byjunoResponse->setRawResponse($response);
-                $byjunoResponse->processResponse();
-                $statusS3 = (int)$byjunoResponse->getCustomerRequestStatus();
-                $this->saveLog($request, $xml, $response, $statusS3, $statusLog);
-                if (intval($statusS3) > 15) {
-                    $statusS3 = 0;
-                }
-            }
+        $requestAUT = Cembrapay_CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $this, $this->payment_plan, $this->payment_send, $order->getNumber());
+        $CembraPayRequestName = "Authorization request";
+        if ($requestAUT->custDetails->custType == CembraPayConstants::$CUSTOMER_BUSINESS) {
+            $CembraPayRequestName = "Authorization request company";
+        }
+
+        $json = $requestAUT->createRequest();
+        $cembrapayCommunicator = new CembraPayCommunicator();
+        if (isset($mode) && $mode == 'Live') {
+            $cembrapayCommunicator->setServer('live');
         } else {
-            $_SESSION["byjuno"]["processing"] = false;
-            return false;
+            $cembrapayCommunicator->setServer('test');
+        }
+        $accessData = Cembrapay_GetAccessData($mode);
+        $response = $cembrapayCommunicator->sendScreeningRequest($json, $accessData, function ($object, $token, $accessData) {
+            $object->saveToken($token, $accessData);
+        });
+        if ($response) {
+            /* @var $responseRes CembraPayCheckoutAuthorizationResponse */
+            $responseRes = CembraPayConstants::authorizationResponse($response);
+            $status = $responseRes->processingStatus;
+            Cembrapay_SaveLog($requestAUT->requestMsgId, $requestAUT->custDetails->firstName, $requestAUT->custDetails->lastName, $json, $response, $status, $CembraPayRequestName);
+        } else {
+            Cembrapay_SaveLog($requestAUT->requestMsgId, $requestAUT->custDetails->firstName, $requestAUT->custDetails->lastName, $json, "", "ERROR", $CembraPayRequestName);
         }
         if ($order == null) {
             $_SESSION["byjuno"]["processing"] = false;
@@ -289,19 +252,18 @@ abstract class Shopware_Controllers_Frontend_BasebyjunoController extends Shopwa
         if ($successPaymentStatusId <= 0) {
             $successPaymentStatusId = $this->PAYMENTSTATUSPAID;
         }
-
         $orderModule = Shopware()->Modules()->Order();
-        if ($this->isStatusOkS2($statusS1) && $this->isStatusOkS3($statusS3)) {
+        if ($status == CembraPayConstants::$AUTH_OK) {
             $orderModule->setPaymentStatus($order->getId(), $successPaymentStatusId, false);
             if ($successStatusId != 0) {
                 $orderModule->setOrderStatus($order->getId(), $successStatusId, false);
             }
             $mail = $orderModule->createStatusMail($order->getId(), $successPaymentStatusId);
             $mail->clearRecipients();
-			if (isset($mode) && $mode == 'Live') {
-				$mail->addTo(Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_prodemail"));
+            if (isset($mode) && $mode == 'Live') {
+                $mail->addTo(Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_prodemail"));
             } else {
-				$mail->addTo(Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_testemail"));
+                $mail->addTo(Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_testemail"));
             }
             $orderModule->sendStatusMail($mail);
             $this->saveTransactionPaymentData($order->getId(), 'payment_plan', $this->payment_plan);
