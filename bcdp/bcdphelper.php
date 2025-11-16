@@ -147,6 +147,12 @@ function Cembrapay_CreateShopWareShopRequestUserBilling($user, $billing, $shippi
     {
         $b2b = true;
     }
+    $instantSettlement = false;
+    $instantSettlementEnabled = Shopware()->Config()->getByNamespace("ByjunoPayments", "cembra_instant_settlement");
+    if ($instantSettlementEnabled == 'Enabled')
+    {
+        $instantSettlement = true;
+    }
     $sql     = 'SELECT `countryiso` FROM s_core_countries WHERE id = ' . intval($billing["countryID"]);
     $countryBilling = Shopware()->Db()->fetchOne($sql);
     $sql     = 'SELECT `countryiso` FROM s_core_countries WHERE id = ' . intval($shipping["countryID"]);
@@ -267,6 +273,13 @@ function Cembrapay_CreateShopWareShopRequestUserBilling($user, $billing, $shippi
         $request->cembraPayDetails->invoiceDeliveryType = "POSTAL";
     } else {
         $request->cembraPayDetails->invoiceDeliveryType = "EMAIL";
+    }
+
+    if ($instantSettlement) {
+        $request->settlementDetails->instantSettlement = true;
+        $request->settlementDetails->merchantInvoiceRef = $orderId;
+    } else {
+        $request->settlementDetails->instantSettlement = false;
     }
 
     $customerConsents = new CustomerConsents();

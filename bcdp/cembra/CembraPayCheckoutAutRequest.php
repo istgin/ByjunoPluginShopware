@@ -65,6 +65,12 @@ class SettlementDetails
     public $isFinal; //boolean
 }
 
+class SettlementDetailsAuth
+{
+    public $merchantInvoiceRef; //String
+    public $instantSettlement; //boolean
+}
+
 class SettlementDetailsMemo
 {
     public $merchantInvoiceRef; //boolean
@@ -118,6 +124,7 @@ class CembraPayCheckoutAutRequest
     public $sessionInfo; //SessionInfo
     public $cembraPayDetails; //CembraPayDetails
     public $merchantDetails; //MerchantDetails
+    public $settlementDetails; //SettlementDetailsAuth
 
     public function __construct()
     {
@@ -129,6 +136,7 @@ class CembraPayCheckoutAutRequest
         $this->sessionInfo = new SessionInfo();
         $this->cembraPayDetails = new CembraPayDetails();
         $this->merchantDetails = new MerchantDetails();
+        $this->settlementDetails = new SettlementDetailsAuth();
     }
 
     public static function GUID()

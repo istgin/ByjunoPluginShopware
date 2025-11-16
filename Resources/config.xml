@@ -154,6 +154,23 @@
             <label>Shopware order cancel id</label>
             <value>4</value>
         </element>
+        <element type="select" required="true" scope="shop">
+            <name>cembra_instant_settlement</name>
+            <label>Instant settlement</label>
+            <value>Enabled</value>
+            <store>
+                <option>
+                    <value>Enabled</value>
+                    <label lang="de">Enabled</label>
+                    <label lang="en">Enabled</label>
+                </option>
+                <option>
+                    <value>Disabled</value>
+                    <label lang="de">Disabled</label>
+                    <label lang="en">Disabled</label>
+                </option>
+            </store>
+        </element>
         <element type="text" required="true" scope="shop">
             <name>byjuno_prodemail</name>
             <label>Production email of CembraPay</label>
