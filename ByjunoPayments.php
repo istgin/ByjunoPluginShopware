@@ -333,44 +333,6 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
         }
     }
 
-    protected function CDPRequest()
-    {
-        $mode = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_mode");
-        $b2b = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_b2b");
-        $user = $this->getUser();
-        $billing = $user['billingaddress'];
-        $shipping = $user['shippingaddress'];
-        $basket = Shopware()->Modules()->Basket()->sGetAmount();
-        $request = Cembrapay_CreateShopWareShopRequestUserBillingCDP($user, $billing, $shipping, $basket['totalAmount']);
-        $statusLog = "Screening request";
-        if ($request->custDetails->custType == CembraPayConstants::$CUSTOMER_BUSINESS && $b2b) {
-            $statusLog = "Screening request company";
-        }
-        $json = $request->createRequest();
-        $cembrapayCommunicator = new CembraPayCommunicator();
-        if (isset($mode) && $mode == 'Live') {
-            $cembrapayCommunicator->setServer('live');
-        } else {
-            $cembrapayCommunicator->setServer('test');
-        }
-        $accessData = $this->getAccessData($mode);
-        $response = $cembrapayCommunicator->sendScreeningRequest($json, $accessData, function ($object, $token, $accessData) {
-            $object->saveToken($token, $accessData);
-        });
-        if (!empty($response)) {
-            $responseRes = CembraPayConstants::screeningResponse($response);
-            $screeningStatus = $responseRes->processingStatus;
-            $this->saveLog($request->requestMsgId, $request->custDetails->firstName, $request->custDetails->lastName, $json, $response, $screeningStatus, $statusLog);
-        } else {
-            $screeningStatus = CembraPayConstants::$SCREENING_NET_ERROR;
-            $this->saveLog($request->requestMsgId, $request->custDetails->firstName, $request->custDetails->lastName, $json, "", $screeningStatus, $statusLog);
-        }
-        if ($screeningStatus == CembraPayConstants::$SCREENING_OK) {
-            return true;
-        }
-        return false;
-    }
-
     public function SaveLog($requestId, $firstname, $lastname, $xml_request, $xml_response, $status, $type) {
         $sql     = '
             INSERT INTO s_plugin_byjuno_transactions (requestid, requesttype, firstname, lastname, ip, status, datecolumn, xml_request, xml_responce)
@@ -436,7 +398,7 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
                 }
             }
             if (!isset($sesStatus)) {
-                $allowed = $this->CDPRequest();
+                $allowed = Cembrapay_ScreeningRequest($this->getUser());
                 $converted_res = $allowed ? 'true' : 'false';
                 self::$sesStatusString = $converted_res;
             } else {

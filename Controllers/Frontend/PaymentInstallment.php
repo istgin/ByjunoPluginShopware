@@ -33,7 +33,20 @@ class Shopware_Controllers_Frontend_PaymentInstallment extends Shopware_Controll
                     break;
                 }
                 if ($cdp_enabled == 'Enabled') {
-                    $allowed = $this->CDPRequest("byjuno_payment_installment");
+                    if (!empty(self::$sesStatusString)) {
+                        if (self::$sesStatusString == 'true') {
+                            $sesStatus = true;
+                        } else {
+                            $sesStatus = false;
+                        }
+                    }
+                    if (!isset($sesStatus)) {
+                        $allowed = Cembrapay_ScreeningRequest($this->getUser());
+                        $converted_res = $allowed ? 'true' : 'false';
+                        self::$sesStatusString = $converted_res;
+                    } else {
+                        $allowed = $sesStatus;
+                    }
                     if (!$allowed) {
                         $this->forward('cancelcdp');
                         break;

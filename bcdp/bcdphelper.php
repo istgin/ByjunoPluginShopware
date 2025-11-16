@@ -1,7 +1,9 @@
 <?php
 
 use Byjuno\ByjunoPayments\Api\CembraPayCheckoutAutRequest;
+use Byjuno\ByjunoPayments\Api\CembraPayCommunicator;
 use Byjuno\ByjunoPayments\Api\CembraPayConstants;
+use Byjuno\ByjunoPayments\Api\CembraPayLoginDto;
 use Byjuno\ByjunoPayments\Api\CustomerConsents;
 
 function Cembrapay_mapMethod($method) {
@@ -51,6 +53,79 @@ function Cembrapay_mapRepayment($type) {
     } else {
         return "4";
     }
+}
+
+function Cembrapay_SaveLog($requestId, $firstname, $lastname, $xml_request, $xml_response, $status, $type) {
+    $sql     = '
+            INSERT INTO s_plugin_byjuno_transactions (requestid, requesttype, firstname, lastname, ip, status, datecolumn, xml_request, xml_responce)
+                    VALUES (?,?,?,?,?,?,?,?,?)
+        ';
+    Shopware()->Db()->query($sql, Array(
+        $requestId,
+        $type,
+        $firstname,
+        $lastname,
+        $_SERVER['REMOTE_ADDR'],
+        $status,
+        date('Y-m-d\TH:i:sP'),
+        $xml_request,
+        $xml_response
+    ));
+}
+
+function Cembrapay_GetAccessData($mode) {
+    $accessData = new CembraPayLoginDto();
+    $accessData->timeout = (int)Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_timeout");
+    if ($accessData->timeout < 0) {
+        $accessData->timeout = 30;
+    }
+    if ($mode == 'test') {
+        $accessData->mode = 'test';
+        $accessData->username = Shopware()->Config()->getByNamespace("ByjunoPayments", "cembra_clientid_live");
+        $accessData->password = Shopware()->Config()->getByNamespace("ByjunoPayments", "cembra_password_live");
+    } else {
+        $accessData->mode = 'live';
+        $accessData->username = Shopware()->Config()->getByNamespace("ByjunoPayments", "cembra_clientid_test");
+        $accessData->password = Shopware()->Config()->getByNamespace("ByjunoPayments", "cembra_password_test");
+    }
+    return $accessData;
+}
+
+function Cembrapay_ScreeningRequest($user)
+{
+    $mode = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_mode");
+    $b2b = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_b2b");
+    $billing = $user['billingaddress'];
+    $shipping = $user['shippingaddress'];
+    $basket = Shopware()->Modules()->Basket()->sGetAmount();
+    $request = Cembrapay_CreateShopWareShopRequestUserBillingCDP($user, $billing, $shipping, $basket['totalAmount']);
+    $statusLog = "Screening request";
+    if ($request->custDetails->custType == CembraPayConstants::$CUSTOMER_BUSINESS && $b2b) {
+        $statusLog = "Screening request company";
+    }
+    $json = $request->createRequest();
+    $cembrapayCommunicator = new CembraPayCommunicator();
+    if (isset($mode) && $mode == 'Live') {
+        $cembrapayCommunicator->setServer('live');
+    } else {
+        $cembrapayCommunicator->setServer('test');
+    }
+    $accessData = Cembrapay_GetAccessData($mode);
+    $response = $cembrapayCommunicator->sendScreeningRequest($json, $accessData, function ($object, $token, $accessData) {
+        $object->saveToken($token, $accessData);
+    });
+    if (!empty($response)) {
+        $responseRes = CembraPayConstants::screeningResponse($response);
+        $screeningStatus = $responseRes->processingStatus;
+        Cembrapay_SaveLog($request->requestMsgId, $request->custDetails->firstName, $request->custDetails->lastName, $json, $response, $screeningStatus, $statusLog);
+    } else {
+        $screeningStatus = CembraPayConstants::$SCREENING_NET_ERROR;
+        Cembrapay_SaveLog($request->requestMsgId, $request->custDetails->firstName, $request->custDetails->lastName, $json, "", $screeningStatus, $statusLog);
+    }
+    if ($screeningStatus == CembraPayConstants::$SCREENING_OK) {
+        return true;
+    }
+    return false;
 }
 
 function Cembrapay_CreateShopRequestS4_DB($documentId, $amount, $orderAmount, $orderCurrency, $orderId, $customerId, $date)
