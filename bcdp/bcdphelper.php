@@ -187,7 +187,7 @@ function Cembrapay_CreateShopWareShopRequestUserBilling($user, $billing, $shippi
         $lang = substr($langName["locale"], 0, 2);
     }
     $request->custDetails->language = (string)$lang;
-
+    $additionalInfo = $user["additional"]["user"];
     if (!empty($additionalInfo['birthday']) && substr($additionalInfo['birthday'], 0, 4) != '0000') {
         $request->custDetails->dateOfBirth = (String)$additionalInfo['birthday'];
     }
@@ -197,7 +197,6 @@ function Cembrapay_CreateShopWareShopRequestUserBilling($user, $billing, $shippi
 
     $request->custDetails->salutation = CembraPayConstants::$GENTER_UNKNOWN;
 
-    $additionalInfo = $user["additional"]["user"];
     if (!empty($additionalInfo['salutation'])) {
         if (strtolower($additionalInfo['salutation']) == 'ms') {
             $request->custDetails->salutation = CembraPayConstants::$GENTER_FEMALE;
@@ -346,7 +345,6 @@ function Cembrapay_CreateShopWareShopRequestUserBillingScreening($user, $billing
             $request->custDetails->salutation = CembraPayConstants::$GENTER_MALE;
         }
     }
-
     if (!empty($additionalInfo['birthday']) && substr($additionalInfo['birthday'], 0, 4) != '0000') {
         $request->custDetails->dateOfBirth = (String)$additionalInfo['birthday'];
     }
