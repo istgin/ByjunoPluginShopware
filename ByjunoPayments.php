@@ -22,6 +22,7 @@ require (__DIR__) . '/bcdp/bcdphelper.php';
 class ByjunoPayments extends Plugin
 {
 
+    public static $orderNumberGenerated = "";
     private function getPaymentId(\sOrder $sOrder)
     {
         if (!empty($sOrder->sUserData['additional']['payment']['id'])) {
@@ -93,13 +94,23 @@ class ByjunoPayments extends Plugin
             'Enlight_Controller_Dispatcher_ControllerPath_Backend_ByjunoTransactions' => 'registerControllerTransactions',
             'Enlight_Controller_Action_PostDispatch' => 'onPostDispatchByjunoMessage',
             'Enlight_Controller_Action_PreDispatch' => 'onPreDispatchByjunoMessage',
-            'Shopware_Modules_Admin_GetPaymentMeans_DataFilter' => 'Byjuno_CdpStatusCall'
+            'Shopware_Modules_Admin_GetPaymentMeans_DataFilter' => 'Byjuno_CdpStatusCall',
+            'Shopware_Modules_Order_GetOrdernumber_FilterOrdernumber' => 'onFilterOrdernumber'
         ];
     }
 
     public static $controller = "";
     public static $action = "";
     public static $method = "";
+
+    public function onFilterOrdernumber(\Enlight_Event_EventArgs $args)
+    {
+        if (!empty(self::$orderNumberGenerated)) {
+            return self::$orderNumberGenerated;
+        } else {
+            return $args->getReturn();
+        }
+    }
 
     function onPreDispatchByjunoMessage(\Enlight_Event_EventArgs $args) {
         /* @var $request \Enlight_Controller_Request_RequestHttp */;

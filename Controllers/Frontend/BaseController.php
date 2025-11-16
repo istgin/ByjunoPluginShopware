@@ -5,7 +5,9 @@ use Byjuno\ByjunoPayments\Api\CembraPayCheckoutAuthorizationResponse;
 use Byjuno\ByjunoPayments\Api\CembraPayCommunicator;
 use Byjuno\ByjunoPayments\Api\CembraPayConstants;
 use Byjuno\ByjunoPayments\Api\CembraPayLoginDto;
+use ByjunoPayments\ByjunoPayments;
 use Shopware\Components\Logger;
+use Shopware\Components\NumberRangeIncrementerInterface;
 
 abstract class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Controllers_Frontend_Payment
 {
@@ -201,12 +203,9 @@ abstract class Shopware_Controllers_Frontend_BasebyjunoController extends Shopwa
         $user = $this->getUser();
         $billing = $user['billingaddress'];
         $shipping = $user['shippingaddress'];
-        $this->saveOrder(1, uniqid("byjuno_"), $this->PAYMENTSTATUSOPEN);
-        /* @var $order \Shopware\Models\Order\Order */
-        $order = Shopware()->Models()->getRepository('Shopware\Models\Order\Order')
-            ->findOneBy(array('number' => $this->getOrderNumber()));
-
-        $requestAUT = Cembrapay_CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $this, $this->payment_plan, $this->payment_send, $order->getNumber());
+        $orderNumberGenerator = Shopware()->Container()->get(NumberRangeIncrementerInterface::class);
+        ByjunoPayments::$orderNumberGenerated = (String)$orderNumberGenerator->increment('invoice');
+        $requestAUT = Cembrapay_CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $this, $this->payment_plan, $this->payment_send, ByjunoPayments::$orderNumberGenerated);
         $CembraPayRequestName = "Authorization request";
         if ($requestAUT->custDetails->custType == CembraPayConstants::$CUSTOMER_BUSINESS) {
             $CembraPayRequestName = "Authorization request company";
@@ -231,10 +230,6 @@ abstract class Shopware_Controllers_Frontend_BasebyjunoController extends Shopwa
         } else {
             Cembrapay_SaveLog($requestAUT->requestMsgId, $requestAUT->custDetails->firstName, $requestAUT->custDetails->lastName, $json, "", "ERROR", $CembraPayRequestName);
         }
-        if ($order == null) {
-            $_SESSION["byjuno"]["processing"] = false;
-            return false;
-        }
         $cancelStatusId = Shopware()->Config()->getByNamespace("ByjunoPayments", "S5_default_cancel_id");
         $cancelStatusId = intval($cancelStatusId);
         if ($cancelStatusId <= 0) {
@@ -252,8 +247,19 @@ abstract class Shopware_Controllers_Frontend_BasebyjunoController extends Shopwa
         if ($successPaymentStatusId <= 0) {
             $successPaymentStatusId = $this->PAYMENTSTATUSPAID;
         }
-        $orderModule = Shopware()->Modules()->Order();
         if ($status == CembraPayConstants::$AUTH_OK) {
+            $orderModule = Shopware()->Modules()->Order();
+            $this->saveOrder(1, uniqid("byjuno_"), $this->PAYMENTSTATUSOPEN);
+            /* @var $order \Shopware\Models\Order\Order */
+            $order = Shopware()->Models()->getRepository('Shopware\Models\Order\Order')
+                ->findOneBy(array('number' => $this->getOrderNumber()));
+            if ($this->getOrderNumber() !== ByjunoPayments::$orderNumberGenerated) {
+                $orderModule->setPaymentStatus($order->getId(), $this->PAYMENTSTATUSVOID, false);
+                $orderModule->setOrderStatus($order->getId(), $cancelStatusId, false);
+                $_SESSION["byjuno"]["processing"] = false;
+                return false;
+            }
+            ByjunoPayments::$orderNumberGenerated = "";
             $orderModule->setPaymentStatus($order->getId(), $successPaymentStatusId, false);
             if ($successStatusId != 0) {
                 $orderModule->setOrderStatus($order->getId(), $successStatusId, false);
@@ -269,9 +275,6 @@ abstract class Shopware_Controllers_Frontend_BasebyjunoController extends Shopwa
             $this->saveTransactionPaymentData($order->getId(), 'payment_plan', $this->payment_plan);
             $_SESSION["byjuno"]["processing"] = false;
             return true;
-        } else {
-            $orderModule->setPaymentStatus($order->getId(), $this->PAYMENTSTATUSVOID, false);
-            $orderModule->setOrderStatus($order->getId(), $cancelStatusId, false);
         }
         $_SESSION["byjuno"]["processing"] = false;
         return false;
