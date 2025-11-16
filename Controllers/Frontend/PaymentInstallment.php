@@ -70,7 +70,7 @@ class Shopware_Controllers_Frontend_PaymentInstallment extends Shopware_Controll
                 }
                 $checked = 'checked=\"\"';
                 $paymentplans = Array();
-                if ($b2bEnabled == 'Enabled' && Byjuno_IsB2bByjuno($billing)) {
+                if ($b2bEnabled == 'Enabled' && Cembrapay_IsB2bByjuno($billing)) {
                     if ($config->getByNamespace("ByjunoPayments", "installment_3_b2b") == "Enabled") {
                         $paymentplans[] = Array(
                             "checked" => $checked,

@@ -141,7 +141,12 @@ function Cembrapay_IsB2bByjuno($billing) {
 /* @var $controller \Shopware_Controllers_Frontend_BasebyjunoController  */
 function Cembrapay_CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $controller, $paymentmethod, $repayment, $invoiceDelivery, $riskOwner, $orderId = "", $orderClosed = "NO", $transactionNumber = "") {
 
-    $b2b = true; //TODD
+    $b2b = false;
+    $b2bEnabled = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_b2b");
+    if ($b2bEnabled == 'Enabled')
+    {
+        $b2b = true;
+    }
     $sql     = 'SELECT `countryiso` FROM s_core_countries WHERE id = ' . intval($billing["countryID"]);
     $countryBilling = Shopware()->Db()->fetchOne($sql);
     $sql     = 'SELECT `countryiso` FROM s_core_countries WHERE id = ' . intval($shipping["countryID"]);
@@ -183,8 +188,6 @@ function Cembrapay_CreateShopWareShopRequestUserBilling($user, $billing, $shippi
     }
     $request->custDetails->language = (string)$lang;
 
-
-
     if (!empty($additionalInfo['birthday']) && substr($additionalInfo['birthday'], 0, 4) != '0000') {
         $request->custDetails->dateOfBirth = (String)$additionalInfo['birthday'];
     }
@@ -217,7 +220,7 @@ function Cembrapay_CreateShopWareShopRequestUserBilling($user, $billing, $shippi
     if (!empty($billing['additionalAddressLine2'])) {
         $addressAdd = $addressAdd.' '.trim((String)$billing['additionalAddressLine2']);
     }
-    $request->billingAddr->addrFirstLine = trim((String)$billing['street'].' '.$billing['streetnumber'].$addressAdd));
+    $request->billingAddr->addrFirstLine = trim((String)$billing['street'].' '.$billing['streetnumber'].$addressAdd);
     $request->billingAddr->postalCode = (string)(String)$billing['zipcode'];
     $request->billingAddr->country = strtoupper(strtoupper((String)$countryBilling));
     $request->billingAddr->town = (String)$billing['city'];
@@ -289,14 +292,16 @@ function Cembrapay_CreateShopWareShopRequestUserBilling($user, $billing, $shippi
 
 function Cembrapay_CreateShopWareShopRequestUserBillingScreening($user, $billing, $shipping, $amount) {
 
-    $b2b = true; // TODO
-
+    $b2b = false;
+    $b2bEnabled = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_b2b");
+    if ($b2bEnabled == 'Enabled')
+    {
+        $b2b = true;
+    }
     $sql     = 'SELECT `countryiso` FROM s_core_countries WHERE id = ' . intval($billing["countryID"]);
     $countryBilling = Shopware()->Db()->fetchOne($sql);
-
     $sql     = 'SELECT `countryiso` FROM s_core_countries WHERE id = ' . intval($shipping["countryID"]);
     $countryShipping = Shopware()->Db()->fetchOne($sql);
-
     $sql     = 'SELECT `locale` FROM s_core_locales WHERE id = ' . intval(Shopware()->Shop()->getLocale()->getId());
     $langName = Shopware()->Db()->fetchRow($sql);
     $lang = 'de';
