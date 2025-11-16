@@ -21,7 +21,7 @@
         <element type="select" required="true" scope="shop">
             <name>byjuno_b2b</name>
             <label>Enable B2B check</label>
-            <value>Disabled</value>
+            <value>Enable</value>
             <store>
                 <option>
                     <value>Disabled</value>
@@ -37,11 +37,11 @@
         </element>
         <element type="text" required="true" scope="shop">
             <name>cembra_clientid_live</name>
-            <label>Production ClientId</label>
+            <label>Live ClientId</label>
         </element>
         <element type="text" required="true" scope="shop">
             <name>cembra_password_live</name>
-            <label>Production Password</label>
+            <label>Live Password</label>
         </element>
         <element type="text" required="true" scope="shop">
             <name>cembra_clientid_test</name>
