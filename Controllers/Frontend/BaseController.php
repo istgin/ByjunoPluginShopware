@@ -193,7 +193,7 @@ abstract class Shopware_Controllers_Frontend_BasebyjunoController extends Shopwa
      *
      * Collects the payment information and transmit it to the payment provider.
      */
-    protected function gatewayAction($paymentMethod)
+    protected function gatewayAction()
     {
         if (!empty($_SESSION["byjuno"]["processing"]) && $_SESSION["byjuno"]["processing"] == true) {
             return false;

@@ -264,7 +264,7 @@ class Shopware_Controllers_Frontend_PaymentInstallment extends Shopware_Controll
                     $this->payment_plan = $paymentplans[0]["key"];
                     $this->payment_send = "email";
                     $this->payment_send_to = (String)$user["additional"]["user"]["email"];
-                    if ($this->gatewayAction('byjuno_payment_installment')) {
+                    if ($this->gatewayAction()) {
                         $this->redirect(['controller' => 'checkout', 'action' => 'finish']);
                         break;
                     } else {
@@ -277,7 +277,7 @@ class Shopware_Controllers_Frontend_PaymentInstallment extends Shopware_Controll
                         $this->payment_plan = $paymentplans[0]["key"];
                         $this->payment_send = "email";
                         $this->payment_send_to = (String)$user["additional"]["user"]["email"];
-                        if ($this->gatewayAction('byjuno_payment_installment')) {
+                        if ($this->gatewayAction()) {
                             $this->redirect(['controller' => 'checkout', 'action' => 'finish']);
                             break;
                         } else {
@@ -314,7 +314,7 @@ class Shopware_Controllers_Frontend_PaymentInstallment extends Shopware_Controll
         }
         switch ($this->getPaymentShortName()) {
             case 'byjuno_payment_installment':
-                if ($this->gatewayAction('byjuno_payment_installment')) {
+                if ($this->gatewayAction()) {
                     $this->redirect(['controller' => 'checkout', 'action' => 'finish']);
                     break;
                 } else {
