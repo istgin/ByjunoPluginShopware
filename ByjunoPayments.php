@@ -93,8 +93,7 @@ class ByjunoPayments extends Plugin
             'Enlight_Controller_Dispatcher_ControllerPath_Backend_ByjunoTransactions' => 'registerControllerTransactions',
             'Enlight_Controller_Action_PostDispatch' => 'onPostDispatchByjunoMessage',
             'Enlight_Controller_Action_PreDispatch' => 'onPreDispatchByjunoMessage',
-            'Shopware_Modules_Admin_GetPaymentMeans_DataFilter' => 'Byjuno_CdpStatusCall',
-            'Shopware_CronJob_ByjunoPaymentCron' => 'ByjunoPaymentCron'
+            'Shopware_Modules_Admin_GetPaymentMeans_DataFilter' => 'Byjuno_CdpStatusCall'
         ];
     }
 
@@ -258,9 +257,6 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
         $attributeService->update('s_order_attributes', "payment_plan", "string", []);
         $attributeService->update('s_order_attributes', "payment_send", "string", []);
         $attributeService->update('s_order_attributes', "payment_send_to", "string", []);
-
-
-        $this->addCron();
 
         parent::install($context);
     }
@@ -430,118 +426,11 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
         }
     }
 
-    public function addCron()
-    {
-        $connection = $this->container->get('dbal_connection');
-        $connection->insert(
-            's_crontab',
-            [
-                'name'             => 'ByjunoPayment',
-                'action'           => 'ByjunoPaymentCron',
-                'next'             => new \DateTime(),
-                'start'            => null,
-                '`interval`'       => '30',
-                'active'           => true,
-                'end'              => null,
-                'pluginID'         => null
-            ],
-            [
-                'next' => 'datetime',
-                'end'  => 'datetime',
-            ]
-        );
-    }
-
     public function removeCron()
     {
         $this->container->get('dbal_connection')->executeQuery('DELETE FROM s_crontab WHERE `name` = ?', [
             'ByjunoPayment'
         ]);
-    }
-
-    public function ByjunoPaymentCron(\Shopware_Components_Cron_CronJob $job)
-    {
-        $time = time() - 30 * 60;
-        $documents = Shopware()->Db()->fetchAll("
-                        SELECT *
-                        FROM s_plugin_byjuno_documents
-                        WHERE document_sent = false AND document_try_time < ?
-                        ORDER BY id DESC
-                        ",
-            array($time)
-        );
-        if (count($documents) == 0) {
-            return;
-        }
-        foreach ($documents as $document) {
-            $statusLog = "";
-            if ($document["document_type"] == 1) {
-                $request = Byjuno_CreateShopRequestS4($document["document_id"], $document["amount"], $document["order_amount"], $document["order_currency"], $document["order_id"], $document["customer_id"], $document["date"]);
-                $statusLog = "S4 Request";
-            } else if ($document["document_type"] == 2) {
-                $request = Byjuno_CreateShopRequestS5Refund($document["document_id"], $document["amount"], $document["order_currency"], $document["order_id"], $document["customer_id"], $document["date"]);
-                $statusLog = "S5 refund request";
-            } else if ($document["document_type"] == 3) {
-                $request = Byjuno_CreateShopRequestS5Cancel($document["amount"], $document["order_currency"], $document["order_id"], $document["customer_id"], $document["date"]);
-                $statusLog = "S5 cancel request";
-            }
-
-            $xml = $request->createRequest();
-            $byjunoCommunicator = new \ByjunoCommunicator();
-            $mode = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_mode");
-            $timeout = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_timeout");
-            if (isset($mode) && $mode == 'Live') {
-                $byjunoCommunicator->setServer('live');
-            } else {
-                $byjunoCommunicator->setServer('test');
-            }
-            $response = $byjunoCommunicator->sendS4Request($xml, $timeout);
-            if (!empty($response)) {
-                $byjunoResponse = new \ByjunoS4Response();
-                $byjunoResponse->setRawResponse($response);
-                $byjunoResponse->processResponse();
-                $statusCDP = $byjunoResponse->getProcessingInfoClassification();
-                if ($document["document_type"] == 1) {
-                    Byjuno_SaveS4LogCron($request, $xml, $response, $statusCDP, $statusLog, "-", "-");
-                } else if ($document["document_type"] == 2) {
-                    Byjuno_SaveS5LogCron($request, $xml, $response, $statusCDP, $statusLog, "-", "-");
-                } else if ($document["document_type"] == 3) {
-                    Byjuno_saveS5LogCron($request, $xml, $response, $statusCDP, $statusLog, "-", "-");
-                }
-                $sql = 'UPDATE `s_plugin_byjuno_documents` SET `document_sent`= true WHERE id = ?';
-                Shopware()->Db()->query($sql, array($document["id"]));
-            } else {
-                if ($document["document_type"] == 1) {
-                    Byjuno_SaveS4LogCron($request, $xml, "", "error", $statusLog, "-", "-");
-                } else if ($document["document_type"] == 2) {
-                    Byjuno_SaveS5LogCron($request, $xml, "", "error", $statusLog, "-", "-");
-                } else if ($document["document_type"] == 3) {
-                    Byjuno_saveS5LogCron($request, $xml, "", "error", $statusLog, "-", "-");
-                }
-                $sql = 'UPDATE `s_plugin_byjuno_documents` SET `document_try_time`= ? WHERE id = ?';
-                Shopware()->Db()->query($sql, array(time(), $document["id"]));
-            }
-        }
-        return true;
-    }
-
-    public function getAccessData($mode) {
-        $accessData = new CembraPayLoginDto();
-        $accessData->helperObject = $this;
-        $accessData->timeout = (int)Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_timeout");
-        if ($accessData->timeout < 0) {
-            $accessData->timeout = 30;
-        }
-        if ($mode == 'test') {
-            $accessData->mode = 'test';
-            $accessData->username = Shopware()->Config()->getByNamespace("ByjunoPayments", "cembra_clientid_live");
-            $accessData->password = Shopware()->Config()->getByNamespace("ByjunoPayments", "cembra_password_live");
-        } else {
-            $accessData->mode = 'live';
-            $accessData->username = Shopware()->Config()->getByNamespace("ByjunoPayments", "cembra_clientid_test");
-            $accessData->password = Shopware()->Config()->getByNamespace("ByjunoPayments", "cembra_password_test");
-        }
-        return $accessData;
     }
 
 }
