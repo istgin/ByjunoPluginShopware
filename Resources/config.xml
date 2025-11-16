@@ -69,7 +69,7 @@
         <element type="select" required="true" scope="shop">
             <name>byjuno_threatmetrixenable</name>
             <label>Enable ThreatMetrix security check</label>
-            <value>Disabled</value>
+            <value>Enabled</value>
             <store>
                 <option>
                     <value>Disabled</value>
@@ -148,6 +148,11 @@
             <name>byjuno_payment_default_success_id</name>
             <label>Payment order success id</label>
             <value>12</value>
+        </element>
+        <element type="text" required="true" scope="shop">
+            <name>S5_default_cancel_id</name>
+            <label>Shopware order cancel id</label>
+            <value>4</value>
         </element>
         <element type="text" required="true" scope="shop">
             <name>byjuno_prodemail</name>
