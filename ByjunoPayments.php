@@ -236,7 +236,7 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
             'active' => 0,
             'position' => 0,
             'additionalDescription' =>
-                '<img src="https://byjuno.ch/Content/logo/de/6639/BJ_Rechnung_BLK.gif" />'
+                '<img src="https://cembrapay.ch/logo/jpg/660x390/CembraPay_Checkout_RGB_660x390.jpg" style="height:50px" />'
         ];
         $installer->createOrUpdate($context->getPlugin(), $options);
 
@@ -247,7 +247,7 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
             'active' => 0,
             'position' => 0,
             'additionalDescription' =>
-                '<img src="https://byjuno.ch/Content/logo/de/6639/BJ_Ratenzahlung_BLK.gif "/>'
+                '<img src="https://cembrapay.ch/logo/jpg/660x390/CembraPay_Checkout_RGB_660x390.jpg" style="height:50px" />'
         ];
 
         $installer->createOrUpdate($context->getPlugin(), $options);

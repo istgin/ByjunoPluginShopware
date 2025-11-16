@@ -220,7 +220,7 @@ abstract class Shopware_Controllers_Frontend_BasebyjunoController extends Shopwa
             $cembrapayCommunicator->setServer('test');
         }
         $accessData = Cembrapay_GetAccessData($mode);
-        $response = $cembrapayCommunicator->sendScreeningRequest($json, $accessData, function ($object, $token, $accessData) {
+        $response = $cembrapayCommunicator->sendAuthRequest($json, $accessData, function ($object, $token, $accessData) {
             $object->saveToken($token, $accessData);
         });
         if ($response) {
