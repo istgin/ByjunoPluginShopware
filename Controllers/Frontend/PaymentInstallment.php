@@ -76,17 +76,26 @@ class Shopware_Controllers_Frontend_PaymentInstallment extends Shopware_Controll
                             "checked" => $checked,
                             "key" => "installment_3",
                             "val" => $snippets->get('installment_3', "3 Raten"),
-                            "url" => $snippets->get('installment_3_toc_url', "http://byjuno.ch/de/terms")
+                            "url" => $snippets->get('installment_3_toc_url', "https://cembrapay.ch/de/terms")
                         );
                         $checked = '';
                     }
-                    if ($config->getByNamespace("ByjunoPayments", "installment_10_b2b") == "Enabled") {
+                    if ($config->getByNamespace("ByjunoPayments", "installment_4_b2b") == "Enabled") {
+                        $paymentplans[] = Array(
+                            "checked" => $checked,
+                            "key" => "installment_4",
+                            "val" => $snippets->get('installment_4', "3 Raten"),
+                            "url" => $snippets->get('installment_4_toc_url', "https://cembrapay.ch/de/terms")
+                        );
+                        $checked = '';
+                    }
+                    if ($config->getByNamespace("ByjunoPayments", "installment_6_b2b") == "Enabled") {
                         $paymentplans[] =
                             Array(
                                 "checked" => $checked,
-                                "key" => "installment_10",
-                                "val" => $snippets->get('installment_10', "10 Raten"),
-                                "url" => $snippets->get('installment_10_toc_url', "http://byjuno.ch/de/terms")
+                                "key" => "installment_6",
+                                "val" => $snippets->get('installment_6', "6 Raten"),
+                                "url" => $snippets->get('installment_6_toc_url', "https://cembrapay.ch/de/terms")
                             );
                     }
                     if ($config->getByNamespace("ByjunoPayments", "installment_12_b2b") == "Enabled") {
@@ -95,7 +104,7 @@ class Shopware_Controllers_Frontend_PaymentInstallment extends Shopware_Controll
                                 "checked" => $checked,
                                 "key" => "installment_12",
                                 "val" => $snippets->get('installment_12', "12 Raten"),
-                                "url" => $snippets->get('installment_12_toc_url', "http://byjuno.ch/de/terms")
+                                "url" => $snippets->get('installment_12_toc_url', "https://cembrapay.ch/de/terms")
                             );
                     }
                     if ($config->getByNamespace("ByjunoPayments", "installment_24_b2b") == "Enabled") {
@@ -104,16 +113,25 @@ class Shopware_Controllers_Frontend_PaymentInstallment extends Shopware_Controll
                                 "checked" => $checked,
                                 "key" => "installment_24",
                                 "val" => $snippets->get('installment_24', "24 Raten"),
-                                "url" => $snippets->get('installment_24_toc_url', "http://byjuno.ch/de/terms")
+                                "url" => $snippets->get('installment_24_toc_url', "https://cembrapay.ch/de/terms")
                             );
                     }
-                    if ($config->getByNamespace("ByjunoPayments", "installment_4x12_b2b") == "Enabled") {
+                    if ($config->getByNamespace("ByjunoPayments", "installment_36_b2b") == "Enabled") {
                         $paymentplans[] =
                             Array(
                                 "checked" => $checked,
-                                "key" => "installment_4x12",
-                                "val" => $snippets->get('installment_4x12', "4 Raten innerhalb von 12 Monaten"),
-                                "url" => $snippets->get('installment_4x12_toc_url', "http://byjuno.ch/de/terms")
+                                "key" => "installment_36",
+                                "val" => $snippets->get('installment_36', "36 Raten"),
+                                "url" => $snippets->get('installment_36_toc_url', "https://cembrapay.ch/de/terms")
+                            );
+                    }
+                    if ($config->getByNamespace("ByjunoPayments", "installment_48_b2b") == "Enabled") {
+                        $paymentplans[] =
+                            Array(
+                                "checked" => $checked,
+                                "key" => "installment_48",
+                                "val" => $snippets->get('installment_48', "48 Raten"),
+                                "url" => $snippets->get('installment_48_toc_url', "https://cembrapay.ch/de/terms")
                             );
                     }
                 } else {
@@ -122,17 +140,26 @@ class Shopware_Controllers_Frontend_PaymentInstallment extends Shopware_Controll
                             "checked" => $checked,
                             "key" => "installment_3",
                             "val" => $snippets->get('installment_3', "3 Raten"),
-                            "url" => $snippets->get('installment_3_toc_url', "http://byjuno.ch/de/terms")
+                            "url" => $snippets->get('installment_3_toc_url', "https://cembrapay.ch/de/terms")
                         );
                         $checked = '';
                     }
-                    if ($config->getByNamespace("ByjunoPayments", "installment_10") == "Enabled") {
+                    if ($config->getByNamespace("ByjunoPayments", "installment_4") == "Enabled") {
+                        $paymentplans[] = Array(
+                            "checked" => $checked,
+                            "key" => "installment_4",
+                            "val" => $snippets->get('installment_4', "4 Raten"),
+                            "url" => $snippets->get('installment_4_toc_url', "https://cembrapay.ch/de/terms")
+                        );
+                        $checked = '';
+                    }
+                    if ($config->getByNamespace("ByjunoPayments", "installment_6") == "Enabled") {
                         $paymentplans[] =
                             Array(
                                 "checked" => $checked,
-                                "key" => "installment_10",
-                                "val" => $snippets->get('installment_10', "10 Raten"),
-                                "url" => $snippets->get('installment_10_toc_url', "http://byjuno.ch/de/terms")
+                                "key" => "installment_6",
+                                "val" => $snippets->get('installment_6', "6 Raten"),
+                                "url" => $snippets->get('installment_6_toc_url', "https://cembrapay.ch/de/terms")
                             );
                     }
                     if ($config->getByNamespace("ByjunoPayments", "installment_12") == "Enabled") {
@@ -141,7 +168,7 @@ class Shopware_Controllers_Frontend_PaymentInstallment extends Shopware_Controll
                                 "checked" => $checked,
                                 "key" => "installment_12",
                                 "val" => $snippets->get('installment_12', "12 Raten"),
-                                "url" => $snippets->get('installment_12_toc_url', "http://byjuno.ch/de/terms")
+                                "url" => $snippets->get('installment_12_toc_url', "https://cembrapay.ch/de/terms")
                             );
                     }
                     if ($config->getByNamespace("ByjunoPayments", "installment_24") == "Enabled") {
@@ -150,16 +177,25 @@ class Shopware_Controllers_Frontend_PaymentInstallment extends Shopware_Controll
                                 "checked" => $checked,
                                 "key" => "installment_24",
                                 "val" => $snippets->get('installment_24', "24 Raten"),
-                                "url" => $snippets->get('installment_24_toc_url', "http://byjuno.ch/de/terms")
+                                "url" => $snippets->get('installment_24_toc_url', "https://cembrapay.ch/de/terms")
                             );
                     }
-                    if ($config->getByNamespace("ByjunoPayments", "installment_4x12") == "Enabled") {
+                    if ($config->getByNamespace("ByjunoPayments", "installment_36") == "Enabled") {
                         $paymentplans[] =
                             Array(
                                 "checked" => $checked,
-                                "key" => "installment_4x12",
-                                "val" => $snippets->get('installment_4x12', "4 Raten innerhalb von 12 Monaten"),
-                                "url" => $snippets->get('installment_4x12_toc_url', "http://byjuno.ch/de/terms")
+                                "key" => "installment_36",
+                                "val" => $snippets->get('installment_36', "36 Raten"),
+                                "url" => $snippets->get('installment_36_toc_url', "https://cembrapay.ch/de/terms")
+                            );
+                    }
+                    if ($config->getByNamespace("ByjunoPayments", "installment_48") == "Enabled") {
+                        $paymentplans[] =
+                            Array(
+                                "checked" => $checked,
+                                "key" => "installment_48",
+                                "val" => $snippets->get('installment_48', "48 Raten"),
+                                "url" => $snippets->get('installment_48_toc_url', "https://cembrapay.ch/de/terms")
                             );
                     }
                 }

@@ -81,7 +81,7 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                             "checked" => $checked,
                             "key" => "byjuno_invoice",
                             "val" => $snippets->get('byjuno_invoice', "CembraPay invoice"),
-                            "url" => $snippets->get('byjuno_invoice_toc_url', "http://byjuno.ch/de/terms")
+                            "url" => $snippets->get('byjuno_invoice_toc_url', "https://cembrapay.ch/de/terms")
                         );
                         $checked = '';
                     }
@@ -91,7 +91,7 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                                 "checked" => $checked,
                                 "key" => "sinlge_invoice",
                                 "val" => $snippets->get('single_invoice', "Single invoice"),
-                                "url" => $snippets->get('single_invoice_toc_url', "http://byjuno.ch/de/terms")
+                                "url" => $snippets->get('single_invoice_toc_url', "https://cembrapay.ch/de/terms")
                             );
                     }
                 } else {
@@ -100,7 +100,7 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                             "checked" => $checked,
                             "key" => "byjuno_invoice",
                             "val" => $snippets->get('byjuno_invoice', "CembraPay invoice"),
-                            "url" => $snippets->get('byjuno_invoice_toc_url', "http://byjuno.ch/de/terms")
+                            "url" => $snippets->get('byjuno_invoice_toc_url', "https://cembrapay.ch/de/terms")
                         );
                         $checked = '';
                     }
@@ -110,7 +110,7 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                                 "checked" => $checked,
                                 "key" => "sinlge_invoice",
                                 "val" => $snippets->get('single_invoice', "Single invoice"),
-                                "url" => $snippets->get('single_invoice_toc_url', "http://byjuno.ch/de/terms")
+                                "url" => $snippets->get('single_invoice_toc_url', "https://cembrapay.ch/de/terms")
                             );
                     }
                 }
