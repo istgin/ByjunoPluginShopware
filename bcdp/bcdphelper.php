@@ -236,9 +236,7 @@ function Cembrapay_CreateShopWareShopRequestUserBilling($user, $billing, $shippi
     $request->order->basketItemsGoogleTaxonomies = array();
     $request->order->basketItemsPrices = array();
 
-    $tmx_enable = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_threatmetrixenable");
-    $tmxorgid = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_threatmetrix");
-    if (isset($tmx_enable) && $tmx_enable == 'Enabled' && isset($tmxorgid) && $tmxorgid != '' && !empty($_SESSION["byjuno_tmx"])) {
+    if (!empty($_SESSION["byjuno_tmx"])) {
         $request->sessionInfo->tmxSessionId = $_SESSION["byjuno_tmx"];
     }
 
@@ -370,7 +368,7 @@ function Cembrapay_CreateShopWareShopRequestUserBillingScreening($user, $billing
     $request->deliveryDetails->deliveryAddrTown = html_entity_decode($shipping['city'], ENT_COMPAT, 'UTF-8');
     $request->deliveryDetails->deliveryAddrCountry = strtoupper($countryShipping);
 
-    if (isset($tmx_enable) && $tmx_enable == 'Enabled' && isset($tmxorgid) && $tmxorgid != '' && !empty($_SESSION["byjuno_tmx"])) {
+    if (!empty($_SESSION["byjuno_tmx"])) {
         $request->sessionInfo->tmxSessionId = $_SESSION["byjuno_tmx"];
     }
 

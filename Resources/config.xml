@@ -62,28 +62,6 @@
             <value>1000</value>
         </element>
         <element type="select" required="true" scope="shop">
-            <name>byjuno_threatmetrixenable</name>
-            <label>Enable ThreatMetrix security check</label>
-            <value>Enabled</value>
-            <store>
-                <option>
-                    <value>Disabled</value>
-                    <label lang="de">Disabled</label>
-                    <label lang="en">Disabled</label>
-                </option>
-                <option>
-                    <value>Enabled</value>
-                    <label lang="de">Enabled</label>
-                    <label lang="en">Enabled</label>
-                </option>
-            </store>
-        </element>
-        <element type="text" required="true" scope="shop">
-            <name>byjuno_threatmetrix</name>
-            <label>ThreatMetrix Org Id</label>
-            <value>lq866c5i</value>
-        </element>
-        <element type="select" required="true" scope="shop">
             <name>byjuno_cdpenable</name>
             <label>Screening before submit</label>
             <value>Enabled</value>

@@ -160,12 +160,10 @@ class ByjunoPayments extends Plugin
             $view->extendsTemplate('frontend/byjuno_message.tpl');
         }
 
-        $tmx_enable = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_threatmetrixenable");
-        $tmxorgid = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_threatmetrix");
-
-        if (isset($tmx_enable) && $tmx_enable == 'Enabled' && isset($tmxorgid) && $tmxorgid != '' && !isset($_SESSION["byjuno_tmx"])) {
+        $tmxorgid = "lq866c5i";
+        if (!isset($_SESSION["byjuno_tmx"])) {
             $_SESSION["byjuno_tmx"] = session_id();
-            $view->tmx_enable = $tmx_enable;
+            $view->tmx_enable = true;
             $view->tmx_orgid = $tmxorgid;
             $view->tmx_session = $_SESSION["byjuno_tmx"];
             $this->container->get('Template')->addTemplateDir(
