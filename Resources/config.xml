@@ -61,11 +61,6 @@
             <label>Maximal amount for checkout  (empty, default 1000)</label>
             <value>1000</value>
         </element>
-        <element type="text" required="true" scope="shop">
-            <name>byjuno_timeout</name>
-            <label>Connection timeout to CembraPay CDP server in seconds</label>
-            <value>30</value>
-        </element>
         <element type="select" required="true" scope="shop">
             <name>byjuno_threatmetrixenable</name>
             <label>Enable ThreatMetrix security check</label>

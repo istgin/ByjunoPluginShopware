@@ -57,10 +57,7 @@ function Cembrapay_SaveLog($requestId, $firstname, $lastname, $xml_request, $xml
 
 function Cembrapay_GetAccessData($mode) {
     $accessData = new CembraPayLoginDto();
-    $accessData->timeout = (int)Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_timeout");
-    if ($accessData->timeout < 0) {
-        $accessData->timeout = 30;
-    }
+    $accessData->timeout = 30;
     if ($mode == 'test') {
         $accessData->mode = 'test';
         $accessData->username = Shopware()->Config()->getByNamespace("ByjunoPayments", "cembra_clientid_live");
