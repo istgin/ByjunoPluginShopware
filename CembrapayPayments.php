@@ -19,7 +19,7 @@ use Doctrine\ORM\Tools\SchemaTool;
 require (__DIR__) . '/bcdp/cembrapay.php';
 require (__DIR__) . '/bcdp/bcdphelper.php';
 
-class ByjunoPayments extends Plugin
+class CembrapayPayments extends Plugin
 {
 
     public static $orderNumberGenerated = "";
@@ -89,12 +89,12 @@ class ByjunoPayments extends Plugin
     public static function getSubscribedEvents()
     {
         return [
-            'Enlight_Controller_Dispatcher_ControllerPath_Frontend_PaymentInvoice' => 'registerControllerInvoice',
-            'Enlight_Controller_Dispatcher_ControllerPath_Backend_ByjunoTransactions' => 'registerControllerTransactions',
-            'Enlight_Controller_Action_PostDispatch' => 'onPostDispatchByjunoMessage',
-            'Enlight_Controller_Action_PreDispatch' => 'onPreDispatchByjunoMessage',
-            'Shopware_Modules_Admin_GetPaymentMeans_DataFilter' => 'Byjuno_CdpStatusCall',
-            'Shopware_Modules_Order_GetOrdernumber_FilterOrdernumber' => 'onFilterOrdernumber'
+            'Enlight_Controller_Dispatcher_ControllerPath_Frontend_PaymentInvoice' => 'cembra_registerControllerInvoice',
+            'Enlight_Controller_Dispatcher_ControllerPath_Backend_ByjunoTransactions' => 'cembra_registerControllerTransactions',
+            'Enlight_Controller_Action_PostDispatch' => 'cembra_onPostDispatchByjunoMessage',
+            'Enlight_Controller_Action_PreDispatch' => 'cembra_onPreDispatchByjunoMessage',
+            'Shopware_Modules_Admin_GetPaymentMeans_DataFilter' => 'cembra_CdpStatusCall',
+            'Shopware_Modules_Order_GetOrdernumber_FilterOrdernumber' => 'cembra_onFilterOrdernumber'
         ];
     }
 
@@ -102,7 +102,7 @@ class ByjunoPayments extends Plugin
     public static $action = "";
     public static $method = "";
 
-    public function onFilterOrdernumber(\Enlight_Event_EventArgs $args)
+    public function cembra_onFilterOrdernumber(\Enlight_Event_EventArgs $args)
     {
         if (!empty(self::$orderNumberGenerated)) {
             return self::$orderNumberGenerated;
@@ -111,7 +111,7 @@ class ByjunoPayments extends Plugin
         }
     }
 
-    function onPreDispatchByjunoMessage(\Enlight_Event_EventArgs $args) {
+    function cembra_onPreDispatchByjunoMessage(\Enlight_Event_EventArgs $args) {
         /* @var $request \Enlight_Controller_Request_RequestHttp */;
         $request = $args->getRequest();
         self::$controller = $request->getControllerName();
@@ -119,7 +119,7 @@ class ByjunoPayments extends Plugin
         self::$method = $request->getMethod();
     }
 
-    function onPostDispatchByjunoMessage(\Enlight_Event_EventArgs $args) {
+    function cembra_onPostDispatchByjunoMessage(\Enlight_Event_EventArgs $args) {
 
         self::$controller = $args->getRequest()->getControllerName();
         self::$action = $args->getRequest()->getActionName();
@@ -174,7 +174,7 @@ class ByjunoPayments extends Plugin
     }
 
 
-    public function registerControllerTransactions(\Enlight_Event_EventArgs $args)
+    public function cembra_registerControllerTransactions(\Enlight_Event_EventArgs $args)
     {
         $this->container->get('Template')->addTemplateDir(
             $this->getPath() . '/Resources/views/'
@@ -183,7 +183,7 @@ class ByjunoPayments extends Plugin
         return $this->getPath() . '/Controllers/Backend/ByjunoTransactions.php';
     }
 
-    public function registerControllerInvoice(\Enlight_Event_EventArgs $args)
+    public function cembra_registerControllerInvoice(\Enlight_Event_EventArgs $args)
     {
         $this->container->get('Template')->addTemplateDir(
             $this->getPath() . '/Views/'
@@ -263,7 +263,6 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
         } catch (\Exception $e) {
 
         }
-        $this->removeCron();
     }
 
     /**
@@ -286,7 +285,7 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
      * @param Payment[] $payments
      * @param $active bool
      */
-    private function setActiveFlag($payments, $active)
+    private function cembra_setActiveFlag($payments, $active)
     {
         $em = $this->container->get('models');
 
@@ -296,46 +295,8 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
         $em->flush();
     }
 
-    protected function isStatusOkCDP($status) {
-        try {
-            $accepted_CDP = Shopware()->Config()->getByNamespace("ByjunoPayments", "allowed_cdp");
-            $ijStatus = Array();
-            if (!empty(trim($accepted_CDP))) {
-                $ijStatus = explode(",", trim($accepted_CDP));
-                foreach($ijStatus as $key => $val) {
-                    $ijStatus[$key] = intval($val);
-                }
-            }
-            if (!empty($accepted_CDP) && count($ijStatus) > 0 && in_array($status, $ijStatus)) {
-                return true;
-            }
-            return false;
-
-        } catch (\Exception $e) {
-            return false;
-        }
-    }
-
-    public function SaveLog($requestId, $firstname, $lastname, $xml_request, $xml_response, $status, $type) {
-        $sql     = '
-            INSERT INTO s_plugin_byjuno_transactions (requestid, requesttype, firstname, lastname, ip, status, datecolumn, xml_request, xml_responce)
-                    VALUES (?,?,?,?,?,?,?,?,?)
-        ';
-        Shopware()->Db()->query($sql, Array(
-            $requestId,
-            $type,
-            $firstname,
-            $lastname,
-            $_SERVER['REMOTE_ADDR'],
-            $status,
-            date('Y-m-d\TH:i:sP'),
-            $xml_request,
-            $xml_response
-        ));
-    }
-
     public static $sesStatusString = '';
-    public function Byjuno_CdpStatusCall(\Enlight_Event_EventArgs $args)
+    public function cembra_CdpStatusCall(\Enlight_Event_EventArgs $args)
     {
         $cdp_enabled = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_cdpenable");
         $user = $this->getUser();
@@ -411,13 +372,6 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
         } catch(\Exception $e) {
             return null;
         }
-    }
-
-    public function removeCron()
-    {
-        $this->container->get('dbal_connection')->executeQuery('DELETE FROM s_crontab WHERE `name` = ?', [
-            'ByjunoPayment'
-        ]);
     }
 
 }

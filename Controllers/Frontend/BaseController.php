@@ -5,7 +5,7 @@ use Byjuno\ByjunoPayments\Api\CembraPayCheckoutAuthorizationResponse;
 use Byjuno\ByjunoPayments\Api\CembraPayCommunicator;
 use Byjuno\ByjunoPayments\Api\CembraPayConstants;
 use Byjuno\ByjunoPayments\Api\CembraPayLoginDto;
-use ByjunoPayments\ByjunoPayments;
+use ByjunoPayments\CembrapayPayments;
 use Shopware\Components\Logger;
 use Shopware\Components\NumberRangeIncrementerInterface;
 
@@ -204,8 +204,8 @@ abstract class Shopware_Controllers_Frontend_BasebyjunoController extends Shopwa
         $billing = $user['billingaddress'];
         $shipping = $user['shippingaddress'];
         $orderNumberGenerator = Shopware()->Container()->get(NumberRangeIncrementerInterface::class);
-        ByjunoPayments::$orderNumberGenerated = (String)$orderNumberGenerator->increment('invoice');
-        $requestAUT = Cembrapay_CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $this, $this->payment_plan, $this->payment_send, ByjunoPayments::$orderNumberGenerated);
+        CembrapayPayments::$orderNumberGenerated = (String)$orderNumberGenerator->increment('invoice');
+        $requestAUT = Cembrapay_CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $this, $this->payment_plan, $this->payment_send, CembrapayPayments::$orderNumberGenerated);
         $CembraPayRequestName = "Authorization request";
         if ($requestAUT->custDetails->custType == CembraPayConstants::$CUSTOMER_BUSINESS) {
             $CembraPayRequestName = "Authorization request company";
@@ -253,13 +253,13 @@ abstract class Shopware_Controllers_Frontend_BasebyjunoController extends Shopwa
             /* @var $order \Shopware\Models\Order\Order */
             $order = Shopware()->Models()->getRepository('Shopware\Models\Order\Order')
                 ->findOneBy(array('number' => $this->getOrderNumber()));
-            if ($this->getOrderNumber() !== ByjunoPayments::$orderNumberGenerated) {
+            if ($this->getOrderNumber() !== CembrapayPayments::$orderNumberGenerated) {
                 $orderModule->setPaymentStatus($order->getId(), $this->PAYMENTSTATUSVOID, false);
                 $orderModule->setOrderStatus($order->getId(), $cancelStatusId, false);
                 $_SESSION["byjuno"]["processing"] = false;
                 return false;
             }
-            ByjunoPayments::$orderNumberGenerated = "";
+            CembrapayPayments::$orderNumberGenerated = "";
             $orderModule->setPaymentStatus($order->getId(), $successPaymentStatusId, false);
             if ($successStatusId != 0) {
                 $orderModule->setOrderStatus($order->getId(), $successStatusId, false);
