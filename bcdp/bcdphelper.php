@@ -7,13 +7,6 @@ use Byjuno\ByjunoPayments\Api\CembraPayConstants;
 use Byjuno\ByjunoPayments\Api\CembraPayLoginDto;
 use Byjuno\ByjunoPayments\Api\CustomerConsents;
 
-function Cembrapay_mapMethod($method) {
-    if ($method == 'byjuno_payment_installment') {
-        return "INSTALLMENT";
-    } else {
-        return "INVOICE";
-    }
-}
 
 function Cembrapay_getClientIp() {
     $ipaddress = '';
@@ -37,21 +30,7 @@ function Cembrapay_getClientIp() {
 }
 
 function Cembrapay_mapRepayment($type) {
-    if ($type == 'installment_3') {
-        return CembraPayConstants::$INSTALLMENT_3;
-    } else if ($type == 'installment_4') {
-        return CembraPayConstants::$INSTALLMENT_4;
-    } else if ($type == 'installment_6') {
-        return CembraPayConstants::$INSTALLMENT_6;
-    } else if ($type == 'installment_12') {
-        return CembraPayConstants::$INSTALLMENT_12;
-    } else if ($type == 'installment_24') {
-        return CembraPayConstants::$INSTALLMENT_24;
-    } else if ($type == 'installment_36') {
-        return CembraPayConstants::$INSTALLMENT_36;
-    } else if ($type == 'installment_48') {
-        return CembraPayConstants::$INSTALLMENT_48;
-    } else if ($type == 'single_invoice') {
+    if ($type == 'single_invoice') {
         return CembraPayConstants::$SINGLEINVOICE;
     } else {
         return CembraPayConstants::$CEMBRAPAYINVOICE;

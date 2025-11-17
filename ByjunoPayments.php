@@ -90,7 +90,6 @@ class ByjunoPayments extends Plugin
     {
         return [
             'Enlight_Controller_Dispatcher_ControllerPath_Frontend_PaymentInvoice' => 'registerControllerInvoice',
-            'Enlight_Controller_Dispatcher_ControllerPath_Frontend_PaymentInstallment' => 'registerControllerInstallment',
             'Enlight_Controller_Dispatcher_ControllerPath_Backend_ByjunoTransactions' => 'registerControllerTransactions',
             'Enlight_Controller_Action_PostDispatch' => 'onPostDispatchByjunoMessage',
             'Enlight_Controller_Action_PreDispatch' => 'onPreDispatchByjunoMessage',
@@ -149,8 +148,7 @@ class ByjunoPayments extends Plugin
         }
 
         if (!strstr($args->getRequest()->getActionName(), "ajax")
-            && !strstr($args->getRequest()->getControllerName(), "PaymentInvoice")
-            && !strstr($args->getRequest()->getControllerName(), "PaymentInstallment")) {
+            && !strstr($args->getRequest()->getControllerName(), "PaymentInvoice")) {
             $view->messageByjuno = "";
             if (!empty($_SESSION["byjuno"]["paymentMessage"])) {
                 $view->messageByjuno = $_SESSION["byjuno"]["paymentMessage"];
@@ -185,15 +183,6 @@ class ByjunoPayments extends Plugin
         );
 
         return $this->getPath() . '/Controllers/Backend/ByjunoTransactions.php';
-    }
-
-    public function registerControllerInstallment(\Enlight_Event_EventArgs $args)
-    {
-        $this->container->get('Template')->addTemplateDir(
-            $this->getPath() . '/Views/'
-        );
-
-        return $this->getPath() . '/Controllers/Frontend/PaymentInstallment.php';
     }
 
     public function registerControllerInvoice(\Enlight_Event_EventArgs $args)
@@ -251,17 +240,6 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
         ];
         $installer->createOrUpdate($context->getPlugin(), $options);
 
-        $options = [
-            'name' => 'byjuno_payment_installment',
-            'description' => 'CembraPay installment',
-            'action' => 'PaymentInstallment',
-            'active' => 0,
-            'position' => 0,
-            'additionalDescription' =>
-                '<img src="https://cembrapay.ch/logo/jpg/660x390/CembraPay_Checkout_RGB_660x390.jpg" style="height:50px" />'
-        ];
-
-        $installer->createOrUpdate($context->getPlugin(), $options);
         $this->snippetInstalationToDB();
 
         $attributeService = Shopware()->Container()->get('shopware_attribute.crud_service');
@@ -371,7 +349,7 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
 
         $needToCheck = false;
         foreach($methods as $m) {
-            if ($m["name"] == 'byjuno_payment_invoice' || $m["name"] == 'byjuno_payment_installment') {
+            if ($m["name"] == 'byjuno_payment_invoice') {
                 $needToCheck = true;
                 break;
             }
@@ -389,7 +367,7 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
         if ($basket == null || $min > $basket['totalAmount'] || $max < $basket['totalAmount']) {
             $return = Array();
             foreach($methods as $m) {
-                if (($m["name"] == 'byjuno_payment_invoice' || $m["name"] == 'byjuno_payment_installment')) {
+                if (($m["name"] == 'byjuno_payment_invoice')) {
                     continue;
                 }
                 $return[] = $m;
@@ -413,7 +391,7 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
             }
             $return = Array();
             foreach($methods as $m) {
-                if (($m["name"] == 'byjuno_payment_invoice' || $m["name"] == 'byjuno_payment_installment') && !$allowed) {
+                if (($m["name"] == 'byjuno_payment_invoice') && !$allowed) {
                     continue;
                 }
                 $return[] = $m;
