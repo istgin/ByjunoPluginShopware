@@ -2,17 +2,17 @@
  * $Id: $
  */
 
-//{namespace name=backend/byjuno_transactions/main}
+//{namespace name=backend/cembrapay_transactions/main}
 
 /**
  * todo@all: Documentation
  */
-//{block name="backend/byjuno_transactions/view/main/detailwindow"}
-Ext.define('Shopware.apps.ByjunoTransactions.view.main.Detailwindow', {
+//{block name="backend/cembrapay_transactions/view/main/detailwindow"}
+Ext.define('Shopware.apps.CembrapayTransactions.view.main.Detailwindow', {
 	extend: 'Enlight.app.Window',
     title: '{s name="window_detail_title"}CembraPay transactions details{/s}',
     cls: Ext.baseCSSPrefix + 'detail-window',
-    alias: 'widget.ByjunoApilogMainDetailWindow',
+    alias: 'widget.CembrapayApilogMainDetailWindow',
     border: false,
     autoShow: true,
     layout: 'border',
@@ -31,7 +31,7 @@ Ext.define('Shopware.apps.ByjunoTransactions.view.main.Detailwindow', {
         var me = this;
         me.title = 'API-Log Details zu ID ' + me.itemSelected;
         me.items = [{
-            xtype: 'ByjunoApilogMainDetail',
+            xtype: 'CembrapayApilogMainDetail',
             itemSelected: me.itemSelected,
         }];
 

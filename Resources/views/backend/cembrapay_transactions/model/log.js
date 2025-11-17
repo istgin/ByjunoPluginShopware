@@ -7,8 +7,8 @@
  *
  * This model represents a single log of s_core_log.
  */
-//{block name="backend/byjuno_transactions/model/log"}
-Ext.define('Shopware.apps.ByjunoTransactions.model.Log', {
+//{block name="backend/cembrapay_transactions/model/log"}
+Ext.define('Shopware.apps.CembrapayTransactions.model.Log', {
   /**
     * Extends the standard ExtJS 4
     * @string
@@ -19,7 +19,7 @@ Ext.define('Shopware.apps.ByjunoTransactions.model.Log', {
     * @array
     */
   fields: [
-  //{block name="backend/byjuno_transactions/model/log/fields"}{/block}
+  //{block name="backend/cembrapay_transactions/model/log/fields"}{/block}
   'id',
   'requestid',
   'requesttype',
@@ -42,9 +42,9 @@ Ext.define('Shopware.apps.ByjunoTransactions.model.Log', {
         */
     api: {
       //read out all articles
-      read: '{url controller="ByjunoTransactions" action="getApilogs"}',
-      destroy: '{url controller="ByjunoTransactions" action="deleteLogs"}',
-      detail: '{url controller="ByjunoTransactions" action="getDetailLog"}'
+      read: '{url controller="CembrapayTransactions" action="getApilogs"}',
+      destroy: '{url controller="CembrapayTransactions" action="deleteLogs"}',
+      detail: '{url controller="CembrapayTransactions" action="getDetailLog"}'
     },
     /**
         * Configure the data reader

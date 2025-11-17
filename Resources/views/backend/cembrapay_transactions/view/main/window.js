@@ -2,13 +2,13 @@
  * $Id: $
  */
 
-//{namespace name=backend/byjuno_transactions/main}
+//{namespace name=backend/cembrapay_transactions/main}
 
 /**
  * todo@all: Documentation
  */
-//{block name="backend/byjuno_transactions/view/main/window"}
-Ext.define('Shopware.apps.ByjunoTransactions.view.main.Window', {
+//{block name="backend/cembrapay_transactions/view/main/window"}
+Ext.define('Shopware.apps.CembrapayTransactions.view.main.Window', {
   extend: 'Enlight.app.Window',
   title: '{s name="window_title"}CembraPay transactions log{/s}',
   cls: Ext.baseCSSPrefix + 'log-window',

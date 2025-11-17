@@ -2,14 +2,14 @@
  * $Id: $
  */
 
-//{namespace name=backend/byjuno_transactions/main}
+//{namespace name=backend/cembrapay_transactions/main}
 
 /**
  * Shopware UI - Log view list
  *
  * This grid contains all logs and its information.
  */
-//{block name="backend/byjuno_transactions/view/detail/detail"}
+//{block name="backend/cembrapay_transactions/view/detail/detail"}
 
 Ext.define('ExternalInfoWindow', {
     extend: 'Ext.data.Connection',
@@ -22,7 +22,7 @@ Ext.define('ExternalInfoWindow', {
     }
 });
 
-Ext.define('Shopware.apps.ByjunoTransactions.view.detail.Detail', {
+Ext.define('Shopware.apps.CembrapayTransactions.view.detail.Detail', {
   /**
    * Extend from the standard ExtJS 4
    * @string
@@ -42,7 +42,7 @@ Ext.define('Shopware.apps.ByjunoTransactions.view.detail.Detail', {
    * of the view through Ext.widget('moptPayoneApilogMainDetail')
    * @string
    */
-  alias: 'widget.ByjunoApilogMainDetail',
+  alias: 'widget.CembrapayApilogMainDetail',
   /**
    * The window uses a border layout, so we need to set
    * a region for the grid panel
@@ -71,9 +71,9 @@ Ext.define('Shopware.apps.ByjunoTransactions.view.detail.Detail', {
             flex: 1,
             listeners: {
                 boxready:function (e) {
-                    url = 'ByjunoTransactions/getGridData?id='+me.itemSelected+'&type=request';
+                    url = 'CembrapayTransactions/getGridData?id='+me.itemSelected+'&type=request';
                     Ext.Ajax.request({
-                        url:'{url controller="ByjunoTransactions" action="getGridData"}',
+                        url:'{url controller="CembrapayTransactions" action="getGridData"}',
                         method: 'GET',
                         params: {
                             id: me.itemSelected,
@@ -95,9 +95,9 @@ Ext.define('Shopware.apps.ByjunoTransactions.view.detail.Detail', {
             flex: 1,
             listeners: {
                 boxready:function (e) {
-                    url = 'ByjunoTransactions/getGridData?id='+me.itemSelected+'&type=response';
+                    url = 'CembrapayTransactions/getGridData?id='+me.itemSelected+'&type=response';
                     Ext.Ajax.request({
-                        url:'{url controller="ByjunoTransactions" action="getGridData"}',
+                        url:'{url controller="CembrapayTransactions" action="getGridData"}',
                         method: 'GET',
                         params: {
                             id: me.itemSelected,

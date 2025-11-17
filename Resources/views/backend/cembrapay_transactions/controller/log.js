@@ -2,11 +2,11 @@
  * $Id: $
  */
 
-//{namespace name=backend/byjuno_transactions/main}
+//{namespace name=backend/cembrapayo_transactions/main}
 
 
-//{block name="backend/byjuno_log/controller/log"}
-Ext.define('Shopware.apps.ByjunoTransactions.controller.Log', {
+//{block name="backend/cembrapay_log/controller/log"}
+Ext.define('Shopware.apps.CembrapayTransactions.controller.Log', {
     /**
     * Extend from the standard ExtJS 4
     * @string

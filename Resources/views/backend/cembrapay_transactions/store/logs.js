@@ -7,8 +7,8 @@
  *
  * This store contains all logs.
  */
-//{block name="backend/byjuno_transactions/store/logs"}
-Ext.define('Shopware.apps.ByjunoTransactions.store.Logs', {
+//{block name="backend/cembrapay_transactions/store/logs"}
+Ext.define('Shopware.apps.CembrapayTransactions.store.Logs', {
   /**
    * Extend for the standard ExtJS 4
    * @string
@@ -32,7 +32,7 @@ Ext.define('Shopware.apps.ByjunoTransactions.store.Logs', {
    * Define the used model for this store
    * @string
    */
-  model: 'Shopware.apps.ByjunoTransactions.model.Log',
+  model: 'Shopware.apps.CembrapayTransactions.model.Log',
   proxy: {
     type: 'ajax',
     /**
@@ -41,10 +41,10 @@ Ext.define('Shopware.apps.ByjunoTransactions.store.Logs', {
      */
     api: {
       //read out all articles
-      read: '{url controller="ByjunoTransactions" action="getApilogs"}',
-      destroy: '{url controller="ByjunoTransactions" action="deleteLogs"}',
-      detail: '{url controller="ByjunoTransactions" action="getDetailLog"}',
-      search: '{url controller="ByjunoTransactions" action="getSearchResult"}',
+      read: '{url controller="CembrapayTransactions" action="getApilogs"}',
+      destroy: '{url controller="CembrapayTransactions" action="deleteLogs"}',
+      detail: '{url controller="CembrapayTransactions" action="getDetailLog"}',
+      search: '{url controller="CembrapayTransactions" action="getSearchResult"}',
     },
     /**
      * Configure the data reader

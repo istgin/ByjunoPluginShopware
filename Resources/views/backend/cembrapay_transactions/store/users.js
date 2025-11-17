@@ -7,8 +7,8 @@
  *
  * This store contains all users.
  */
-//{block name="backend/byjuno_transactions/store/users"}
-Ext.define('Shopware.apps.ByjunoTransactions.store.Users', {
+//{block name="backend/cembrapay_transactions/store/users"}
+Ext.define('Shopware.apps.CembrapayTransactions.store.Users', {
 
     /**
     * Extend for the standard ExtJS 4

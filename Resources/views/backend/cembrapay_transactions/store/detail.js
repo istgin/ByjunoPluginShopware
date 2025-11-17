@@ -7,15 +7,15 @@
  *
  * This store contains all logs.
  */
-//{block name="backend/byjuno_transactions/store/detail"}
-Ext.define('Shopware.apps.ByjunoTransactions.store.Detail', {
+//{block name="backend/cembrapay_transactions/store/detail"}
+Ext.define('Shopware.apps.CembrapayTransactions.store.Detail', {
   /**
    * Extend for the standard ExtJS 4
    * @string
    */
   extend: 'Ext.data.Store',
   
-  model: 'Shopware.apps.ByjunoTransactions.model.Grid2cols',
+  model: 'Shopware.apps.CembrapayTransactions.model.Grid2cols',
   /**
    * Auto load the store after the component
    * is initialized
@@ -43,7 +43,7 @@ Ext.define('Shopware.apps.ByjunoTransactions.store.Detail', {
      * den gewünschten Controller-Actions zu
      */
     api: {
-      read: '{url controller="ByjunoTransactions" action="getGridData"}',
+      read: '{url controller="CembrapayTransactions" action="getGridData"}',
     },
     /**
      * Definiert, dass die Kommunikation mit dem Controller

@@ -2,15 +2,15 @@
  * $Id: $
  */
 
-//{block name="backend/byjuno_transactions/controller/log"}
-Ext.define('Shopware.apps.ByjunoTransactions.controller.Main', {
+//{block name="backend/cembrapay_transactions/controller/log"}
+Ext.define('Shopware.apps.CembrapayTransactions.controller.Main', {
   /**
     * Extend from the standard ExtJS 4
     * @string
     */
   extend: 'Ext.app.Controller',
 
-  requires: [ 'Shopware.apps.ByjunoTransactions.controller.Log' ],
+  requires: [ 'Shopware.apps.CembrapayTransactions.controller.Log' ],
  
 
   /**

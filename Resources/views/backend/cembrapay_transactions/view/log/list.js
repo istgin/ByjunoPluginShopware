@@ -2,14 +2,14 @@
  * $Id: $
  */
 
-//{namespace name=backend/byjuno_transactions/main}
+//{namespace name=backend/cembrapay_transactions/main}
 /**
  * Shopware UI - Log view list
  *
  * This grid contains all logs and its information.
  */
-//{block name="backend/byjuno_transactions/view/log/list"}
-Ext.define('Shopware.apps.ByjunoTransactions.view.log.List', {
+//{block name="backend/cembrapay_transactions/view/log/list"}
+Ext.define('Shopware.apps.CembrapayTransactions.view.log.List', {
   /**
    * Extend from the standard ExtJS 4
    * @string
@@ -155,7 +155,7 @@ Ext.define('Shopware.apps.ByjunoTransactions.view.log.List', {
         selectionchange: function(view, selected) {
           if(selected[0])
           {
-            me.detail = Ext.create('Shopware.apps.ByjunoTransactions.view.main.Detailwindow', {
+            me.detail = Ext.create('Shopware.apps.CembrapayTransactions.view.main.Detailwindow', {
               itemSelected: selected[0].data.id
             }).show();
           }

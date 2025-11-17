@@ -2,10 +2,10 @@
 <menu xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/5.2/engine/Shopware/Components/Plugin/schema/menu.xsd">
     <entries>
         <entry>
-            <name>ByjunoTransactionLog</name>
-            <label lang="en">CembraPay Transaction log</label>
-            <label lang="de">CembraPay Transaction log</label>
-            <controller>ByjunoTransactions</controller>
+            <name>CembrapayTransactionLog</name>
+            <label lang="en">CembraPay Direct Transaction log</label>
+            <label lang="de">CembraPay Direct Transaction log</label>
+            <controller>CembrapayTransactions</controller>
             <action>index</action>
             <class>sprite-cards-stack</class>
             <parent identifiedBy="controller">Payments</parent>

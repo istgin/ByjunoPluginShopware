@@ -1,8 +1,8 @@
 /**
  * $Id: $
  */
-//{block name="backend/byjuno_transactions/application"}
-Ext.define('Shopware.apps.ByjunoTransactions', {
+//{block name="backend/cembrapay_transactions/application"}
+Ext.define('Shopware.apps.CembrapayTransactions', {
   /**
 	* Extends from our special controller, which handles the
 	* sub-application behavior and the event bus
@@ -13,7 +13,7 @@ Ext.define('Shopware.apps.ByjunoTransactions', {
 	* The name of the module. Used for internal purpose
 	* @string
 	*/
-  name: 'Shopware.apps.ByjunoTransactions',
+  name: 'Shopware.apps.CembrapayTransactions',
   /**
 	* Sets the loading path for the sub-application.
 	*
@@ -21,7 +21,7 @@ Ext.define('Shopware.apps.ByjunoTransactions', {
 	* controller (server-side)
 	* @string
 	*/
-  loadPath : '{url controller=ByjunoTransactions action=load}',
+  loadPath : '{url controller=CembrapayTransactions action=load}',
   bulkLoad: true,
 
   /**

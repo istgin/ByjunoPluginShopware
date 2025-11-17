@@ -7,8 +7,8 @@
  *
  * This model represents a single log of s_core_log.
  */
-//{block name="backend/byjuno_transactions/model/grid2cols"}
-Ext.define('Shopware.apps.ByjunoTransactions.model.Grid2cols', {
+//{block name="backend/cembrapay_transactions/model/grid2cols"}
+Ext.define('Shopware.apps.CembrapayTransactions.model.Grid2cols', {
   /**
     * Extends the standard ExtJS 4
     * @string
@@ -19,7 +19,7 @@ Ext.define('Shopware.apps.ByjunoTransactions.model.Grid2cols', {
     * @array
     */
   fields: [
-  //{block name="backend/byjuno_transactions/model/grid2cols/fields"}{/block}
+  //{block name="backend/cembrapay_transactions/model/grid2cols/fields"}{/block}
   'name',
   'value'
   ]
