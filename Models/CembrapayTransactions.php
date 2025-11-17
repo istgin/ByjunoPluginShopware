@@ -4,7 +4,7 @@
  * $Id: $
  */
 
-namespace ByjunoPayments\Models;
+namespace CembrapayPayments\Models;
 
 use Shopware\Components\Model\ModelEntity,
     Doctrine\ORM\Mapping AS ORM,
@@ -12,10 +12,10 @@ use Shopware\Components\Model\ModelEntity,
     Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * @ORM\Entity(repositoryClass="ByjunoRepository")
- * @ORM\Table(name="s_plugin_byjuno_transactions")
+ * @ORM\Entity(repositoryClass="CembrapayRepository")
+ * @ORM\Table(name="s_plugin_cembrapay_transactions")
  */
-class ByjunoTransactions extends ModelEntity
+class CembrapayTransactions extends ModelEntity
 {
 
   /**
@@ -84,9 +84,9 @@ class ByjunoTransactions extends ModelEntity
   /**
    * add apiLog to collection
    *
-   * @param \Shopware\CustomModels\ByjunoTransactions\ByjunoLog $apiLog
+   * @param \Shopware\CustomModels\CembrapayTransactions\CembrapayLog $apiLog
    */
-  public function addApiLog(\Shopware\CustomModels\ByjunoTransactions\ByjunoLog $apiLog)
+  public function addApiLog(\Shopware\CustomModels\CembrapayTransactions\CembrapayLog $apiLog)
   {
     $this->apiLogs[] = $apiLog;
   }

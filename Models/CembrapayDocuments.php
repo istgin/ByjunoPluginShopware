@@ -4,7 +4,7 @@
  * $Id: $
  */
 
-namespace ByjunoPayments\Models;
+namespace CembrapayPayments\Models;
 
 use Shopware\Components\Model\ModelEntity,
     Doctrine\ORM\Mapping AS ORM,
@@ -12,11 +12,11 @@ use Shopware\Components\Model\ModelEntity,
     Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * @ORM\Entity(repositoryClass="ByjunoRepository")
- * @ORM\Table(name="s_plugin_byjuno_documents")
+ * @ORM\Entity(repositoryClass="CembrapayRepository")
+ * @ORM\Table(name="s_plugin_cembrapay_documents")
  */
 //$documentId, $amount, $orderAmount, $orderCurrency, $orderId, $customerId, $date
-class ByjunoDocuments extends ModelEntity
+class CembrapayDocuments extends ModelEntity
 {
 
     /**

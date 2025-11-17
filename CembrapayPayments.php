@@ -11,8 +11,8 @@ use Shopware\Components\Plugin\Context\ActivateContext;
 use Shopware\Components\Plugin\Context\DeactivateContext;
 use Shopware\Components\Plugin\Context\InstallContext;
 use Shopware\Components\Plugin\Context\UninstallContext;
-use ByjunoPayments\Models\ByjunoTransactions;
-use ByjunoPayments\Models\ByjunoDocuments;
+use ByjunoPayments\Models\CembrapayTransactions;
+use ByjunoPayments\Models\CembrapayDocuments;
 use Shopware\Models\Payment\Payment;
 use Doctrine\ORM\Tools\SchemaTool;
 
@@ -196,8 +196,8 @@ class CembrapayPayments extends Plugin
     {
         $tool = new SchemaTool($this->container->get('models'));
         $classes = [
-            $this->container->get('models')->getClassMetadata(ByjunoTransactions::class),
-            $this->container->get('models')->getClassMetadata(ByjunoDocuments::class)
+            $this->container->get('models')->getClassMetadata(CembrapayTransactions::class),
+            $this->container->get('models')->getClassMetadata(CembrapayDocuments::class)
         ];
         $tool->dropSchema($classes);
     }
@@ -212,8 +212,8 @@ class CembrapayPayments extends Plugin
 
         $tool = new SchemaTool($this->container->get('models'));
         $classes = [
-            $this->container->get('models')->getClassMetadata(ByjunoTransactions::class),
-            $this->container->get('models')->getClassMetadata(ByjunoDocuments::class)
+            $this->container->get('models')->getClassMetadata(CembrapayTransactions::class),
+            $this->container->get('models')->getClassMetadata(CembrapayDocuments::class)
         ];
 
         try {

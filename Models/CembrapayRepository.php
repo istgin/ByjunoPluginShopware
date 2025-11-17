@@ -4,14 +4,14 @@
  * $Id: $
  */
 
-namespace ByjunoPayments\Models;
+namespace CembrapayPayments\Models;
 
 use Shopware\Components\Model\ModelRepository;
 
 /**
  * Transaction Log Repository
  */
-class ByjunoRepository extends ModelRepository
+class CembrapayRepository extends ModelRepository
 {
 
   const KEY = 'p1_shopware_api';
@@ -38,7 +38,7 @@ class ByjunoRepository extends ModelRepository
     $builder = $this->getEntityManager()->createQueryBuilder();
     $builder->select(array('m.id', 'm.requestid', 'm.requesttype', 'm.firstname', 'm.lastname',
         'm.ip', 'm.status', 'm.datecolumn'))
-            ->from('ByjunoPayments\Models\ByjunoTransactions', 'm');
+            ->from('CembrapayPayments\Models\CembrapayTransactions', 'm');
     return $builder;
   }
 
