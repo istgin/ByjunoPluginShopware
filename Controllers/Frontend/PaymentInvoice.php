@@ -1,11 +1,9 @@
 <?php
 
-use ByjunoPayments\Components\ByjunoPayment\PaymentResponse;
-use ByjunoPayments\Components\ByjunoPayment\InvoicePaymentService;
 use Shopware\Bundle\AccountBundle\Form\Account\PersonalFormType;
 
 include(__DIR__."/BaseController.php");
-class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_Frontend_BasebyjunoController
+class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_Frontend_BasecembrapayController
 {
     /**
      * Index action method.
@@ -19,7 +17,7 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
          * Check if one of the payment methods is selected. Else return to default controller.
          */
         switch ($this->getPaymentShortName()) {
-            case 'byjuno_payment_invoice':
+            case 'cembrapay_payment_invoice':
 
                 $minMaxCheck = $this->minMaxCheck();
                 if (!$minMaxCheck) {
@@ -27,10 +25,10 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                     break;
                 }
 
-                $cdp_enabled = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_cdpenable");
+                $cdp_enabled = Shopware()->Config()->getByNamespace("CembrapayPayments", "cembrapay_cdpenable");
                 $user = $this->getUser();
                 $billing = $user['billingaddress'];
-                $b2bEnabled = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_b2b");
+                $b2bEnabled = Shopware()->Config()->getByNamespace("CembrapayPayments", "cembrapay_b2b");
                 $IsB2BPayment = false;
                 if ($b2bEnabled == 'Enabled' && !empty($billing["company"]))
                 {
@@ -57,35 +55,35 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                     }
                 }
 
-                $snippets = Shopware()->Snippets()->getNamespace('frontend/byjuno/index');
+                $snippets = Shopware()->Snippets()->getNamespace('frontend/cembrapay/index');
                 $config = Shopware()->Config();
                 $custom_fields_gender = 1;
-                if ($config->getByNamespace("ByjunoPayments", "byjuno_gender") == "Disabled") {
+                if ($config->getByNamespace("CembrapayPayments", "cembrapay_gender") == "Disabled") {
                     $custom_fields_gender = 0;
                 }
                 $custom_fields_birthday = 0;
-                if ($config->getByNamespace("ByjunoPayments", "byjuno_birthday") == "Enabled"
+                if ($config->getByNamespace("CembrapayPayments", "cembrapay_birthday") == "Enabled"
                     && (empty($user["additional"]["user"]['birthday']) || substr($user["additional"]["user"]['birthday'], 0, 4) == '0000')) {
                     $custom_fields_birthday = 1;
                 }
-                $byjuno_allowpostal = 1;
-                if ($config->getByNamespace("ByjunoPayments", "byjuno_allowpostal") == "Disabled") {
-                    $byjuno_allowpostal = 0;
+                $cembrapay_allowpostal = 1;
+                if ($config->getByNamespace("CembrapayPayments", "cembrapay_allowpostal") == "Disabled") {
+                    $cembrapay_allowpostal = 0;
                 }
                 $checked = 'checked=\"\"';
                 $paymentplans = Array();
 
-                if ($b2bEnabled == 'Enabled' && Cembrapay_IsB2bByjuno($billing)) {
-                    if ($config->getByNamespace("ByjunoPayments", "byjuno_invoice_b2b") == "Enabled" && !$IsB2BPayment) {
+                if ($b2bEnabled == 'Enabled' && Cembrapay_IsB2bCembrapay($billing)) {
+                    if ($config->getByNamespace("CembrapayPayments", "cembrapay_invoice_b2b") == "Enabled" && !$IsB2BPayment) {
                         $paymentplans[] = Array(
                             "checked" => $checked,
-                            "key" => "byjuno_invoice",
-                            "val" => $snippets->get('byjuno_invoice', "CembraPay invoice"),
-                            "url" => $snippets->get('byjuno_invoice_toc_url', "https://cembrapay.ch/de/terms")
+                            "key" => "cembrapay_invoice",
+                            "val" => $snippets->get('cembrapay_invoice', "CembraPay invoice"),
+                            "url" => $snippets->get('cembrapay_invoice_toc_url', "https://cembrapay.ch/de/terms")
                         );
                         $checked = '';
                     }
-                    if ($config->getByNamespace("ByjunoPayments", "single_invoice_b2b") == "Enabled") {
+                    if ($config->getByNamespace("CembrapayPayments", "single_invoice_b2b") == "Enabled") {
                         $paymentplans[] =
                             Array(
                                 "checked" => $checked,
@@ -95,16 +93,16 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                             );
                     }
                 } else {
-                    if ($config->getByNamespace("ByjunoPayments", "byjuno_invoice") == "Enabled" && !$IsB2BPayment) {
+                    if ($config->getByNamespace("CembrapayPayments", "cembrapay_invoice") == "Enabled" && !$IsB2BPayment) {
                         $paymentplans[] = Array(
                             "checked" => $checked,
-                            "key" => "byjuno_invoice",
-                            "val" => $snippets->get('byjuno_invoice', "CembraPay invoice"),
-                            "url" => $snippets->get('byjuno_invoice_toc_url', "https://cembrapay.ch/de/terms")
+                            "key" => "cembrapay_invoice",
+                            "val" => $snippets->get('cembrapay_invoice', "CembraPay invoice"),
+                            "url" => $snippets->get('cembrapay_invoice_toc_url', "https://cembrapay.ch/de/terms")
                         );
                         $checked = '';
                     }
-                    if ($config->getByNamespace("ByjunoPayments", "single_invoice") == "Enabled") {
+                    if ($config->getByNamespace("CembrapayPayments", "single_invoice") == "Enabled") {
                         $paymentplans[] =
                             Array(
                                 "checked" => $checked,
@@ -143,10 +141,10 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                 }
                 $billing = $user['billingaddress'];
                 $address = trim(trim((String)$billing['street'].' '.$billing['streetnumber']).', '.(String)$billing['city'].', '.(String)$billing['zipcode']);
-                $messagebyjuno = '';
-                if (!empty($_SESSION["byjuno"]["controllerMessage"])) {
-                    $messagebyjuno = $_SESSION["byjuno"]["controllerMessage"];
-                    unset($_SESSION["byjuno"]["controllerMessage"]);
+                $messagecembrapay = '';
+                if (!empty($_SESSION["cembrapay"]["controllerMessage"])) {
+                    $messagecembrapay = $_SESSION["cembrapay"]["controllerMessage"];
+                    unset($_SESSION["cembrapay"]["controllerMessage"]);
                 }
                 $viewAssignments = array(
                     'genders' => Array(
@@ -157,7 +155,7 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                             "val" => $snippets->get('ms', "Ms")
                         )
                     ),
-                    'byjuno_allowpostal' => $byjuno_allowpostal,
+                    'cembrapay_allowpostal' => $cembrapay_allowpostal,
                     'custom_bd_enable' => $custom_fields_birthday,
                     'custom_gender_enable' => $custom_fields_gender,
                     'customer_day' => $customer_day,
@@ -165,7 +163,7 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                     'customer_year' => $customer_year,
                     'customer_gender' => $customer_gender,
                     'paymentplans' => $paymentplans,
-                    'messagebyjuno' => $messagebyjuno,
+                    'messagecembrapay' => $messagecembrapay,
                     'paymentdelivery' => Array(
                         Array("key" => "email",
                             "val" => (String)$user["additional"]["user"]["email"]
@@ -175,8 +173,8 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                         )
                     )
                 );
-                $_SESSION["byjuno"]["processing"] = false;
-                if ($custom_fields_birthday == 0 && $custom_fields_gender == 0 && $byjuno_allowpostal == 0 && count($paymentplans) == 1) {
+                $_SESSION["cembrapay"]["processing"] = false;
+                if ($custom_fields_birthday == 0 && $custom_fields_gender == 0 && $cembrapay_allowpostal == 0 && count($paymentplans) == 1) {
                     $this->payment_plan = $paymentplans[0]["key"];
                     $this->payment_send = "email";
                     $this->payment_send_to = (String)$user["additional"]["user"]["email"];
@@ -187,7 +185,7 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
                         $this->forward('cancel');
                         break;
                     }
-                } else if ($custom_fields_birthday == 1 && $custom_fields_gender == 0 && $byjuno_allowpostal == 0 && count($paymentplans) == 1) {
+                } else if ($custom_fields_birthday == 1 && $custom_fields_gender == 0 && $cembrapay_allowpostal == 0 && count($paymentplans) == 1) {
                     $additionalInfo = $user["additional"]["user"];
                     if (!empty($additionalInfo['birthday']) && substr($additionalInfo['birthday'], 0, 4) != '0000') {
                         $this->payment_plan = $paymentplans[0]["key"];
@@ -214,21 +212,21 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
     }
     public function confirmAction()
     {
-        $_SESSION["byjuno"]["controllerMessage"] = null;
+        $_SESSION["cembrapay"]["controllerMessage"] = null;
         try {
             $this->baseConfirmActions();
         } catch (Exception $e) {
-            $snippets = Shopware()->Snippets()->getNamespace('frontend/byjuno/index');
+            $snippets = Shopware()->Snippets()->getNamespace('frontend/cembrapay/index');
             if ($e->getMessage() == 'wrong_dob') {
-                $_SESSION["byjuno"]["controllerMessage"] = $this->getSnippet(PersonalFormType::SNIPPET_BIRTHDAY);
+                $_SESSION["cembrapay"]["controllerMessage"] = $this->getSnippet(PersonalFormType::SNIPPET_BIRTHDAY);
             } else {
-                $_SESSION["byjuno"]["controllerMessage"] = $snippets->get('payment_canceled', "Payment cancelled");
+                $_SESSION["cembrapay"]["controllerMessage"] = $snippets->get('payment_canceled', "Payment cancelled");
             }
             $this->redirect(['controller' => 'PaymentInvoice']);
             return;
         }
         switch ($this->getPaymentShortName()) {
-            case 'byjuno_payment_invoice':
+            case 'cembrapay_payment_invoice':
                 if ($this->gatewayAction()) {
                     $this->redirect(['controller' => 'checkout', 'action' => 'finish']);
                     break;

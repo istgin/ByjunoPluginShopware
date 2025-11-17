@@ -1,18 +1,18 @@
 <?php
 
 
-namespace ByjunoPayments;
+namespace CembrapayPayments;
 
-use Byjuno\ByjunoPayments\Api\CembraPayCommunicator;
-use Byjuno\ByjunoPayments\Api\CembraPayConstants;
-use Byjuno\ByjunoPayments\Api\CembraPayLoginDto;
+use Cembrapay\CembrapayPayments\Api\CembraPayCommunicator;
+use Cembrapay\CembrapayPayments\Api\CembraPayConstants;
+use Cembrapay\CembrapayPayments\Api\CembraPayLoginDto;
 use Shopware\Components\Plugin;
 use Shopware\Components\Plugin\Context\ActivateContext;
 use Shopware\Components\Plugin\Context\DeactivateContext;
 use Shopware\Components\Plugin\Context\InstallContext;
 use Shopware\Components\Plugin\Context\UninstallContext;
-use ByjunoPayments\Models\CembrapayTransactions;
-use ByjunoPayments\Models\CembrapayDocuments;
+use CembrapayPayments\Models\CembrapayTransactions;
+use CembrapayPayments\Models\CembrapayDocuments;
 use Shopware\Models\Payment\Payment;
 use Doctrine\ORM\Tools\SchemaTool;
 
@@ -52,7 +52,7 @@ class CembrapayPayments extends Plugin
 
         $repository = Shopware()->Models()->getRepository('Shopware\Models\Shop\Locale');
 
-        $file = $this->getPath() . '/Snippets/frontend/byjuno/index.ini';
+        $file = $this->getPath() . '/Snippets/frontend/cembrapay/index.ini';
         $parsed = parse_ini_file($file, true);
         $date = new \DateTime();
 
@@ -63,7 +63,7 @@ class CembrapayPayments extends Plugin
 
                     $locale = array_shift($repository->findBy(array('locale' => $sectionKey)));
                     $arr = Array(
-                        'frontend/byjuno/index',
+                        'frontend/cembrapay/index',
                         $shopId,
                         $locale->getId(),
                         trim($key),
@@ -90,9 +90,9 @@ class CembrapayPayments extends Plugin
     {
         return [
             'Enlight_Controller_Dispatcher_ControllerPath_Frontend_PaymentInvoice' => 'cembra_registerControllerInvoice',
-            'Enlight_Controller_Dispatcher_ControllerPath_Backend_ByjunoTransactions' => 'cembra_registerControllerTransactions',
-            'Enlight_Controller_Action_PostDispatch' => 'cembra_onPostDispatchByjunoMessage',
-            'Enlight_Controller_Action_PreDispatch' => 'cembra_onPreDispatchByjunoMessage',
+            'Enlight_Controller_Dispatcher_ControllerPath_Backend_CembrapayTransactions' => 'cembra_registerControllerTransactions',
+            'Enlight_Controller_Action_PostDispatch' => 'cembra_onPostDispatchCembrapayMessage',
+            'Enlight_Controller_Action_PreDispatch' => 'cembra_onPreDispatchCembrapayMessage',
             'Shopware_Modules_Admin_GetPaymentMeans_DataFilter' => 'cembra_CdpStatusCall',
             'Shopware_Modules_Order_GetOrdernumber_FilterOrdernumber' => 'cembra_onFilterOrdernumber'
         ];
@@ -111,7 +111,7 @@ class CembrapayPayments extends Plugin
         }
     }
 
-    function cembra_onPreDispatchByjunoMessage(\Enlight_Event_EventArgs $args) {
+    function cembra_onPreDispatchCembrapayMessage(\Enlight_Event_EventArgs $args) {
         /* @var $request \Enlight_Controller_Request_RequestHttp */;
         $request = $args->getRequest();
         self::$controller = $request->getControllerName();
@@ -119,16 +119,16 @@ class CembrapayPayments extends Plugin
         self::$method = $request->getMethod();
     }
 
-    function cembra_onPostDispatchByjunoMessage(\Enlight_Event_EventArgs $args) {
+    function cembra_onPostDispatchCembrapayMessage(\Enlight_Event_EventArgs $args) {
 
         self::$controller = $args->getRequest()->getControllerName();
         self::$action = $args->getRequest()->getActionName();
         self::$method = $args->getRequest()->getMethod();
-        if (!empty($_SESSION["byjuno"]["message"])) {
+        if (!empty($_SESSION["cembrapay"]["message"])) {
             if ($args->getSubject()->View()->hasTemplate()){
-                $args->getSubject()->View()->assign("sBasketInfo", $_SESSION["byjuno"]["message"]);
+                $args->getSubject()->View()->assign("sBasketInfo", $_SESSION["cembrapay"]["message"]);
             }
-            $_SESSION["byjuno"]["message"] = null;
+            $_SESSION["cembrapay"]["message"] = null;
         }
 
         /* @var $request \Enlight_Controller_Request_RequestHttp */
@@ -149,27 +149,27 @@ class CembrapayPayments extends Plugin
 
         if (!strstr($args->getRequest()->getActionName(), "ajax")
             && !strstr($args->getRequest()->getControllerName(), "PaymentInvoice")) {
-            $view->messageByjuno = "";
-            if (!empty($_SESSION["byjuno"]["paymentMessage"])) {
-                $view->messageByjuno = $_SESSION["byjuno"]["paymentMessage"];
-                unset($_SESSION["byjuno"]["paymentMessage"]);
+            $view->messageCembrapay = "";
+            if (!empty($_SESSION["cembrapay"]["paymentMessage"])) {
+                $view->messageCembrapay = $_SESSION["cembrapay"]["paymentMessage"];
+                unset($_SESSION["cembrapay"]["paymentMessage"]);
             }
             $this->container->get('Template')->addTemplateDir(
                 $this->getPath() . '/Views/'
             );
-            $view->extendsTemplate('frontend/byjuno_message.tpl');
+            $view->extendsTemplate('frontend/cembrapay_message.tpl');
         }
 
         $tmxorgid = "lq866c5i";
-        if (!isset($_SESSION["byjuno_tmx"])) {
-            $_SESSION["byjuno_tmx"] = session_id();
+        if (!isset($_SESSION["cembrapay_tmx"])) {
+            $_SESSION["cembrapay_tmx"] = session_id();
             $view->tmx_enable = true;
             $view->tmx_orgid = $tmxorgid;
-            $view->tmx_session = $_SESSION["byjuno_tmx"];
+            $view->tmx_session = $_SESSION["cembrapay_tmx"];
             $this->container->get('Template')->addTemplateDir(
                 $this->getPath() . '/Views/'
             );
-            $view->extendsTemplate('frontend/byjuno_tmx.tpl');
+            $view->extendsTemplate('frontend/cembrapay_tmx.tpl');
         }
     }
 
@@ -180,7 +180,7 @@ class CembrapayPayments extends Plugin
             $this->getPath() . '/Resources/views/'
         );
 
-        return $this->getPath() . '/Controllers/Backend/ByjunoTransactions.php';
+        return $this->getPath() . '/Controllers/Backend/CembrapayTransactions.php';
     }
 
     public function cembra_registerControllerInvoice(\Enlight_Event_EventArgs $args)
@@ -221,14 +221,14 @@ class CembrapayPayments extends Plugin
         } catch (\Exception $e) {
 
         }
-        $sql = "ALTER TABLE `s_plugin_byjuno_transactions`
+        $sql = "ALTER TABLE `s_plugin_cembrapay_transactions`
 CHANGE COLUMN `xml_request` `xml_request` TEXT CHARACTER SET 'utf8' COLLATE 'utf8_unicode_ci' NOT NULL ,
 CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'utf8_unicode_ci' NOT NULL";
         Shopware()->Db()->exec($sql);
 
 
         $options = [
-            'name' => 'byjuno_payment_invoice',
+            'name' => 'cembrapay_payment_invoice',
             'description' => 'CembraPay invoice',
             'action' => 'PaymentInvoice',
             'active' => 0,
@@ -298,7 +298,7 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
     public static $sesStatusString = '';
     public function cembra_CdpStatusCall(\Enlight_Event_EventArgs $args)
     {
-        $cdp_enabled = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_cdpenable");
+        $cdp_enabled = Shopware()->Config()->getByNamespace("CembrapayPayments", "cembrapay_cdpenable");
         $user = $this->getUser();
         $methods = $args->getReturn();
         if (self::$controller != "checkout" ||
@@ -308,7 +308,7 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
 
         $needToCheck = false;
         foreach($methods as $m) {
-            if ($m["name"] == 'byjuno_payment_invoice') {
+            if ($m["name"] == 'cembrapay_payment_invoice') {
                 $needToCheck = true;
                 break;
             }
@@ -320,13 +320,13 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
         if (empty($user) || empty($user['billingaddress']) || empty($user['shippingaddress'])) {
             return $methods;
         }
-        $min = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_minimum");
-        $max = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_maximum");
+        $min = Shopware()->Config()->getByNamespace("CembrapayPayments", "cembrapay_minimum");
+        $max = Shopware()->Config()->getByNamespace("CembrapayPayments", "cembrapay_maximum");
         $basket = Shopware()->Modules()->Basket()->sGetAmount();
         if ($basket == null || $min > $basket['totalAmount'] || $max < $basket['totalAmount']) {
             $return = Array();
             foreach($methods as $m) {
-                if (($m["name"] == 'byjuno_payment_invoice')) {
+                if (($m["name"] == 'cembrapay_payment_invoice')) {
                     continue;
                 }
                 $return[] = $m;
@@ -350,7 +350,7 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
             }
             $return = Array();
             foreach($methods as $m) {
-                if (($m["name"] == 'byjuno_payment_invoice') && !$allowed) {
+                if (($m["name"] == 'cembrapay_payment_invoice') && !$allowed) {
                     continue;
                 }
                 $return[] = $m;

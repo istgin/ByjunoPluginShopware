@@ -1,15 +1,15 @@
 <?php
 
 
-use Byjuno\ByjunoPayments\Api\CembraPayCheckoutAuthorizationResponse;
-use Byjuno\ByjunoPayments\Api\CembraPayCommunicator;
-use Byjuno\ByjunoPayments\Api\CembraPayConstants;
-use Byjuno\ByjunoPayments\Api\CembraPayLoginDto;
-use ByjunoPayments\CembrapayPayments;
+use Cembrapay\CembrapayPayments\Api\CembraPayCheckoutAuthorizationResponse;
+use Cembrapay\CembrapayPayments\Api\CembraPayCommunicator;
+use Cembrapay\CembrapayPayments\Api\CembraPayConstants;
+use Cembrapay\CembrapayPayments\Api\CembraPayLoginDto;
+use CembrapayPayments\CembrapayPayments;
 use Shopware\Components\Logger;
 use Shopware\Components\NumberRangeIncrementerInterface;
 
-abstract class Shopware_Controllers_Frontend_BasebyjunoController extends Shopware_Controllers_Frontend_Payment
+abstract class Shopware_Controllers_Frontend_BasecembrapayController extends Shopware_Controllers_Frontend_Payment
 {
     private $PAYMENTSTATUSPAID = 12;
     private $PAYMENTSTATUSOPEN = 17;
@@ -39,8 +39,8 @@ abstract class Shopware_Controllers_Frontend_BasebyjunoController extends Shopwa
 
     protected function minMaxCheck()
     {
-        $min = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_minimum");
-        $max = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_maximum");
+        $min = Shopware()->Config()->getByNamespace("CembrapayPayments", "cembrapay_minimum");
+        $max = Shopware()->Config()->getByNamespace("CembrapayPayments", "cembrapay_maximum");
         $amount = $this->getAmount();
         if ((isset($min) && $min != "" && $amount < $min) || (isset($max) && $max != "" && $amount > $max))
         {
@@ -51,8 +51,8 @@ abstract class Shopware_Controllers_Frontend_BasebyjunoController extends Shopwa
 
     protected function isStatusOkS2($status) {
         try {
-            $accepted_S2_ij = Shopware()->Config()->getByNamespace("ByjunoPayments", "allowed_s2");
-            $accepted_S2_merhcant = Shopware()->Config()->getByNamespace("ByjunoPayments", "allowed_s2_merchant");
+            $accepted_S2_ij = Shopware()->Config()->getByNamespace("CembrapayPayments", "allowed_s2");
+            $accepted_S2_merhcant = Shopware()->Config()->getByNamespace("CembrapayPayments", "allowed_s2_merchant");
             $ijStatus = Array();
             if (!empty(trim($accepted_S2_ij))) {
                 $ijStatus = explode(",", trim($accepted_S2_ij));
@@ -81,7 +81,7 @@ abstract class Shopware_Controllers_Frontend_BasebyjunoController extends Shopwa
 
     protected function isStatusOkCDP($status) {
         try {
-            $accepted_CDP = Shopware()->Config()->getByNamespace("ByjunoPayments", "allowed_cdp");
+            $accepted_CDP = Shopware()->Config()->getByNamespace("CembrapayPayments", "allowed_cdp");
             $ijStatus = Array();
             if (!empty(trim($accepted_CDP))) {
                 $ijStatus = explode(",", trim($accepted_CDP));
@@ -102,7 +102,7 @@ abstract class Shopware_Controllers_Frontend_BasebyjunoController extends Shopwa
 
     protected function isStatusOkS3($status) {
         try {
-            $accepted_S3 = Shopware()->Config()->getByNamespace("ByjunoPayments", "allowed_s3");
+            $accepted_S3 = Shopware()->Config()->getByNamespace("CembrapayPayments", "allowed_s3");
             $ijStatus = Array();
             if (!empty(trim($accepted_S3))) {
                 $ijStatus = explode(",", trim($accepted_S3));
@@ -122,8 +122,8 @@ abstract class Shopware_Controllers_Frontend_BasebyjunoController extends Shopwa
 
     protected function getStatusRisk($status) {
         try {
-            $accepted_S2_ij = Shopware()->Config()->getByNamespace("ByjunoPayments", "allowed_s2");
-            $accepted_S2_merhcant = Shopware()->Config()->getByNamespace("ByjunoPayments", "allowed_s2_merchant");
+            $accepted_S2_ij = Shopware()->Config()->getByNamespace("CembrapayPayments", "allowed_s2");
+            $accepted_S2_merhcant = Shopware()->Config()->getByNamespace("CembrapayPayments", "allowed_s2_merchant");
             $ijStatus = Array();
             if (!empty(trim($accepted_S2_ij))) {
                 $ijStatus = explode(",", trim($accepted_S2_ij));
@@ -155,8 +155,8 @@ abstract class Shopware_Controllers_Frontend_BasebyjunoController extends Shopwa
      */
     public function cancelcdpAction()
     {
-        $snippets = Shopware()->Snippets()->getNamespace('frontend/byjuno/index');
-        $_SESSION["byjuno"]["paymentMessage"] = $snippets->get('paymentcdp_canceled', "CembraPay invoice");
+        $snippets = Shopware()->Snippets()->getNamespace('frontend/cembrapay/index');
+        $_SESSION["cembrapay"]["paymentMessage"] = $snippets->get('paymentcdp_canceled', "CembraPay invoice");
         $this->redirect(array(
             'controller' => 'checkout',
             'action' => 'payment'
@@ -168,8 +168,8 @@ abstract class Shopware_Controllers_Frontend_BasebyjunoController extends Shopwa
      */
     public function cancelAction()
     {
-        $snippets = Shopware()->Snippets()->getNamespace('frontend/byjuno/index');
-        $_SESSION["byjuno"]["paymentMessage"] = $snippets->get('payment_canceled', "CembraPay invoice");
+        $snippets = Shopware()->Snippets()->getNamespace('frontend/cembrapay/index');
+        $_SESSION["cembrapay"]["paymentMessage"] = $snippets->get('payment_canceled', "CembraPay invoice");
         $this->redirect(array(
             'controller' => 'checkout',
             'action' => 'payment'
@@ -180,8 +180,8 @@ abstract class Shopware_Controllers_Frontend_BasebyjunoController extends Shopwa
      */
     public function cancelminmaxAction()
     {
-        $snippets = Shopware()->Snippets()->getNamespace('frontend/byjuno/index');
-        $_SESSION["byjuno"]["paymentMessage"] = $snippets->get('paymentminmax_canceled', "CembraPay invoice");
+        $snippets = Shopware()->Snippets()->getNamespace('frontend/cembrapay/index');
+        $_SESSION["cembrapay"]["paymentMessage"] = $snippets->get('paymentminmax_canceled', "CembraPay invoice");
         $this->redirect(array(
             'controller' => 'checkout',
             'action' => 'payment'
@@ -195,11 +195,11 @@ abstract class Shopware_Controllers_Frontend_BasebyjunoController extends Shopwa
      */
     protected function gatewayAction()
     {
-        if (!empty($_SESSION["byjuno"]["processing"]) && $_SESSION["byjuno"]["processing"] == true) {
+        if (!empty($_SESSION["cembrapay"]["processing"]) && $_SESSION["cembrapay"]["processing"] == true) {
             return false;
         }
-        $_SESSION["byjuno"]["processing"] = true;
-        $mode = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_mode");
+        $_SESSION["cembrapay"]["processing"] = true;
+        $mode = Shopware()->Config()->getByNamespace("CembrapayPayments", "cembrapay_mode");
         $user = $this->getUser();
         $billing = $user['billingaddress'];
         $shipping = $user['shippingaddress'];
@@ -230,33 +230,33 @@ abstract class Shopware_Controllers_Frontend_BasebyjunoController extends Shopwa
         } else {
             Cembrapay_SaveLog($requestAUT->requestMsgId, $requestAUT->custDetails->firstName, $requestAUT->custDetails->lastName, $json, "", "ERROR", $CembraPayRequestName);
         }
-        $cancelStatusId = Shopware()->Config()->getByNamespace("ByjunoPayments", "S5_default_cancel_id");
+        $cancelStatusId = Shopware()->Config()->getByNamespace("CembrapayPayments", "S5_default_cancel_id");
         $cancelStatusId = intval($cancelStatusId);
         if ($cancelStatusId <= 0) {
             $cancelStatusId = $this->ORDERSTATUSCANCEL;
         }
 
-        $successStatusId = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_order_default_success_id");
+        $successStatusId = Shopware()->Config()->getByNamespace("CembrapayPayments", "cembrapay_order_default_success_id");
         $successStatusId = intval($successStatusId);
         if ($successStatusId < 0) {
             $successStatusId = $this->ORDERSTATUSINPROGRESS;
         }
 
-        $successPaymentStatusId = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_payment_default_success_id");
+        $successPaymentStatusId = Shopware()->Config()->getByNamespace("CembrapayPayments", "cembrapay_payment_default_success_id");
         $successPaymentStatusId = intval($successPaymentStatusId);
         if ($successPaymentStatusId <= 0) {
             $successPaymentStatusId = $this->PAYMENTSTATUSPAID;
         }
         if ($status == CembraPayConstants::$AUTH_OK) {
             $orderModule = Shopware()->Modules()->Order();
-            $this->saveOrder(1, uniqid("byjuno_"), $this->PAYMENTSTATUSOPEN);
+            $this->saveOrder(1, uniqid("cembrapay_"), $this->PAYMENTSTATUSOPEN);
             /* @var $order \Shopware\Models\Order\Order */
             $order = Shopware()->Models()->getRepository('Shopware\Models\Order\Order')
                 ->findOneBy(array('number' => $this->getOrderNumber()));
             if ($this->getOrderNumber() !== CembrapayPayments::$orderNumberGenerated) {
                 $orderModule->setPaymentStatus($order->getId(), $this->PAYMENTSTATUSVOID, false);
                 $orderModule->setOrderStatus($order->getId(), $cancelStatusId, false);
-                $_SESSION["byjuno"]["processing"] = false;
+                $_SESSION["cembrapay"]["processing"] = false;
                 return false;
             }
             CembrapayPayments::$orderNumberGenerated = "";
@@ -265,10 +265,10 @@ abstract class Shopware_Controllers_Frontend_BasebyjunoController extends Shopwa
                 $orderModule->setOrderStatus($order->getId(), $successStatusId, false);
             }
             $this->saveTransactionPaymentData($order->getId(), 'payment_plan', $this->payment_plan);
-            $_SESSION["byjuno"]["processing"] = false;
+            $_SESSION["cembrapay"]["processing"] = false;
             return true;
         }
-        $_SESSION["byjuno"]["processing"] = false;
+        $_SESSION["cembrapay"]["processing"] = false;
         return false;
     }
 
@@ -280,7 +280,7 @@ abstract class Shopware_Controllers_Frontend_BasebyjunoController extends Shopwa
         if ($this->Request()->isPost()) {
             $this->payment_plan = $this->Request()->getParam('payment_plan');
             $config = Shopware()->Config();
-            if ($config->getByNamespace("ByjunoPayments", "byjuno_allowpostal") == "Disabled") {
+            if ($config->getByNamespace("CembrapayPayments", "cembrapay_allowpostal") == "Disabled") {
                 $this->payment_send = "email";
             } else {
                 $this->payment_send = $this->Request()->getParam('invoice_send');

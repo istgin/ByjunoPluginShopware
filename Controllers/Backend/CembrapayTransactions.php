@@ -3,7 +3,7 @@
 /**
  * $Id: $
  */
-class Shopware_Controllers_Backend_ByjunoTransactions extends Shopware_Controllers_Backend_ExtJs
+class Shopware_Controllers_Backend_CembrapayTransactions extends Shopware_Controllers_Backend_ExtJs
 {
 
   /**
@@ -27,7 +27,7 @@ class Shopware_Controllers_Backend_ByjunoTransactions extends Shopware_Controlle
             'log.id as id', 'log.requestid as requestid', 'log.requesttype as requesttype',
             'log.firstname as firstname', 'log.lastname as lastname', 'log.ip as ip',
             'log.status as status', 'log.datecolumn as datecolumn'
-    )->from('ByjunoPayments\Models\CembrapayTransactions', 'log');
+    )->from('CembrapayPayments\Models\CembrapayTransactions', 'log');
 
 
     //order data
@@ -63,7 +63,7 @@ class Shopware_Controllers_Backend_ByjunoTransactions extends Shopware_Controlle
 
     $builder = Shopware()->Models()->createQueryBuilder();
     $builder->select('log.id as id', 'log.requestid as requestid', 'log.requesttype as requesttype', 'log.xml_request as xml_request', 'log.xml_responce as xml_responce')
-            ->from('ByjunoPayments\Models\CembrapayTransactions', 'log')
+            ->from('CembrapayPayments\Models\CembrapayTransactions', 'log')
             ->where('log.id = ?1')
             ->setParameter(1, $this->Request()->get('id'));
 
@@ -165,7 +165,7 @@ class Shopware_Controllers_Backend_ByjunoTransactions extends Shopware_Controlle
         'log.id as id', 'log.requestid as requestid', 'log.requesttype as requesttype',
         'log.firstname as firstname', 'log.lastname as lastname', 'log.ip as ip',
         'log.status as status', 'log.datecolumn as datecolumn'
-    )->from('ByjunoPayments\Models\CembrapayTransactions', 'log');
+    )->from('CembrapayPayments\Models\CembrapayTransactions', 'log');
 
     if ($filterValue)
     {
@@ -194,7 +194,7 @@ class Shopware_Controllers_Backend_ByjunoTransactions extends Shopware_Controlle
         'log.id as id', 'log.requestid as requestid', 'log.requesttype as requesttype',
         'log.firstname as firstname', 'log.lastname as lastname', 'log.ip as ip',
         'log.status as status', 'log.datecolumn as datecolumn'
-    )->from('ByjunoPayments\Models\CembrapayTransactions', 'log');
+    )->from('CembrapayPayments\Models\CembrapayTransactions', 'log');
 
     foreach ($filters as $filter)
     {

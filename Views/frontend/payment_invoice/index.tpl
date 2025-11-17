@@ -2,12 +2,12 @@
 
 {* Breadcrumb *}
 {block name='frontend_index_start' append}
-    {$sBreadcrumb = [['name'=>"{s name=pay_byjuno_invoice namespace=frontend/byjuno/index}Pay with CembraPay invoice{/s}"]]}
+    {$sBreadcrumb = [['name'=>"{s name=pay_cembrapay_invoice namespace=frontend/cembrapay/index}Pay with CembraPay invoice{/s}"]]}
 {/block}
 
 {block name='frontend_checkout_confirm_error_messages' prepend}
-    {if $messagebyjuno != ''}
-        {include file="frontend/_includes/messages.tpl" type="error" content="$messagebyjuno"}
+    {if $messagecembrapay != ''}
+        {include file="frontend/_includes/messages.tpl" type="error" content="$messagecembrapay"}
     {/if}
 {/block}
 
@@ -22,14 +22,14 @@
     <div class="cembra--panel panel has--border">
         {block name='frontend_checkout_confirm_cembra_panel_headline'}
             <div class="panel--title primary is--underline">
-                {s name=panelheader namespace=frontend/byjuno/index}Cembra Pay{/s}
+                {s name=panelheader namespace=frontend/cembrapay/index}Cembra Pay{/s}
             </div>
         {/block}
         <div class="panel--body is--wide">
             <div id="payment" class="grid_20" style="margin:10px 0 10px 0;">
-                <form action="{url action='confirm'}" method="post" id="proceed_byjuno_invoice" name="proceed_byjuno_invoice" onsubmit="return byjuno_submit_form_fn()">
+                <form action="{url action='confirm'}" method="post" id="proceed_cembrapay_invoice" name="proceed_cembrapay_invoice" onsubmit="return cembrapay_submit_form_fn()">
                     {if $custom_gender_enable == 1}
-                        <div style="padding: 0 0 5px 0"><label for="custom_gender" style="font-size: 18px"><b>{s name=gender namespace=frontend/byjuno/index}Gender{/s}</b></label></div>
+                        <div style="padding: 0 0 5px 0"><label for="custom_gender" style="font-size: 18px"><b>{s name=gender namespace=frontend/cembrapay/index}Gender{/s}</b></label></div>
                         <div style="padding: 0 0 15px 0">
                             <select id="custom_gender" name="custom_gender" required>
                                 {foreach from=$genders item=gender}
@@ -39,7 +39,7 @@
                         </div>
                     {/if}
                     {if $custom_bd_enable == 1}
-                        <div style="padding: 0 0 5px 0"><label for="custom_birthday" style="font-size: 18px"><b>{s name=dob namespace=frontend/byjuno/index}Date of birth{/s}</b></label></div>
+                        <div style="padding: 0 0 5px 0"><label for="custom_birthday" style="font-size: 18px"><b>{s name=dob namespace=frontend/cembrapay/index}Date of birth{/s}</b></label></div>
                         <div style="padding: 0 0 15px 0">
                             {block name="frontend_account_profile_profile_input_birthday_day"}
                                 <div class="profile--birthday field--select" style="display: inline-block">
@@ -86,51 +86,51 @@
                         </div>
                     {/if}
                     {if count($paymentplans) == 1}
-                        <div style="padding: 0 0 5px 0"><label for="payment_plan" style="font-size: 18px"><b>{s name=payment_plan namespace=frontend/byjuno/index}Payment plan{/s}</b></label></div>
+                        <div style="padding: 0 0 5px 0"><label for="payment_plan" style="font-size: 18px"><b>{s name=payment_plan namespace=frontend/cembrapay/index}Payment plan{/s}</b></label></div>
                         <div style="padding: 0 0 15px 0">
                             {foreach from=$paymentplans item=paymentplan}
                                 <input type="hidden" name="payment_plan" value="{$paymentplan.key}">
-                                {$paymentplan.val} <a href="{$paymentplan.url}" target="_blank">{s name=t_and_c namespace=frontend/byjuno/index}(T&C){/s}</a><br>
+                                {$paymentplan.val} <a href="{$paymentplan.url}" target="_blank">{s name=t_and_c namespace=frontend/cembrapay/index}(T&C){/s}</a><br>
                             {/foreach}                            
                         </div>
                     {else}
-                        <div style="padding: 0 0 5px 0"><label for="payment_plan" style="font-size: 18px"><b>{s name=select_payment_plan namespace=frontend/byjuno/index}Select payment plan{/s}</b></label></div>
+                        <div style="padding: 0 0 5px 0"><label for="payment_plan" style="font-size: 18px"><b>{s name=select_payment_plan namespace=frontend/cembrapay/index}Select payment plan{/s}</b></label></div>
                         <div style="padding: 0 0 15px 0">
                             {foreach from=$paymentplans item=paymentplan}
-                                <input type="radio" name="payment_plan" {$paymentplan.checked} value="{$paymentplan.key}"> &nbsp;{$paymentplan.val} <a href="{$paymentplan.url}" target="_blank">{s name=t_and_c namespace=frontend/byjuno/index}(T&C){/s}</a><br>
+                                <input type="radio" name="payment_plan" {$paymentplan.checked} value="{$paymentplan.key}"> &nbsp;{$paymentplan.val} <a href="{$paymentplan.url}" target="_blank">{s name=t_and_c namespace=frontend/cembrapay/index}(T&C){/s}</a><br>
                             {/foreach}
                             {if count($paymentplans) == 0}
-                                {s name=payment_plans_not_available namespace=frontend/byjuno/index}No any payment plans are available{/s}
+                                {s name=payment_plans_not_available namespace=frontend/cembrapay/index}No any payment plans are available{/s}
                             {/if}
                         </div>
                     {/if}
-                    {if $byjuno_allowpostal == 1}
-                        <div style="padding: 0 0 5px 0"><label for="invoice_send" style="font-size: 18px"><b>{s name=select_invoice_delivery_method namespace=frontend/byjuno/index}Select invoice delivery method{/s}</b></label></div>
+                    {if $cembrapay_allowpostal == 1}
+                        <div style="padding: 0 0 5px 0"><label for="invoice_send" style="font-size: 18px"><b>{s name=select_invoice_delivery_method namespace=frontend/cembrapay/index}Select invoice delivery method{/s}</b></label></div>
                         <div style="padding: 0 0 15px 0">
                             {foreach from=$paymentdelivery item=paymentdeliver}
                                 {if $paymentdeliver.key == "email"}
-                                    <input type="radio" name="invoice_send" checked="checked" value="{$paymentdeliver.key}" id="sendbymail"> <span onclick="document.getElementById('sendbymail').checked = true;">&nbsp;{s name=invoice_email namespace=frontend/byjuno/index}Rechnungsversand via E-Mail (ohne Gebühr) an:{/s} {$paymentdeliver.val})</span><br>
+                                    <input type="radio" name="invoice_send" checked="checked" value="{$paymentdeliver.key}" id="sendbymail"> <span onclick="document.getElementById('sendbymail').checked = true;">&nbsp;{s name=invoice_email namespace=frontend/cembrapay/index}Rechnungsversand via E-Mail (ohne Gebühr) an:{/s} {$paymentdeliver.val})</span><br>
                                 {/if}
                                 {if $paymentdeliver.key == "postal"}
-                                    <input type="radio" name="invoice_send" value="{$paymentdeliver.key}" id="sendbypost"> <span onclick="document.getElementById('sendbypost').checked = true;">&nbsp;{s name=invoice_postal namespace=frontend/byjuno/index}Rechnungsversand in Papierform via Post (gegen Gebühr von CHF 3.50) an:{/s} {$paymentdeliver.val})</span><br>
+                                    <input type="radio" name="invoice_send" value="{$paymentdeliver.key}" id="sendbypost"> <span onclick="document.getElementById('sendbypost').checked = true;">&nbsp;{s name=invoice_postal namespace=frontend/cembrapay/index}Rechnungsversand in Papierform via Post (gegen Gebühr von CHF 3.50) an:{/s} {$paymentdeliver.val})</span><br>
                                 {/if}
                             {/foreach}
                         </div>
                     {/if}
                     <script>
                         var form_submited = false;
-                        function byjuno_submit_form_fn()
+                        function cembrapay_submit_form_fn()
                         {
                             if (form_submited) {
                                 return false;
                             }
                             form_submited = true;
-                            setTimeout(function(){ document.getElementById('proceed_byjuno_invoice').submit();}, 1);
+                            setTimeout(function(){ document.getElementById('proceed_cembrapay_invoice').submit();}, 1);
                             return false;
                         }
                     </script>
                     <div style="padding: 0 0 35px 0">
-                        <button type="submit" class="btn is--primary is--large left is--icon-right"{if count($paymentplans) == 0} disabled="disabled"{/if} form="proceed_byjuno_invoice" data-preloader-button="true">{s name=proceed_payment namespace=frontend/byjuno/index}Proceed payment{/s}<i class="icon--arrow-right"></i>
+                        <button type="submit" class="btn is--primary is--large left is--icon-right"{if count($paymentplans) == 0} disabled="disabled"{/if} form="proceed_cembrapay_invoice" data-preloader-button="true">{s name=proceed_payment namespace=frontend/cembrapay/index}Proceed payment{/s}<i class="icon--arrow-right"></i>
                         </button>
                     </div>
                 </form>
