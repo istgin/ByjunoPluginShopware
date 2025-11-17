@@ -264,14 +264,6 @@ abstract class Shopware_Controllers_Frontend_BasebyjunoController extends Shopwa
             if ($successStatusId != 0) {
                 $orderModule->setOrderStatus($order->getId(), $successStatusId, false);
             }
-            $mail = $orderModule->createStatusMail($order->getId(), $successPaymentStatusId);
-            $mail->clearRecipients();
-            if (isset($mode) && $mode == 'Live') {
-                $mail->addTo(Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_prodemail"));
-            } else {
-                $mail->addTo(Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_testemail"));
-            }
-            $orderModule->sendStatusMail($mail);
             $this->saveTransactionPaymentData($order->getId(), 'payment_plan', $this->payment_plan);
             $_SESSION["byjuno"]["processing"] = false;
             return true;

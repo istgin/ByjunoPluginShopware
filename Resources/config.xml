@@ -171,16 +171,6 @@
                 </option>
             </store>
         </element>
-        <element type="text" required="true" scope="shop">
-            <name>byjuno_prodemail</name>
-            <label>Production email of CembraPay</label>
-            <value>invoices@byjuno.ch</value>
-        </element>
-        <element type="text" required="true" scope="shop">
-            <name>byjuno_testemail</name>
-            <label>Test email of CembraPay</label>
-            <value>invoices-test@byjuno.ch</value>
-        </element>
 
         <element type="select" required="true" scope="shop">
         <name>byjuno_invoice</name>
