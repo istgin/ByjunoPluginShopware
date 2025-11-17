@@ -2,7 +2,7 @@
 /**
  * Created by CembraPay.
  */
-namespace Byjuno\ByjunoPayments\Api;
+namespace Cembrapay\CembrapayoPayments\Api;
 
 /* sample response
 {

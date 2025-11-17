@@ -1,6 +1,6 @@
 <?php
 
-namespace Byjuno\ByjunoPayments\Api;
+namespace Cembrapay\CembrapayoPayments\Api;
 
 /*
  * {

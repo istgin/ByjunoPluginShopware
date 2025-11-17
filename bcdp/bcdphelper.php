@@ -1,11 +1,11 @@
 <?php
 
-use Byjuno\ByjunoPayments\Api\CembraPayCheckoutAutRequest;
-use Byjuno\ByjunoPayments\Api\CembraPayCheckoutChkRequest;
-use Byjuno\ByjunoPayments\Api\CembraPayCommunicator;
-use Byjuno\ByjunoPayments\Api\CembraPayConstants;
-use Byjuno\ByjunoPayments\Api\CembraPayLoginDto;
-use Byjuno\ByjunoPayments\Api\CustomerConsents;
+use Cembrapay\CembrapayoPayments\Api\CembraPayCheckoutAutRequest;
+use Cembrapay\CembrapayoPayments\Api\CembraPayCheckoutChkRequest;
+use Cembrapay\CembrapayoPayments\Api\CembraPayCommunicator;
+use Cembrapay\CembrapayoPayments\Api\CembraPayConstants;
+use Cembrapay\CembrapayoPayments\Api\CembraPayLoginDto;
+use Cembrapay\CembrapayoPayments\Api\CustomerConsents;
 
 
 function Cembrapay_getClientIp() {
