@@ -19,8 +19,8 @@
 
 {* Main content *}
 {block name="frontend_checkout_confirm_form"}
-    <div class="cembra--panel panel has--border">
-        {block name='frontend_checkout_confirm_cembra_panel_headline'}
+    <div class="cembrapay--panel panel has--border">
+        {block name='frontend_checkout_confirm_cembrapay_panel_headline'}
             <div class="panel--title primary is--underline">
                 {s name=panelheader namespace=frontend/cembrapay/index}Cembra Pay{/s}
             </div>
