@@ -2,8 +2,8 @@
 
 use Shopware\Bundle\AccountBundle\Form\Account\PersonalFormType;
 
-include(__DIR__."/BaseController.php");
-class Shopware_Controllers_Frontend_CembrapayPaymentInvoice extends Shopware_Controllers_Frontend_BasecembrapayController
+include(__DIR__."/BaseCembrapayController.php");
+class Shopware_Controllers_Frontend_CembrapayPaymentInvoice extends Shopware_Controllers_Frontend_BaseCembrapayController
 {
     /**
      * Index action method.

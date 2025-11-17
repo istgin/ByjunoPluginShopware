@@ -89,7 +89,7 @@ class CembrapayPayments extends Plugin
     public static function getSubscribedEvents()
     {
         return [
-            'Enlight_Controller_Dispatcher_ControllerPath_Frontend_PaymentInvoice' => 'cembra_registerControllerInvoice',
+            'Enlight_Controller_Dispatcher_ControllerPath_Frontend_CembrapayPaymentInvoice' => 'cembra_registerControllerCembrapayPaymentInvoice',
             'Enlight_Controller_Dispatcher_ControllerPath_Backend_CembrapayTransactions' => 'cembra_registerControllerTransactions',
             'Enlight_Controller_Action_PostDispatch' => 'cembra_onPostDispatchCembrapayMessage',
             'Enlight_Controller_Action_PreDispatch' => 'cembra_onPreDispatchCembrapayMessage',
@@ -173,6 +173,14 @@ class CembrapayPayments extends Plugin
         }
     }
 
+    public function cembra_registerControllerCembrapayPaymentInvoice(\Enlight_Event_EventArgs $args)
+    {
+        $this->container->get('Template')->addTemplateDir(
+            $this->getPath() . '/Views/'
+        );
+
+        return $this->getPath() . '/Controllers/Frontend/CembrapayPaymentInvoice.php';
+    }
 
     public function cembra_registerControllerTransactions(\Enlight_Event_EventArgs $args)
     {
@@ -181,15 +189,6 @@ class CembrapayPayments extends Plugin
         );
 
         return $this->getPath() . '/Controllers/Backend/CembrapayTransactions.php';
-    }
-
-    public function cembra_registerControllerInvoice(\Enlight_Event_EventArgs $args)
-    {
-        $this->container->get('Template')->addTemplateDir(
-            $this->getPath() . '/Views/'
-        );
-
-        return $this->getPath() . '/Controllers/Frontend/CembrapayPaymentInvoice.php';
     }
 
     private function removeSchema()

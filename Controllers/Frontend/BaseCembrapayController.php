@@ -9,7 +9,7 @@ use CembrapayPayments\CembrapayPayments;
 use Shopware\Components\Logger;
 use Shopware\Components\NumberRangeIncrementerInterface;
 
-abstract class Shopware_Controllers_Frontend_BasecembrapayController extends Shopware_Controllers_Frontend_Payment
+abstract class Shopware_Controllers_Frontend_BaseCembrapayController extends Shopware_Controllers_Frontend_Payment
 {
     private $PAYMENTSTATUSPAID = 12;
     private $PAYMENTSTATUSOPEN = 17;

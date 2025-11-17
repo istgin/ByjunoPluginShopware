@@ -114,7 +114,7 @@ function Cembrapay_IsB2bCembrapay($billing) {
     return false;
 }
 
-/* @var $controller \Shopware_Controllers_Frontend_BasecembrapayController  */
+/* @var $controller \Shopware_Controllers_Frontend_BaseCembrapayController  */
 function Cembrapay_CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $controller, $repayment, $invoiceDelivery, $orderId) {
 
     $b2b = false;
