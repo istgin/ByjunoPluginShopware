@@ -50,7 +50,7 @@ Expand allCollapse all
 "tmxSessionId": "63b5a205d9sasfdad50a079bd69dded2ad421a207b657ae1b8262a8efe___"
 },
 "cembraPayDetails": {
-"cembraPayPaymentMethod": "BYJUNO-INVOICE"
+"cembraPayPaymentMethod": "CEMBRAPAY-INVOICE"
 },
 "merchantDetails": {
 "returnUrlSuccess": "www.merchant.ch/Checkout21244/success",

@@ -39,7 +39,7 @@ function Cembrapay_mapRepayment($type) {
 
 function Cembrapay_SaveLog($requestId, $firstname, $lastname, $xml_request, $xml_response, $status, $type) {
     $sql     = '
-            INSERT INTO s_plugin_byjuno_transactions (requestid, requesttype, firstname, lastname, ip, status, datecolumn, xml_request, xml_responce)
+            INSERT INTO s_plugin_cembrapay_transactions (requestid, requesttype, firstname, lastname, ip, status, datecolumn, xml_request, xml_responce)
                     VALUES (?,?,?,?,?,?,?,?,?)
         ';
     Shopware()->Db()->query($sql, Array(
@@ -72,8 +72,8 @@ function Cembrapay_GetAccessData($mode) {
 
 function Cembrapay_ScreeningRequest($user)
 {
-    $mode = Shopware()->Config()->getByNamespace("CembrapayPayments", "byjuno_mode");
-    $b2b = Shopware()->Config()->getByNamespace("CembrapayPayments", "byjuno_b2b");
+    $mode = Shopware()->Config()->getByNamespace("CembrapayPayments", "cembrapay_mode");
+    $b2b = Shopware()->Config()->getByNamespace("CembrapayPayments", "cembrapay_b2b");
     $billing = $user['billingaddress'];
     $shipping = $user['shippingaddress'];
     $basket = Shopware()->Modules()->Basket()->sGetAmount();
@@ -107,18 +107,18 @@ function Cembrapay_ScreeningRequest($user)
     return false;
 }
 
-function Cembrapay_IsB2bByjuno($billing) {
+function Cembrapay_IsB2bCembrapay($billing) {
     if (!empty($billing["company"])) {
         return true;
     }
     return false;
 }
 
-/* @var $controller \Shopware_Controllers_Frontend_BasebyjunoController  */
+/* @var $controller \Shopware_Controllers_Frontend_BasecembrapayController  */
 function Cembrapay_CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $controller, $repayment, $invoiceDelivery, $orderId) {
 
     $b2b = false;
-    $b2bEnabled = Shopware()->Config()->getByNamespace("CembrapayPayments", "byjuno_b2b");
+    $b2bEnabled = Shopware()->Config()->getByNamespace("CembrapayPayments", "cembrapay_b2b");
     if ($b2bEnabled == 'Enabled')
     {
         $b2b = true;
@@ -236,8 +236,8 @@ function Cembrapay_CreateShopWareShopRequestUserBilling($user, $billing, $shippi
     $request->order->basketItemsGoogleTaxonomies = array();
     $request->order->basketItemsPrices = array();
 
-    if (!empty($_SESSION["byjuno_tmx"])) {
-        $request->sessionInfo->tmxSessionId = $_SESSION["byjuno_tmx"];
+    if (!empty($_SESSION["cembrapay_tmx"])) {
+        $request->sessionInfo->tmxSessionId = $_SESSION["cembrapay_tmx"];
     }
 
     $request->cembraPayDetails->riskOnlyOnCembraPay = false; // TODO
@@ -279,7 +279,7 @@ function Cembrapay_CreateShopWareShopRequestUserBilling($user, $billing, $shippi
 function Cembrapay_CreateShopWareShopRequestUserBillingScreening($user, $billing, $shipping, $amount) {
 
     $b2b = false;
-    $b2bEnabled = Shopware()->Config()->getByNamespace("CembrapayPayments", "byjuno_b2b");
+    $b2bEnabled = Shopware()->Config()->getByNamespace("CembrapayPayments", "cembrapay_b2b");
     if ($b2bEnabled == 'Enabled')
     {
         $b2b = true;
@@ -368,8 +368,8 @@ function Cembrapay_CreateShopWareShopRequestUserBillingScreening($user, $billing
     $request->deliveryDetails->deliveryAddrTown = html_entity_decode($shipping['city'], ENT_COMPAT, 'UTF-8');
     $request->deliveryDetails->deliveryAddrCountry = strtoupper($countryShipping);
 
-    if (!empty($_SESSION["byjuno_tmx"])) {
-        $request->sessionInfo->tmxSessionId = $_SESSION["byjuno_tmx"];
+    if (!empty($_SESSION["cembrapay_tmx"])) {
+        $request->sessionInfo->tmxSessionId = $_SESSION["cembrapay_tmx"];
     }
 
     $request->cembraPayDetails->riskOnlyOnCembraPay = true;

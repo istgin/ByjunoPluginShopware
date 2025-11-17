@@ -1,6 +1,6 @@
 <?php
 
-define("_PS_MODULE_BYJUNO_API", "defined");
+define("_PS_MODULE_CEMBRAPAY_API", "defined");
 require(dirname(__FILE__).'/cembra/CembraPayAzure.php');
 require(dirname(__FILE__).'/cembra/CembraPayCheckoutAuthorizationResponse.php');
 require(dirname(__FILE__).'/cembra/CembraPayCheckoutAutRequest.php');
