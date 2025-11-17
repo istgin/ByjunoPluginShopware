@@ -285,7 +285,7 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
      * @param Payment[] $payments
      * @param $active bool
      */
-    private function cembra_setActiveFlag($payments, $active)
+    private function setActiveFlag($payments, $active)
     {
         $em = $this->container->get('models');
 
