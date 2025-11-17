@@ -2,7 +2,7 @@
 /**
  * Created by CembraPay.
  */
-namespace Cembrapay\CembrapayoPayments\Api;
+namespace Cembrapay\CembrapayPayments\Api;
 
 class CembraPayCheckoutScreeningDetails {
     public $allowedCembraPayPaymentMethods;  //array( String )

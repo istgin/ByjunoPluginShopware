@@ -1,6 +1,6 @@
 <?php
 
-namespace Cembrapay\CembrapayoPayments\Api;
+namespace Cembrapay\CembrapayPayments\Api;
 
 /*
 {

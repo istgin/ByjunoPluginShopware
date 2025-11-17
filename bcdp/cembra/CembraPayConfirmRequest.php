@@ -1,6 +1,6 @@
 <?php
 
-namespace Cembrapay\CembrapayoPayments\Api;
+namespace Cembrapay\CembrapayPayments\Api;
 
 /*
 "requestMsgId": "ed58eb92-8424-487e-bb7c-fcb43066dcac",

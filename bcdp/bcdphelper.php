@@ -1,11 +1,11 @@
 <?php
 
-use Cembrapay\CembrapayoPayments\Api\CembraPayCheckoutAutRequest;
-use Cembrapay\CembrapayoPayments\Api\CembraPayCheckoutChkRequest;
-use Cembrapay\CembrapayoPayments\Api\CembraPayCommunicator;
-use Cembrapay\CembrapayoPayments\Api\CembraPayConstants;
-use Cembrapay\CembrapayoPayments\Api\CembraPayLoginDto;
-use Cembrapay\CembrapayoPayments\Api\CustomerConsents;
+use Cembrapay\CembrapayPayments\Api\CembraPayCheckoutAutRequest;
+use Cembrapay\CembrapayPayments\Api\CembraPayCheckoutChkRequest;
+use Cembrapay\CembrapayPayments\Api\CembraPayCommunicator;
+use Cembrapay\CembrapayPayments\Api\CembraPayConstants;
+use Cembrapay\CembrapayPayments\Api\CembraPayLoginDto;
+use Cembrapay\CembrapayPayments\Api\CustomerConsents;
 
 
 function Cembrapay_getClientIp() {
@@ -60,20 +60,20 @@ function Cembrapay_GetAccessData($mode) {
     $accessData->timeout = 30;
     if ($mode == 'test') {
         $accessData->mode = 'test';
-        $accessData->username = Shopware()->Config()->getByNamespace("ByjunoPayments", "cembra_clientid_live");
-        $accessData->password = Shopware()->Config()->getByNamespace("ByjunoPayments", "cembra_password_live");
+        $accessData->username = Shopware()->Config()->getByNamespace("CembrapayPayments", "cembra_clientid_live");
+        $accessData->password = Shopware()->Config()->getByNamespace("CembrapayPayments", "cembra_password_live");
     } else {
         $accessData->mode = 'live';
-        $accessData->username = Shopware()->Config()->getByNamespace("ByjunoPayments", "cembra_clientid_test");
-        $accessData->password = Shopware()->Config()->getByNamespace("ByjunoPayments", "cembra_password_test");
+        $accessData->username = Shopware()->Config()->getByNamespace("CembrapayPayments", "cembra_clientid_test");
+        $accessData->password = Shopware()->Config()->getByNamespace("CembrapayPayments", "cembra_password_test");
     }
     return $accessData;
 }
 
 function Cembrapay_ScreeningRequest($user)
 {
-    $mode = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_mode");
-    $b2b = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_b2b");
+    $mode = Shopware()->Config()->getByNamespace("CembrapayPayments", "byjuno_mode");
+    $b2b = Shopware()->Config()->getByNamespace("CembrapayPayments", "byjuno_b2b");
     $billing = $user['billingaddress'];
     $shipping = $user['shippingaddress'];
     $basket = Shopware()->Modules()->Basket()->sGetAmount();
@@ -118,13 +118,13 @@ function Cembrapay_IsB2bByjuno($billing) {
 function Cembrapay_CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $controller, $repayment, $invoiceDelivery, $orderId) {
 
     $b2b = false;
-    $b2bEnabled = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_b2b");
+    $b2bEnabled = Shopware()->Config()->getByNamespace("CembrapayPayments", "byjuno_b2b");
     if ($b2bEnabled == 'Enabled')
     {
         $b2b = true;
     }
     $instantSettlement = false;
-    $instantSettlementEnabled = Shopware()->Config()->getByNamespace("ByjunoPayments", "cembra_instant_settlement");
+    $instantSettlementEnabled = Shopware()->Config()->getByNamespace("CembrapayPayments", "cembra_instant_settlement");
     if ($instantSettlementEnabled == 'Enabled')
     {
         $instantSettlement = true;
@@ -279,7 +279,7 @@ function Cembrapay_CreateShopWareShopRequestUserBilling($user, $billing, $shippi
 function Cembrapay_CreateShopWareShopRequestUserBillingScreening($user, $billing, $shipping, $amount) {
 
     $b2b = false;
-    $b2bEnabled = Shopware()->Config()->getByNamespace("ByjunoPayments", "byjuno_b2b");
+    $b2bEnabled = Shopware()->Config()->getByNamespace("CembrapayPayments", "byjuno_b2b");
     if ($b2bEnabled == 'Enabled')
     {
         $b2b = true;
