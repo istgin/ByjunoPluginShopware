@@ -1,7 +1,7 @@
 {extends file="parent:frontend/index/index.tpl"}
 
 {block name="frontend_index_body_classes"}
-	{if $Controller == 'PaymentInvoice'}
+	{if $Controller == 'CembrapayPaymentInvoice'}
 		{strip}
 		    is--ctl-checkout is--act-confirm
 		    {if $sUserLoggedIn} is--user{/if}

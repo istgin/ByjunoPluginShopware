@@ -148,7 +148,7 @@ class CembrapayPayments extends Plugin
         }
 
         if (!strstr($args->getRequest()->getActionName(), "ajax")
-            && !strstr($args->getRequest()->getControllerName(), "PaymentInvoice")) {
+            && !strstr($args->getRequest()->getControllerName(), "CembrapayPaymentInvoice")) {
             $view->messageCembrapay = "";
             if (!empty($_SESSION["cembrapay"]["paymentMessage"])) {
                 $view->messageCembrapay = $_SESSION["cembrapay"]["paymentMessage"];
@@ -189,7 +189,7 @@ class CembrapayPayments extends Plugin
             $this->getPath() . '/Views/'
         );
 
-        return $this->getPath() . '/Controllers/Frontend/PaymentInvoice.php';
+        return $this->getPath() . '/Controllers/Frontend/CembrapayPaymentInvoice.php';
     }
 
     private function removeSchema()
@@ -230,7 +230,7 @@ CHANGE COLUMN `xml_responce` `xml_responce` TEXT CHARACTER SET 'utf8' COLLATE 'u
         $options = [
             'name' => 'cembrapay_payment_invoice',
             'description' => 'CembraPay invoice',
-            'action' => 'PaymentInvoice',
+            'action' => 'CembrapayPaymentInvoice',
             'active' => 0,
             'position' => 0,
             'additionalDescription' =>

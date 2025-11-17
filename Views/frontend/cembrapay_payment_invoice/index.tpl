@@ -91,7 +91,7 @@
                             {foreach from=$paymentplans item=paymentplan}
                                 <input type="hidden" name="payment_plan" value="{$paymentplan.key}">
                                 {$paymentplan.val} <a href="{$paymentplan.url}" target="_blank">{s name=t_and_c namespace=frontend/cembrapay/index}(T&C){/s}</a><br>
-                            {/foreach}                            
+                            {/foreach}
                         </div>
                     {else}
                         <div style="padding: 0 0 5px 0"><label for="payment_plan" style="font-size: 18px"><b>{s name=select_payment_plan namespace=frontend/cembrapay/index}Select payment plan{/s}</b></label></div>

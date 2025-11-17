@@ -3,7 +3,7 @@
 use Shopware\Bundle\AccountBundle\Form\Account\PersonalFormType;
 
 include(__DIR__."/BaseController.php");
-class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_Frontend_BasecembrapayController
+class Shopware_Controllers_Frontend_CembrapayPaymentInvoice extends Shopware_Controllers_Frontend_BasecembrapayController
 {
     /**
      * Index action method.
@@ -222,7 +222,7 @@ class Shopware_Controllers_Frontend_PaymentInvoice extends Shopware_Controllers_
             } else {
                 $_SESSION["cembrapay"]["controllerMessage"] = $snippets->get('payment_canceled', "Payment cancelled");
             }
-            $this->redirect(['controller' => 'PaymentInvoice']);
+            $this->redirect(['controller' => 'CembrapayPaymentInvoice']);
             return;
         }
         switch ($this->getPaymentShortName()) {
