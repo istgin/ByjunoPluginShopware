@@ -72,8 +72,7 @@ class Shopware_Controllers_Frontend_CembrapayPaymentInvoice extends Shopware_Con
                 }
                 $checked = 'checked=\"\"';
                 $paymentplans = Array();
-
-                if ($b2bEnabled == 'Enabled' && Cembrapay_IsB2bCembrapay($billing)) {
+                if ($IsB2BPayment && Cembrapay_IsB2bCembrapay($billing)) {
                     if ($config->getByNamespace("CembrapayPayments", "cembrapay_invoice_b2b") == "Enabled" && !$IsB2BPayment) {
                         $paymentplans[] = Array(
                             "checked" => $checked,

@@ -154,7 +154,7 @@ function Cembrapay_CreateShopWareShopRequestUserBilling($user, $billing, $shippi
     if ($b2b && !empty($billing["company"])) {
         $vatId = "";
         if (!empty($billing["vatId"])) {
-            $vatId =$billing["vatId"];
+            $vatId = $billing["vatId"];
         }
         $request->custDetails->custType = CembraPayConstants::$CUSTOMER_BUSINESS;
         $request->custDetails->companyName = $billing["company"];

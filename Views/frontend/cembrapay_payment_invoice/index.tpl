@@ -19,8 +19,8 @@
 
 {* Main content *}
 {block name="frontend_checkout_confirm_form"}
-    <div class="cembrapay--panel panel has--border">
-        {block name='frontend_checkout_confirm_cembrapay_panel_headline'}
+    <div class="cembra--panel panel has--border">
+        {block name='frontend_checkout_confirm_cembra_panel_headline'}
             <div class="panel--title primary is--underline">
                 {s name=panelheader namespace=frontend/cembrapay/index}Cembra Pay{/s}
             </div>
@@ -90,14 +90,14 @@
                         <div style="padding: 0 0 15px 0">
                             {foreach from=$paymentplans item=paymentplan}
                                 <input type="hidden" name="payment_plan" value="{$paymentplan.key}">
-                                {$paymentplan.val} <a href="{$paymentplan.url}" target="_blank">{s name=t_and_c namespace=frontend/cembrapay/index}(T&C){/s}</a><br>
+                                {$paymentplan.val} <br>
                             {/foreach}
                         </div>
                     {else}
                         <div style="padding: 0 0 5px 0"><label for="payment_plan" style="font-size: 18px"><b>{s name=select_payment_plan namespace=frontend/cembrapay/index}Select payment plan{/s}</b></label></div>
                         <div style="padding: 0 0 15px 0">
                             {foreach from=$paymentplans item=paymentplan}
-                                <input type="radio" name="payment_plan" {$paymentplan.checked} value="{$paymentplan.key}"> &nbsp;{$paymentplan.val} <a href="{$paymentplan.url}" target="_blank">{s name=t_and_c namespace=frontend/cembrapay/index}(T&C){/s}</a><br>
+                                <input type="radio" name="payment_plan" {$paymentplan.checked} value="{$paymentplan.key}"> &nbsp;{$paymentplan.val}<br>
                             {/foreach}
                             {if count($paymentplans) == 0}
                                 {s name=payment_plans_not_available namespace=frontend/cembrapay/index}No any payment plans are available{/s}
@@ -117,6 +117,12 @@
                             {/foreach}
                         </div>
                     {/if}
+
+                    <div style="padding: 0 0 15px 0">
+                        <input type="checkbox" value="terms_conditions" name="terms_conditions" id="terms_conditions"
+                               style="display: inline-block" required/> &nbsp;
+                        {s name=t_and_c_cembra namespace=frontend/cembrapay/index}{/s}
+                    </div>
                     <script>
                         var form_submited = false;
                         function cembrapay_submit_form_fn()

@@ -21,7 +21,7 @@
         <element type="select" required="true" scope="shop">
             <name>cembrapay_b2b</name>
             <label>Enable B2B check</label>
-            <value>Enable</value>
+            <value>Enabled</value>
             <store>
                 <option>
                     <value>Disabled</value>
@@ -200,7 +200,7 @@
         <element type="select" required="true" scope="shop">
             <name>single_invoice_b2b</name>
             <label>CembraPay Single Invoice (B2B)</label>
-            <value>Disabled</value>
+            <value>Enabled</value>
             <store>
                 <option>
                     <value>Disabled</value>
