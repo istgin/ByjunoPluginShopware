@@ -146,7 +146,6 @@ class CembrapayPayments extends Plugin
         ) {
             return;
         }
-
         if (!strstr($args->getRequest()->getActionName(), "ajax")
             && !strstr($args->getRequest()->getControllerName(), "CembrapayPaymentInvoice")) {
             $view->messageCembrapay = "";

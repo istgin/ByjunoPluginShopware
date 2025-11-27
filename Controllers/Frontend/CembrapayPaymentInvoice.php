@@ -86,7 +86,7 @@ class Shopware_Controllers_Frontend_CembrapayPaymentInvoice extends Shopware_Con
                         $paymentplans[] =
                             Array(
                                 "checked" => $checked,
-                                "key" => "sinlge_invoice",
+                                "key" => "single_invoice",
                                 "val" => $snippets->get('single_invoice', "Single invoice"),
                                 "url" => $snippets->get('single_invoice_toc_url', "https://cembrapay.ch/de/terms")
                             );
@@ -105,7 +105,7 @@ class Shopware_Controllers_Frontend_CembrapayPaymentInvoice extends Shopware_Con
                         $paymentplans[] =
                             Array(
                                 "checked" => $checked,
-                                "key" => "sinlge_invoice",
+                                "key" => "single_invoice",
                                 "val" => $snippets->get('single_invoice', "Single invoice"),
                                 "url" => $snippets->get('single_invoice_toc_url', "https://cembrapay.ch/de/terms")
                             );
