@@ -28,24 +28,30 @@ Ext.define('Shopware.apps.CembrapayTransactions', {
     * Required views for controller
     * @array
     */
-  views: [ 'main.Window', 'main.Detailwindow', 'log.List', 'detail.Detail' ],
+  views: [ 'Shopware.apps.CembrapayTransactions.view.main.Window',
+      'Shopware.apps.CembrapayTransactions.view.main.Detailwindow',
+      'Shopware.apps.CembrapayTransactions.view.log.List',
+      'Shopware.apps.CembrapayTransactions.view.detail.Detail' ],
   /**
     * Required stores for controller
     * @array
     */
 //  stores: [ 'Logs', 'Users' ],
-  stores: [ 'Logs', 'Detail' ],
+  stores: [
+        'Shopware.apps.CembrapayTransactions.store.Logs',
+        'Shopware.apps.CembrapayTransactions.store.Detail' ],
   /**
     * Required models for controller
     * @array
     */
-  models: [ 'Log', 'Grid2cols' ],
+  models: [ 'Shopware.apps.CembrapayTransactions.model.Log',
+            'Shopware.apps.CembrapayTransactions.model.Grid2cols' ],
 
   /**
 	* Requires controllers for sub-application
 	* @array
 	*/
-  controllers : [ 'Main' ],
+  controllers : [ 'Shopware.apps.CembrapayTransactions.controller.Main' ],
 
   /**
      * Returns the main application window for this is expected
@@ -62,7 +68,7 @@ Ext.define('Shopware.apps.CembrapayTransactions', {
      */
   launch:function () {
     var me = this,
-    mainController = me.getController('Main');
+    mainController = me.getController('Shopware.apps.CembrapayTransactions.controller.Main');
 
     return mainController.mainWindow;
   }

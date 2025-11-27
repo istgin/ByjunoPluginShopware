@@ -20,7 +20,7 @@ Ext.define('Shopware.apps.CembrapayTransactions.view.main.Detailwindow', {
     width: 800,
 
     stateful: true,
-    stateId:'shopware-detail-window',
+    stateId:'shopware-detail-window-cembrapay',
 
     /**
      * Initializes the component and builds up the main interface

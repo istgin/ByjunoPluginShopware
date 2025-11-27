@@ -12,7 +12,7 @@ Ext.define('Shopware.apps.CembrapayTransactions.view.main.Window', {
   extend: 'Enlight.app.Window',
   title: '{s name="window_title"}CembraPay transactions log{/s}',
   cls: Ext.baseCSSPrefix + 'log-window',
-  alias: 'widget.log-main-window-api',
+  alias: 'widget.log-main-window-api-cembrapay',
   border: false,
   autoShow: true,
   height: 550,
@@ -29,7 +29,7 @@ Ext.define('Shopware.apps.CembrapayTransactions.view.main.Window', {
     var me = this;
     me.items = [
       {
-        xtype: 'moptPayoneApilogMainList',
+        xtype: 'CembrapayTransactionsApilogMainList',
         logStore: me.logStore
       },
     ];

@@ -22,7 +22,7 @@ Ext.define('Shopware.apps.CembrapayTransactions.view.log.List', {
    * of the view through Ext.widget('moptPayoneApilogMainList')
    * @string
    */
-  alias: 'widget.moptPayoneApilogMainList',
+  alias: 'widget.CembrapayTransactionsApilogMainList',
   /**
    * The window uses a border layout, so we need to set
    * a region for the grid panel

@@ -20,7 +20,7 @@ Ext.define('Shopware.apps.CembrapayTransactions.store.Logs', {
    * @boolean
    */
   autoLoad: false,
-  storeId: 'logsStore',
+  storeId: 'logsStoreCembrapay',
   /**
    * Amount of data loaded at once
    * @integer
@@ -42,7 +42,6 @@ Ext.define('Shopware.apps.CembrapayTransactions.store.Logs', {
     api: {
       //read out all articles
       read: '{url controller="CembrapayTransactions" action="getApilogs"}',
-      search: '{url controller="CembrapayTransactions" action="getSearchResult"}',
     },
     /**
      * Configure the data reader
