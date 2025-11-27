@@ -96,6 +96,23 @@
             </store>
         </element>
         <element type="select" required="true" scope="shop">
+            <name>cembrapay_gender</name>
+            <label>Enable gender selection</label>
+            <value>Enabled</value>
+            <store>
+                <option>
+                    <value>Disabled</value>
+                    <label lang="de">Disabled</label>
+                    <label lang="en">Disabled</label>
+                </option>
+                <option>
+                    <value>Enabled</value>
+                    <label lang="de">Enabled</label>
+                    <label lang="en">Enabled</label>
+                </option>
+            </store>
+        </element>
+        <element type="select" required="true" scope="shop">
             <name>cembrapay_birthday</name>
             <label>Enable birthday selection</label>
             <value>Enabled</value>

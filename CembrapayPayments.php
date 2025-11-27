@@ -22,7 +22,6 @@ require (__DIR__) . '/bcdp/bcdphelper.php';
 class CembrapayPayments extends Plugin
 {
 
-    public static $orderNumberGenerated = "";
     private function getPaymentId(\sOrder $sOrder)
     {
         if (!empty($sOrder->sUserData['additional']['payment']['id'])) {
@@ -93,23 +92,13 @@ class CembrapayPayments extends Plugin
             'Enlight_Controller_Dispatcher_ControllerPath_Backend_CembrapayTransactions' => 'cembra_registerControllerTransactions',
             'Enlight_Controller_Action_PostDispatch' => 'cembra_onPostDispatchCembrapayMessage',
             'Enlight_Controller_Action_PreDispatch' => 'cembra_onPreDispatchCembrapayMessage',
-            'Shopware_Modules_Admin_GetPaymentMeans_DataFilter' => 'cembra_CdpStatusCall',
-            'Shopware_Modules_Order_GetOrdernumber_FilterOrdernumber' => 'cembra_onFilterOrdernumber'
+            'Shopware_Modules_Admin_GetPaymentMeans_DataFilter' => 'cembra_CdpStatusCall'
         ];
     }
 
     public static $controller = "";
     public static $action = "";
     public static $method = "";
-
-    public function cembra_onFilterOrdernumber(\Enlight_Event_EventArgs $args)
-    {
-        if (!empty(self::$orderNumberGenerated)) {
-            return self::$orderNumberGenerated;
-        } else {
-            return $args->getReturn();
-        }
-    }
 
     function cembra_onPreDispatchCembrapayMessage(\Enlight_Event_EventArgs $args) {
         /* @var $request \Enlight_Controller_Request_RequestHttp */;

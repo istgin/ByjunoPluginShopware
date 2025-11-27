@@ -49,36 +49,6 @@ abstract class Shopware_Controllers_Frontend_BaseCembrapayController extends Sho
         return true;
     }
 
-    protected function isStatusOkS2($status) {
-        try {
-            $accepted_S2_ij = Shopware()->Config()->getByNamespace("CembrapayPayments", "allowed_s2");
-            $accepted_S2_merhcant = Shopware()->Config()->getByNamespace("CembrapayPayments", "allowed_s2_merchant");
-            $ijStatus = Array();
-            if (!empty(trim($accepted_S2_ij))) {
-                $ijStatus = explode(",", trim($accepted_S2_ij));
-                foreach($ijStatus as $key => $val) {
-                    $ijStatus[$key] = intval($val);
-                }
-            }
-            $merchantStatus = Array();
-            if (!empty(trim($accepted_S2_merhcant))) {
-                $merchantStatus = explode(",", trim($accepted_S2_merhcant));
-                foreach($merchantStatus as $key => $val) {
-                    $merchantStatus[$key] = intval($val);
-                }
-            }
-            if (!empty($accepted_S2_ij) && count($ijStatus) > 0 && in_array($status, $ijStatus)) {
-                return true;
-            } else if (!empty($accepted_S2_merhcant) && count($merchantStatus) > 0 && in_array($status, $merchantStatus)) {
-                return true;
-            }
-            return false;
-
-        } catch (Exception $e) {
-            return false;
-        }
-    }
-
     /**
      * Cancel action method
      */
@@ -101,7 +71,7 @@ abstract class Shopware_Controllers_Frontend_BaseCembrapayController extends Sho
         $_SESSION["cembrapay"]["paymentMessage"] = $snippets->get('payment_canceled', "CembraPay invoice");
         $this->redirect(array(
             'controller' => 'checkout',
-            'action' => 'payment'
+            'action' => 'cart'
         ));
     }
     /**
@@ -127,80 +97,84 @@ abstract class Shopware_Controllers_Frontend_BaseCembrapayController extends Sho
         if (!empty($_SESSION["cembrapay"]["processing"]) && $_SESSION["cembrapay"]["processing"] == true) {
             return false;
         }
+        $logger = Shopware()->Container()->get('corelogger');
         $_SESSION["cembrapay"]["processing"] = true;
         $mode = Shopware()->Config()->getByNamespace("CembrapayPayments", "cembrapay_mode");
         $user = $this->getUser();
-        $billing = $user['billingaddress'];
-        $shipping = $user['shippingaddress'];
-        $orderNumberGenerator = Shopware()->Container()->get(NumberRangeIncrementerInterface::class);
-        CembrapayPayments::$orderNumberGenerated = (String)$orderNumberGenerator->increment('invoice');
-        $requestAUT = Cembrapay_CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $this, $this->payment_plan, $this->payment_send, CembrapayPayments::$orderNumberGenerated);
-        $CembraPayRequestName = "Authorization request";
-        if ($requestAUT->custDetails->custType == CembraPayConstants::$CUSTOMER_BUSINESS) {
-            $CembraPayRequestName = "Authorization request company";
-        }
-
-        $json = $requestAUT->createRequest();
-        $cembrapayCommunicator = new CembraPayCommunicator();
-        if (isset($mode) && $mode == 'Live') {
-            $cembrapayCommunicator->setServer('live');
-        } else {
-            $cembrapayCommunicator->setServer('test');
-        }
-        $accessData = Cembrapay_GetAccessData($mode);
-        $response = $cembrapayCommunicator->sendAuthRequest($json, $accessData, function ($object, $token, $accessData) {
-            $object->saveToken($token, $accessData);
-        });
-        if ($response) {
-            /* @var $responseRes CembraPayCheckoutAuthorizationResponse */
-            $responseRes = CembraPayConstants::authorizationResponse($response);
-            $status = $responseRes->processingStatus;
-            Cembrapay_SaveLog($requestAUT->requestMsgId, $requestAUT->custDetails->firstName, $requestAUT->custDetails->lastName, $json, $response, $status, $CembraPayRequestName);
-        } else {
-            Cembrapay_SaveLog($requestAUT->requestMsgId, $requestAUT->custDetails->firstName, $requestAUT->custDetails->lastName, $json, "", "ERROR", $CembraPayRequestName);
-        }
-        $cancelStatusId = Shopware()->Config()->getByNamespace("CembrapayPayments", "S5_default_cancel_id");
-        $cancelStatusId = intval($cancelStatusId);
-        if ($cancelStatusId <= 0) {
-            $cancelStatusId = $this->ORDERSTATUSCANCEL;
-        }
-
-        $successStatusId = Shopware()->Config()->getByNamespace("CembrapayPayments", "cembrapay_order_default_success_id");
-        $successStatusId = intval($successStatusId);
-        if ($successStatusId < 0) {
-            $successStatusId = $this->ORDERSTATUSINPROGRESS;
-        }
-
-        $successPaymentStatusId = Shopware()->Config()->getByNamespace("CembrapayPayments", "cembrapay_payment_default_success_id");
-        $successPaymentStatusId = intval($successPaymentStatusId);
-        if ($successPaymentStatusId <= 0) {
-            $successPaymentStatusId = $this->PAYMENTSTATUSPAID;
-        }
-        $logger = Shopware()->Container()->get('corelogger');
-        if ($status == CembraPayConstants::$AUTH_OK) {
-            $logger->log(Logger::INFO, "Cembrapay order Ok");
+        $requestScreening = Cembrapay_ScreeningRequest($user);
+        if ($requestScreening) {
             $orderModule = Shopware()->Modules()->Order();
             $this->saveOrder(1, uniqid("cembrapay_"), $this->PAYMENTSTATUSOPEN);
             /* @var $order \Shopware\Models\Order\Order */
             $order = Shopware()->Models()->getRepository('Shopware\Models\Order\Order')
                 ->findOneBy(array('number' => $this->getOrderNumber()));
-            if ($this->getOrderNumber() !== CembrapayPayments::$orderNumberGenerated) {
-                $logger->log(Logger::ERROR, "Wrong order number created. expected:".CembrapayPayments::$orderNumberGenerated." received:".$this->getOrderNumber());
+
+            $billing = $user['billingaddress'];
+            $shipping = $user['shippingaddress'];
+            $requestAUT = Cembrapay_CreateShopWareShopRequestUserBilling($user, $billing, $shipping, $this, $this->payment_plan, $this->payment_send, $this->getOrderNumber());
+            $CembraPayRequestName = "Authorization request";
+            if ($requestAUT->custDetails->custType == CembraPayConstants::$CUSTOMER_BUSINESS) {
+                $CembraPayRequestName = "Authorization request company";
             }
-            CembrapayPayments::$orderNumberGenerated = "";
-            $orderModule->setPaymentStatus($order->getId(), $successPaymentStatusId, false);
-            if ($successStatusId != 0) {
-                $orderModule->setOrderStatus($order->getId(), $successStatusId, false);
+
+            $json = $requestAUT->createRequest();
+            $cembrapayCommunicator = new CembraPayCommunicator();
+            if (isset($mode) && $mode == 'Live') {
+                $cembrapayCommunicator->setServer('live');
+            } else {
+                $cembrapayCommunicator->setServer('test');
             }
-            $this->saveTransactionPaymentData($order->getId(), 'payment_plan', $this->payment_plan);
+            $accessData = Cembrapay_GetAccessData($mode);
+            $response = $cembrapayCommunicator->sendAuthRequest($json, $accessData, function ($object, $token, $accessData) {
+                $object->saveToken($token, $accessData);
+            });
+            if ($response) {
+                /* @var $responseRes CembraPayCheckoutAuthorizationResponse */
+                $responseRes = CembraPayConstants::authorizationResponse($response);
+                $status = $responseRes->processingStatus;
+                Cembrapay_SaveLog($requestAUT->requestMsgId, $requestAUT->custDetails->firstName, $requestAUT->custDetails->lastName, $json, $response, $status, $CembraPayRequestName);
+            } else {
+                Cembrapay_SaveLog($requestAUT->requestMsgId, $requestAUT->custDetails->firstName, $requestAUT->custDetails->lastName, $json, "", "ERROR", $CembraPayRequestName);
+            }
+            $cancelStatusId = Shopware()->Config()->getByNamespace("CembrapayPayments", "S5_default_cancel_id");
+            $cancelStatusId = intval($cancelStatusId);
+            if ($cancelStatusId <= 0) {
+                $cancelStatusId = $this->ORDERSTATUSCANCEL;
+            }
+
+            $successStatusId = Shopware()->Config()->getByNamespace("CembrapayPayments", "cembrapay_order_default_success_id");
+            $successStatusId = intval($successStatusId);
+            if ($successStatusId < 0) {
+                $successStatusId = $this->ORDERSTATUSINPROGRESS;
+            }
+
+            $successPaymentStatusId = Shopware()->Config()->getByNamespace("CembrapayPayments", "cembrapay_payment_default_success_id");
+            $successPaymentStatusId = intval($successPaymentStatusId);
+            if ($successPaymentStatusId <= 0) {
+                $successPaymentStatusId = $this->PAYMENTSTATUSPAID;
+            }
+            if ($status == CembraPayConstants::$AUTH_OK) {
+                $logger->log(Logger::INFO, "Cembrapay AUTH order Ok");
+                $orderModule->setPaymentStatus($order->getId(), $successPaymentStatusId, false);
+                if ($successStatusId != 0) {
+                    $orderModule->setOrderStatus($order->getId(), $successStatusId, false);
+                }
+                $this->saveTransactionPaymentData($order->getId(), 'payment_plan', $this->payment_plan);
+                $_SESSION["cembrapay"]["processing"] = false;
+                return true;
+            } else {
+                $logger->log(Logger::INFO, "Cembrapay AUTH order Failed");
+                $orderModule->setPaymentStatus($order->getId(), $this->PAYMENTSTATUSVOID, false);
+                $orderModule->setOrderStatus($order->getId(), $cancelStatusId, false);
+                $_SESSION["cembrapay"]["processing"] = false;
+                return false;
+            }
+        } else {
+            $logger->log(Logger::INFO, "Cembrapay screening failed");
             $_SESSION["cembrapay"]["processing"] = false;
-            CembrapayPayments::$orderNumberGenerated = null;
-            return true;
+            return false;
         }
-        $logger->log(Logger::INFO, "Cembrapay order failed");
-        $_SESSION["cembrapay"]["processing"] = false;
-        CembrapayPayments::$orderNumberGenerated = null;
-        return false;
+
     }
 
     protected function baseConfirmActions()

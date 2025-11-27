@@ -173,36 +173,7 @@ class Shopware_Controllers_Frontend_CembrapayPaymentInvoice extends Shopware_Con
                     )
                 );
                 $_SESSION["cembrapay"]["processing"] = false;
-                if ($custom_fields_birthday == 0 && $custom_fields_gender == 0 && $cembrapay_allowpostal == 0 && count($paymentplans) == 1) {
-                    $this->payment_plan = $paymentplans[0]["key"];
-                    $this->payment_send = "email";
-                    $this->payment_send_to = (String)$user["additional"]["user"]["email"];
-                    if ($this->gatewayAction()) {
-                        $this->redirect(['controller' => 'checkout', 'action' => 'finish']);
-                        break;
-                    } else {
-                        $this->forward('cancel');
-                        break;
-                    }
-                } else if ($custom_fields_birthday == 1 && $custom_fields_gender == 0 && $cembrapay_allowpostal == 0 && count($paymentplans) == 1) {
-                    $additionalInfo = $user["additional"]["user"];
-                    if (!empty($additionalInfo['birthday']) && substr($additionalInfo['birthday'], 0, 4) != '0000') {
-                        $this->payment_plan = $paymentplans[0]["key"];
-                        $this->payment_send = "email";
-                        $this->payment_send_to = (String)$user["additional"]["user"]["email"];
-                        if ($this->gatewayAction()) {
-                            $this->redirect(['controller' => 'checkout', 'action' => 'finish']);
-                            break;
-                        } else {
-                            $this->forward('cancel');
-                            break;
-                        }
-                    } else {
-                        $this->View()->assign($viewAssignments);
-                    }
-                } else {
-                    $this->View()->assign($viewAssignments);
-                }
+                $this->View()->assign($viewAssignments);
                 break;
             default:
                 $this->redirect(['controller' => 'checkout']);
