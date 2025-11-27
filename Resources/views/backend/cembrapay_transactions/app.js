@@ -45,7 +45,6 @@ Ext.define('Shopware.apps.CembrapayTransactions', {
 	* Requires controllers for sub-application
 	* @array
 	*/
-//  controllers : [ 'Main', 'Log' ],
   controllers : [ 'Main' ],
 
   /**
