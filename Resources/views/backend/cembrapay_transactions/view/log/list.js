@@ -45,7 +45,6 @@ Ext.define('Shopware.apps.CembrapayTransactions.view.log.List', {
     me.store = me.logStoreCembrapay;
 
     me.columns = me.getColumns();
-    //me.toolbar = me.getToolbar(me);
 
     me.dockedItems = [];
     me.dockedItems.push(me.toolbar);
@@ -132,9 +131,13 @@ Ext.define('Shopware.apps.CembrapayTransactions.view.log.List', {
         selectionchange: function(view, selected) {
           if(selected[0])
           {
-            me.detail = Ext.create('Shopware.apps.CembrapayTransactions.view.main.Detailwindow', {
+            if (me.CembraDetail) {
+              me.CembraDetail.close();
+            }
+            me.CembraDetail = Ext.create('Shopware.apps.CembrapayTransactions.view.main.Detailwindow', {
               itemSelected: selected[0].data.id
-            }).show();
+            });
+            me.CembraDetail.show();
           }
         }
       }

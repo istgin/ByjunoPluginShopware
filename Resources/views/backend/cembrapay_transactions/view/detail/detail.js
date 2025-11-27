@@ -52,7 +52,6 @@ Ext.define('Shopware.apps.CembrapayTransactions.view.detail.Detail', {
 
     me.items = [
         {
-            id: 'request_xml',
             autoScroll: true,
             title: 'Request',
             width: '50%',
@@ -76,7 +75,6 @@ Ext.define('Shopware.apps.CembrapayTransactions.view.detail.Detail', {
             }
         },
         {
-            id: 'response_xml',
             autoScroll: true,
             title: 'Request',
             width: '50%',
