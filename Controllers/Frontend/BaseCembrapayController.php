@@ -5,8 +5,8 @@ use Cembrapay\CembrapayPayments\Api\CembraPayCheckoutAuthorizationResponse;
 use Cembrapay\CembrapayPayments\Api\CembraPayCommunicator;
 use Cembrapay\CembrapayPayments\Api\CembraPayConstants;
 use Cembrapay\CembrapayPayments\Api\CembraPayLoginDto;
+use \Shopware\Components\Logger;
 use CembrapayPayments\CembrapayPayments;
-use Shopware\Components\Logger;
 use Shopware\Components\NumberRangeIncrementerInterface;
 
 abstract class Shopware_Controllers_Frontend_BaseCembrapayController extends Shopware_Controllers_Frontend_Payment
@@ -176,17 +176,16 @@ abstract class Shopware_Controllers_Frontend_BaseCembrapayController extends Sho
         if ($successPaymentStatusId <= 0) {
             $successPaymentStatusId = $this->PAYMENTSTATUSPAID;
         }
+        $logger = Shopware()->Container()->get('corelogger');
         if ($status == CembraPayConstants::$AUTH_OK) {
+            $logger->log(Logger::INFO, "Cembrapay order Ok");
             $orderModule = Shopware()->Modules()->Order();
             $this->saveOrder(1, uniqid("cembrapay_"), $this->PAYMENTSTATUSOPEN);
             /* @var $order \Shopware\Models\Order\Order */
             $order = Shopware()->Models()->getRepository('Shopware\Models\Order\Order')
                 ->findOneBy(array('number' => $this->getOrderNumber()));
             if ($this->getOrderNumber() !== CembrapayPayments::$orderNumberGenerated) {
-                $orderModule->setPaymentStatus($order->getId(), $this->PAYMENTSTATUSVOID, false);
-                $orderModule->setOrderStatus($order->getId(), $cancelStatusId, false);
-                $_SESSION["cembrapay"]["processing"] = false;
-                return false;
+                $logger->log(Logger::ERROR, "Wrong order number created. expected:".CembrapayPayments::$orderNumberGenerated." received:".$this->getOrderNumber());
             }
             CembrapayPayments::$orderNumberGenerated = "";
             $orderModule->setPaymentStatus($order->getId(), $successPaymentStatusId, false);
@@ -195,9 +194,12 @@ abstract class Shopware_Controllers_Frontend_BaseCembrapayController extends Sho
             }
             $this->saveTransactionPaymentData($order->getId(), 'payment_plan', $this->payment_plan);
             $_SESSION["cembrapay"]["processing"] = false;
+            CembrapayPayments::$orderNumberGenerated = null;
             return true;
         }
+        $logger->log(Logger::INFO, "Cembrapay order failed");
         $_SESSION["cembrapay"]["processing"] = false;
+        CembrapayPayments::$orderNumberGenerated = null;
         return false;
     }
 
@@ -242,7 +244,7 @@ abstract class Shopware_Controllers_Frontend_BaseCembrapayController extends Sho
                         Shopware()->Models()->flush();
                     } catch (Exception $e) {
                         $logger = Shopware()->Container()->get('corelogger');
-                        $logger->log(Logger::ERROR, $e->getMessage());
+                        $logger->log($logger, $e->getMessage());
                     }
                 }
             }
