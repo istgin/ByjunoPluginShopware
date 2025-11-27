@@ -42,7 +42,7 @@ Ext.define('Shopware.apps.CembrapayTransactions.view.log.List', {
     var me = this;
     me.registerEvents();
     me.selModel = me.createSelectionModel();
-    me.store = me.logStore;
+    me.store = me.logStoreCembrapay;
 
     me.columns = me.getColumns();
     //me.toolbar = me.getToolbar(me);
@@ -114,29 +114,6 @@ Ext.define('Shopware.apps.CembrapayTransactions.view.log.List', {
    */
   renderDate: function(value) {
     return Ext.util.Format.date(value) + ' ' + Ext.util.Format.date(value, 'H:i:s');
-  },
-  renderLivemode: function(value) {
-    return value === true ? 'live' : 'test';
-  },
-  /**
-   * Renders the action-column
-   *
-   * @param value Contains the clicked value
-   * @param metaData Contains the metaData
-   * @param model Contains the selected model
-   * @param rowIndex Contains the rowIndex of the selection
-   * @return [object] Ext.DomHelper
-   */
-  renderActionColumn: function(value, metaData, model, rowIndex) {
-    var data = [];
-    data.push(Ext.DomHelper.markup({
-      tag: 'img',
-      class: 'x-action-col-icon sprite-minus-circle',
-      tooltip: '{s name="grid/actioncolumn/buttonTooltip"}Delete log{/s}',
-      cls: 'sprite-minus-circle',
-      onclick: "Ext.getCmp('" + this.id + "').fireEvent('deleteColumn', " + rowIndex + ");"
-    }));
-    return data;
   },
   /**
    * Defines additional events which will be

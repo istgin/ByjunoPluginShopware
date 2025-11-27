@@ -11,17 +11,6 @@
  */
 //{block name="backend/cembrapay_transactions/view/detail/detail"}
 
-Ext.define('ExternalInfoWindow', {
-    extend: 'Ext.data.Connection',
-    singleton: true,
-    loading: false,
-    page: false,
-    language: false,
-    constructor : function(config){
-        this.callParent([config]);
-    }
-});
-
 Ext.define('Shopware.apps.CembrapayTransactions.view.detail.Detail', {
   /**
    * Extend from the standard ExtJS 4
@@ -111,18 +100,6 @@ Ext.define('Shopware.apps.CembrapayTransactions.view.detail.Detail', {
             }
         }
     ];
-
-
-//    me.items = [
-//      {
-//        xtype: 'tablepanel',
-//        fieldLabel: 'Start date'
-//      },
-//      {
-//        xtype: 'tablepanel',
-//        fieldLabel: 'End date'
-//      }
-//    ];
 
     me.callParent(arguments);
   },

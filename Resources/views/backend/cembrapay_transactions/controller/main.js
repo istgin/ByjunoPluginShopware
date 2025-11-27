@@ -18,14 +18,14 @@ Ext.define('Shopware.apps.CembrapayTransactions.controller.Main', {
      */
   init: function() {
     var me = this;
-    me.subApplication.logStore = me.subApplication.getStore('Shopware.apps.CembrapayTransactions.store.Logs');
-    me.subApplication.logStore.load();
-    me.subApplication.dataStore = me.subApplication.getStore('Shopware.apps.CembrapayTransactions.store.Detail');
-    me.subApplication.dataStore.load();
+    me.subApplication.logStoreCembrapay = me.subApplication.getStore('Shopware.apps.CembrapayTransactions.store.Logs');
+    me.subApplication.logStoreCembrapay.load();
+    me.subApplication.dataStoreCembrapay = me.subApplication.getStore('Shopware.apps.CembrapayTransactions.store.Detail');
+    me.subApplication.dataStoreCembrapay.load();
     me.mainWindow = me.getView('Shopware.apps.CembrapayTransactions.view.main.Window').create({
-      logStore: me.subApplication.logStore,
+      logStoreCembrapay: me.subApplication.logStoreCembrapay,
     });
-    
+
     this.callParent(arguments);
   }
 });

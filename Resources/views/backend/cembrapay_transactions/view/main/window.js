@@ -30,7 +30,7 @@ Ext.define('Shopware.apps.CembrapayTransactions.view.main.Window', {
     me.items = [
       {
         xtype: 'CembrapayTransactionsApilogMainList',
-        logStore: me.logStore
+        logStoreCembrapay: me.logStoreCembrapay
       },
     ];
 
