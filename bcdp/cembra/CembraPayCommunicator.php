@@ -64,10 +64,10 @@ class CembraPayCommunicator
         } else {
             $timeout = $accessData->timeout;
         }
-        if ($this->server == 'test') {
-            $url = 'https://ext-test.api.cembrapay.ch/'.$endpoint;
-        } else {
+        if ($this->server == 'live') {
             $url = 'https://api.cembrapay.ch/'.$endpoint;
+        } else {
+            $url = 'https://ext-test.api.cembrapay.ch/'.$endpoint;
         }
         $request_data = $xmlRequest;
 

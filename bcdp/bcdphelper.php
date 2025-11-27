@@ -58,12 +58,12 @@ function Cembrapay_SaveLog($requestId, $firstname, $lastname, $xml_request, $xml
 function Cembrapay_GetAccessData($mode) {
     $accessData = new CembraPayLoginDto();
     $accessData->timeout = 30;
-    if ($mode == 'test') {
-        $accessData->mode = 'test';
+    if (isset($mode) && $mode == 'Live') {
+        $accessData->mode = 'live';
         $accessData->username = Shopware()->Config()->getByNamespace("CembrapayPayments", "cembra_clientid_live");
         $accessData->password = Shopware()->Config()->getByNamespace("CembrapayPayments", "cembra_password_live");
     } else {
-        $accessData->mode = 'live';
+        $accessData->mode = 'test';
         $accessData->username = Shopware()->Config()->getByNamespace("CembrapayPayments", "cembra_clientid_test");
         $accessData->password = Shopware()->Config()->getByNamespace("CembrapayPayments", "cembra_password_test");
     }
