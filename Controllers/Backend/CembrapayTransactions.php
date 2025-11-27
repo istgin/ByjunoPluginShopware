@@ -160,42 +160,5 @@ class Shopware_Controllers_Backend_CembrapayTransactions extends Shopware_Contro
     $this->View()->assign(array('success' => true, 'data'    => $result, 'total'   => $total));
   }
 
-  /**
-   * assigns search result data to view object 
-   */
-  public function getSearchResultAction()
-  {
-    $filters = $this->Request()->get('filter');
-
-    $builder = Shopware()->Models()->createQueryBuilder();
-    $builder->select(
-        'log.id as id', 'log.requestid as requestid', 'log.requesttype as requesttype',
-        'log.firstname as firstname', 'log.lastname as lastname', 'log.ip as ip',
-        'log.status as status', 'log.datecolumn as datecolumn'
-    )->from('CembrapayPayments\Models\CembrapayTransactions', 'log');
-
-    foreach ($filters as $filter)
-    {
-      if ($filter['property'] == 'search' && !empty($filter['value']))
-      {
-        $builder->where($builder->expr()->orx($builder->expr()->like('log.requestid', $builder->expr()->literal(
-                                        '%' . $filter['value'] . '%')), 
-                $builder->expr()->like('log.requestid', $builder->expr()->literal(
-                                        '%' . $filter['value'] . '%'))
-                ));
-      }
-      elseif ($filter['property'] == 'searchtrans' && !empty($filter['value']))
-      {
-        $builder->where($builder->expr()->orx($builder->expr()->like('log.requestid', $builder->expr()->literal(
-                                        '%txid=' . $filter['value'] . '%'))));
-      }
-    }
-
-    $builder->setMaxResults(20);
-    $result = $builder->getQuery()->getArrayResult();
-    $total  = Shopware()->Models()->getQueryCount($builder->getQuery());
-
-    $this->View()->assign(array('success' => true, 'data'    => $result, 'total'   => $total));
-  }
 
 }
