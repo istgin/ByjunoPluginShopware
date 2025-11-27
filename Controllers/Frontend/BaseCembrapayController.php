@@ -126,7 +126,7 @@ abstract class Shopware_Controllers_Frontend_BaseCembrapayController extends Sho
             }
             $accessData = Cembrapay_GetAccessData($mode);
             $response = $cembrapayCommunicator->sendAuthRequest($json, $accessData, function ($object, $token, $accessData) {
-                $object->saveToken($token, $accessData);
+
             });
             if ($response) {
                 /* @var $responseRes CembraPayCheckoutAuthorizationResponse */

@@ -91,7 +91,7 @@ function Cembrapay_ScreeningRequest($user)
     }
     $accessData = Cembrapay_GetAccessData($mode);
     $response = $cembrapayCommunicator->sendScreeningRequest($json, $accessData, function ($object, $token, $accessData) {
-        $object->saveToken($token, $accessData);
+
     });
     if (!empty($response)) {
         $responseRes = CembraPayConstants::screeningResponse($response);
