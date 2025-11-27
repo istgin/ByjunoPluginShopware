@@ -240,7 +240,7 @@ function Cembrapay_CreateShopWareShopRequestUserBilling($user, $billing, $shippi
         $request->sessionInfo->tmxSessionId = $_SESSION["cembrapay_tmx"];
     }
 
-    $request->cembraPayDetails->riskOnlyOnCembraPay = false; // TODO
+    $request->cembraPayDetails->riskOnlyOnCembraPay = true;
     $request->sessionInfo->sessionIp = Cembrapay_getClientIp();
     $request->cembraPayDetails->cembraPayPaymentMethod =  Cembrapay_mapRepayment($repayment);
     if ($invoiceDelivery == 'postal') {
