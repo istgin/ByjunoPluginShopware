@@ -42,9 +42,7 @@ Ext.define('Shopware.apps.CembrapayTransactions.model.Log', {
         */
     api: {
       //read out all articles
-      read: '{url controller="CembrapayTransactions" action="getApilogs"}',
-      destroy: '{url controller="CembrapayTransactions" action="deleteLogs"}',
-      detail: '{url controller="CembrapayTransactions" action="getDetailLog"}'
+      read: '{url controller="CembrapayTransactions" action="getApilogs"}'
     },
     /**
         * Configure the data reader
