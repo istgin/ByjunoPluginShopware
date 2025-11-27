@@ -139,61 +139,6 @@ Ext.define('Shopware.apps.CembrapayTransactions.view.log.List', {
         }
       }
     });
-  },
-  getToolbar: function(me)
-  {
-
-    var items = [
-      '-',
-      , {
-        xtype: 'textfield',
-        name: 'searchApi',
-        id: 'searchFieldApi',
-        dock: 'top',
-        fieldLabel: 'Freitext'
-      }, {
-        xtype: 'button',
-        name: 'searchbtnapi',
-        text: 'Suchen',
-        id: 'searchBtnApi',
-        width: '50px',
-        dock: 'top',
-        handler: function(btn, event) {
-          var value = Ext.getCmp('searchFieldApi').getValue();
-          var stori = me.store;
-
-          data = stori.load({
-            action: 'search',
-            pageSize: 20,
-            filters: [{
-                property: 'search',
-                value: value
-              }],
-          });
-        }
-      },
-      '-',
-      {
-        xtype: 'button',
-        name: 'resetApiBtn',
-        text: 'Suche zurücksetzen',
-        id: 'resetApiBtn',
-        dock: 'top',
-        handler: function(btn, event) {
-          var stori = me.store;
-          Ext.getCmp('searchFieldApi').setValue('');
-          data = stori.load({
-            action: 'search',
-            pageSize: 20,
-          });
-        }
-      }
-    ];
-    return Ext.create('Ext.toolbar.Toolbar', {
-      dock: 'top',
-      ui: 'shopware-ui',
-      items: items
-    });
   }
 });
 //{/block}
